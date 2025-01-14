@@ -1,0 +1,97 @@
+=============================   DJANGO TABLES   ================================
+
+1. User Management
+
+Users Table
+   id (primary key)
+   username (unique)
+   password_hash (hashed passwords)
+   email (unique)
+   avatar_url (optional, default if not provided)
+   created_at, updated_at (timestamps)
+
+Friends Table (for friend connections)
+   user_id (foreign key to Users)
+   friend_id (foreign key to Users)
+   status (pending/accepted)
+
+
+2. Game Data
+
+Games Table
+   id (primary key)
+   type (e.g., Pong, other games if added)
+   created_at
+
+Game Sessions Table
+   id (primary key)
+   game_id (foreign key to Games)
+   player1_id (foreign key to Users)
+   player2_id (foreign key to Users)
+   score_player1
+   score_player2
+   winner_id (foreign key to Users)
+   created_at
+
+Tournament Table
+   id (primary key)
+   name
+   created_at
+
+Tournament Matches Table
+   id (primary key)
+   tournament_id (foreign key to Tournament)
+   match_number
+   player1_id (foreign key to Users)
+   player2_id (foreign key to Users)
+   winner_id (foreign key to Users)
+
+
+3. Statistics and Match History
+
+Statistics Table
+   user_id (foreign key to Users)
+   games_played
+   games_won
+   tournaments_won
+   total_score
+
+Match History Table
+   id (primary key)
+   user_id (foreign key to Users)
+   match_id (foreign key to Game Sessions)
+   date
+
+
+4. Live Chat
+
+Messages Table
+   id (primary key)
+   sender_id (foreign key to Users)
+   receiver_id (foreign key to Users or NULL for group/tournament messages)
+   message
+   created_at
+
+
+5. Security and Authentication
+
+Sessions Table
+   id (primary key)
+   user_id (foreign key to Users)
+   token (authentication token or JWT)
+   expires_at (timestamp)
+
+Two-Factor Authentication Table (if applicable)
+   user_id (foreign key to Users)
+   method (e.g., email, app)
+   secret_key
+
+
+6. Optional Features
+
+Customization Options
+   user_id (foreign key to Users)
+   preferences (JSON or key-value pairs for game settings)
+
+AI Settings
+   For storing AI opponent behavior or difficulty levels.
