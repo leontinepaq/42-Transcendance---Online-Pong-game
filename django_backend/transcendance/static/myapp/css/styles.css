@@ -1,0 +1,6 @@
+/* static/myapp/css/styles.css */
+body {
+    font-family: Arial, sans-serif;
+    background-image: url("/static/myapp/images/background.jpg");
+    background-size: cover;
+}

@@ -95,3 +95,119 @@ Customization Options
 
 AI Settings
    For storing AI opponent behavior or difficulty levels.
+
+
+
+-----------------------------------------------------------------------
+
+Ok to sum it up, all I have to do right now to design the backend of my website is : 
+ - Create views of everything in views.py
+ - Make correspondance of the views and urls in urls.py
+
+is that it or did i miss anything ? 
+
+ChatGPT said:
+ChatGPT
+Yes, you’ve got the core steps right, but let’s refine it a little to ensure you cover everything needed for a functional Django backend. Here's the complete breakdown of the tasks:
+
+1. Create Views in views.py
+For each page or endpoint you want to serve, create a view in views.py. Views handle the logic behind the pages, such as interacting with the database, processing forms, or returning templates.
+You can use Django’s built-in views (e.g., for login, logout, etc.) or create your custom views.
+
+2. Define URL Patterns in urls.py
+In urls.py, create URL patterns that correspond to the views you defined in views.py.
+You need to map URLs to views so that when users visit a certain URL, the appropriate view will be executed.
+
+3. Create Templates (Optional, but Common)
+If your views need to render HTML pages (for example, the homepage, or a registration form), you'll need templates. These templates should be placed in the appropriate directory (usually templates/).
+You can pass dynamic data to the template from your views using context.
+
+4. Set Up Static Files (Optional, for CSS, JavaScript, Images)
+If your website uses static files like CSS, JavaScript, or images, make sure you define a static directory.
+You’ll also need to configure Django to serve static files during development.
+
+5. Handle Forms and Validations (If Needed)
+If you are working with forms (e.g., user registration, login), use Django’s built-in form handling, validation, and models.
+You can create custom forms using forms.py or use model forms for easier handling of data.
+
+6. Configure Authentication and Permissions (If Needed)
+If you need user login, registration, and authentication, Django provides views and models for user management.
+Make sure you have URLs and views for login, logout, registration, and possibly password management.
+Set up permissions or decorators (e.g., @login_required) to restrict access to certain views based on user status.
+
+7. Test the Views and URLs
+After setting up the views, URLs, and templates, run the Django server and test if everything works by visiting the URLs you've set up.
+You might also want to write unit tests to ensure everything is functioning as expected.
+
+8. Database Setup (If Needed)
+If you're storing data in a database (e.g., user profiles, tournament data), define models in models.py and apply migrations using python manage.py migrate.
+Use the Django ORM to interact with the database (e.g., querying for tournament data in your home view).
+
+
+So to summarize, yes:
+
+Views in views.py define the logic.
+URLs in urls.py map the URLs to your views.
+Templates are used to render HTML pages, and static files are used for assets like CSS and JavaScript.
+Forms and authentication are additional features to manage user input and authentication.
+If you have any questions or need help setting up something specific, feel free to ask!
+
+
+
+
+
+---------------------------- VIEWS ---------------------------------
+
+1/ LOGIN
+ - log in + 2FA email
+ - sign up
+ - forgotten password -> enter email address -> sends forgotten password page through email
+1b/ SIGNUP
+ - username
+ - email
+ - password
+ - confirm password
+1c/ FORGOTTEN PASSWORD
+ - enter new password
+ - confirm new password
+ - back to login button
+
+2/ HOME
+ - Play button
+ - History button
+ - Friendlist right
+ - My profile
+ - Live Chat bottom right
+
+3/ PLAY
+ - Quick game vs IA
+ - Quick Game vs friend
+ - Quick Game vs random ?
+ - Create Tournament
+   - invite Friends
+   - play
+
+4/ HISTORY
+ - Match History
+ - Tournaments History
+
+5/ MATCHES HISTORY
+ - All matches played
+
+6/ TOURNAMENTS HISTORY
+ - All Tournaments played
+
+6B/ TOURNAMENT RECAP
+ - All games played in tournament
+
+7/ MY PROFILE
+ - Update my informations
+ - Sign out
+ - Customization
+ - AI Settings
+ 
+8/ FRIEND PROFILE
+ - Their History
+ - Remove friend
+ - Block
+

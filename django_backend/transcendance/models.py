@@ -26,7 +26,7 @@ class UserProfile(models.Model):
 class Friendship(models.Model):
     user = models.ForeignKey(UserProfile, related_name='friendships', on_delete=models.CASCADE)
     friend = models.ForeignKey(UserProfile, related_name='friend_of_friendships', on_delete=models.CASCADE)
-    status = models.CharField(choices=[('pending', 'Pending'), ('accepted', 'Accepted')], default='pending')
+    status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted')], default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -80,7 +80,7 @@ class Tournament(models.Model):
 
     def get_rankings(self):
         players = list(self.participants.all())
-        if len(players != 4):
+        if len(players) != 4:
             raise ValueError("Tournament must have exactly 4 participants.")
 
         rankings = {}
