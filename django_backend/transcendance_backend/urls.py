@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView
 from transcendance import views
 
 urlpatterns = [
@@ -46,7 +47,7 @@ urlpatterns = [
     path('profile/password/', views.change_password, name='change_password'),
     path('profile/customize/', views.customize_profile, name='customize_profile'),
     # path('profile/ai-settings/', views.ai_settings, name='ai_settings'),
-    path('logout/', views.sign_out, name='sign_out'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
 	#FRIENDS
     path('friend/<int:friend_id>/', views.friend_profile, name='friend_profile'),

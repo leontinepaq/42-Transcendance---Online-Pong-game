@@ -17,7 +17,7 @@ class UserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-	status = 
+    is_logged_in = models.BooleanField(default=False)
 
     friends = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="friend_of")
 

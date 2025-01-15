@@ -8,11 +8,11 @@
 <body>
     <h1>Login</h1>
     
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Login</button>
-    </form>
+	<form method="post">
+		{% csrf_token %}
+		{{ form.as_p }}
+		<button type="submit">Login</button>
+	</form>
 
     <p>Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></p>
     <p>Forgot your password? <a href="{% url 'password_reset' %}">Reset Password</a></p>

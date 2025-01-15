@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate, login
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 from .forms import CustomUserCreationForm
 from django.utils.crypto import get_random_string
@@ -90,7 +90,7 @@ def home_view(request):
 
     friends = user_profile.friends.all()
 
-    return render(reqest, 'home.html', {
+    return render(request, 'home.html', {
         'user_profile': user_profile,
         'friends': friends,
     })
@@ -99,12 +99,6 @@ def home_view(request):
 def play_game(request):
     # add game logic here
     return render(request, 'play.html')
-
-@login_required
-def history_view(request):
-    history = MatchHistory.objects.filter(user=request.user)
-
-    return render(request, 'history.html', {'history': history})
 
 @login_required
 def profile_view(request):
@@ -139,6 +133,10 @@ def play_game_with_friends(request):
 	friend_id = request.POST['friend']
 	friend = get_object_or_404(UserProfile, id=friend_id)
 
+	if friend not in request.user.userprofile.friends.all():
+		messages.error(request, 'You are not friends with this user.')
+		return redirect('profile')
+
 	game = Game.objects.create(
 		player1=request.user.userprofile,
 		player2=friend
@@ -163,14 +161,20 @@ def create_tournament(request):
 
 #----------------------------HISTORY----------------------------
 #Main history page
+# @login_required
+# def history_view(request):
+# 	return render(request, 'history.html')
+
 @login_required
 def history_view(request):
-	return render(request, 'history.html')
+    history = MatchHistory.objects.filter(user=request.user)
+
+    return render(request, 'history.html', {'history': history})
 
 #display all matches the user has played
 @login_required
 def match_history_view(request):
-	match_history = MatchHistory.objets.filter(user=request.user.userprofile).order_by('-created_at')
+	match_history = MatchHistory.objects.filter(user=request.user.userprofile).order_by('-created_at')
 	return render(request, 'match-history.html', {'matches':match_history})
 
 #Display all tournaments the user has participated in
@@ -260,11 +264,13 @@ def sign_out(request):
 
 #----------------------------FRIENDS PROFILE----------------------------
 #view friend profile
+#/!\ CAREFUL MAYBE ADD TOURNAMENTHISTORY.OBJECTS.FILTER INSTEAD OF TOURNAMENT.OBJECTS.FILTER AND ADD TOURNAMENT HISTORY MODEL
+
 @login_required
-def friend_profile(request):
+def friend_profile(request, friend_id):
 	friend = get_object_or_404(UserProfile, id=friend_id)
 	match_history = MatchHistory.objects.filter(user=friend)
-	tournament_history = TournamentHistory.objects.filter(user=friend)
+	tournament_history = Tournament.objects.filter(user=friend)
 
 	return render(request, 'friend_profile.html', {
 		'friend': friend,
@@ -286,4 +292,4 @@ def remove_friend(request, friend_id):
     else:
         messages.error(request, 'You are not friends with this user.')
 
-    return redirect('profile')
+    return JsonResponse({'status': 'success', 'message': f'{friend.username} has been removed from your friends list.'})
