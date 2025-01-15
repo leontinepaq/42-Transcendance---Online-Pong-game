@@ -59,8 +59,8 @@ Solutions : Docker in a VM, rebuild container after changes, create own docker i
 7 Major modules are required for 100% completion. 2 minor modules = 1 major module.
 
 WEB : 
- - Use a framework to build the backend = Django
- - (minor) Use a databse for the backend
+ - Use a framework to build the backend = Django						OK
+ - (minor) Use a database for the backend								OK
  - (minor) Use a framework to build the frontend
 
 USER MANAGEMENT : 

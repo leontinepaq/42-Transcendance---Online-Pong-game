@@ -1,0 +1,7 @@
+<h1>Update My Information</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+    <button onclick="location.href='{% url 'profile' %}'">Cancel</button>
+</form>

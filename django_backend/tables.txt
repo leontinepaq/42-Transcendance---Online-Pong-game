@@ -184,30 +184,67 @@ If you have any questions or need help setting up something specific, feel free 
  - Quick Game vs friend
  - Quick Game vs random ?
  - Create Tournament
-   - invite Friends
-   - play
+3b/ Quick Game vs friend
+ - Invite friend
+ - play button (launches game)
+3c/ Tournament
+ - invite Friends
+ - play button (launches tournament)
 
 4/ HISTORY
  - Match History
  - Tournaments History
-
-5/ MATCHES HISTORY
+4b/ MATCHES HISTORY
  - All matches played
-
-6/ TOURNAMENTS HISTORY
+4c/ TOURNAMENTS HISTORY
  - All Tournaments played
-
-6B/ TOURNAMENT RECAP
+4c2/ TOURNAMENT RECAP
  - All games played in tournament
 
-7/ MY PROFILE
+5/ MY PROFILE
  - Update my informations
  - Sign out
  - Customization
  - AI Settings
  
-8/ FRIEND PROFILE
+6/ FRIEND PROFILE
  - Their History
  - Remove friend
- - Block
 
+TODATABASE : 
+
+1/ User
+ - id
+ - username
+ - password hashed
+ - email
+ - avatar-url
+ - created at
+ - updated at
+ - Friendlist (friends id, status)
+ - theme
+ - player satistics (games played, games won, winrate, tournaments played, tournaments won)
+
+2/ Matches
+ - id
+ - player1 username
+ - player2 username
+ - created at
+ - scores (+score timestamp)
+ - winner
+
+3/ Match History
+ - all matches from player_id
+
+4/ Tournaments
+ - id
+ - name
+ - participants
+ - winner
+ - all matches from this tournament
+
+5/ all time Statistics
+ - number of users
+ - number of match played
+ - number of tournaments played
+ - number of points scored

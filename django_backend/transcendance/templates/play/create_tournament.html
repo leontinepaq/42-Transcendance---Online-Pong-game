@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Tournament</title>
+</head>
+<body>
+    <h1>Create Tournament</h1>
+    <form method="POST" action="{% url 'create_tournament' %}">
+        {% csrf_token %}
+        <label for="tournament_name">Tournament Name:</label>
+        <input type="text" id="tournament_name" name="tournament_name" required>
+        
+        <h3>Invite Friends</h3>
+        {% for friend in friends %}
+            <input type="checkbox" name="friends" value="{{ friend.id }}" id="friend_{{ friend.id }}">
+            <label for="friend_{{ friend.id }}">{{ friend.user.username }}</label><br>
+        {% endfor %}
+        
+        <button type="submit">Create Tournament</button>
+    </form>
+</body>
+</html>
