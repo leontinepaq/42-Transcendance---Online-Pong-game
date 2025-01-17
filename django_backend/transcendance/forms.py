@@ -26,7 +26,7 @@ class UserProfileForm(forms.ModelForm):
 
 #Add power up, attacks, maps, etc...
 #customize shortcuts
-class Customization(forms.ModelForm):
+class CustomizationForm(forms.ModelForm):
 	class Meta:
 		model = UserProfile
 		fields = ['avatar_url', 'theme']

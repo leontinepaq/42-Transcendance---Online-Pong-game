@@ -104,8 +104,9 @@ class Tournament(models.Model):
     name = models.CharField(max_length=100)
     id = models.AutoField(primary_key=True)
     participants = models.ManyToManyField(UserProfile, related_name='tournaments', blank=True)
-    games = models.ForeignKey(Game, related_name='tournaments', on_delete=models.CASCADE)
+    games = models.ForeignKey(Game, related_name='tournaments', on_delete=models.CASCADE, null=True, blank=True)
     winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='won_tournaments')
+    date = models.DateTimeField(auto_now_add=True)
 
     def get_rankings(self):
         players = list(self.participants.all())

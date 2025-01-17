@@ -1,19 +1,20 @@
 import random
 import string
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, get_user_model
+from django.contrib.auth import authenticate, login, get_user_model, update_session_auth_hash, logout
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
-from .forms import CustomUserCreationForm
+from .forms import CustomUserCreationForm, UserProfileForm, CustomizationForm
 from django.utils.crypto import get_random_string
 from .models import UserProfile
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.urls import reverse
 from .models import UserProfile, Tournament, Game, MatchHistory
+
 
 #----------------------------LOGIN----------------------------
 # Custom SignUp view with confirm password
@@ -123,7 +124,7 @@ def profile_view(request):
 #main play page
 @login_required
 def play_view(request):
-	friends = request.user.userprofile.friends.all()
+	friends = request.user.friends.all()
 	return render(request, 'play/play.html', {'friends': friends})
 
 
@@ -136,22 +137,22 @@ def play_view(request):
 #Quick game vs friend, invite and play
 @login_required
 def quick_game_friend(request):
-    friends = request.user.userprofile.friends.all()
+    friends = request.user.friends.all()
     return render(request, 'play/quick_game_friend.html', {'friends': friends})
 
 
 #Create a game with friend
 @login_required
-def play_game_with_friends(request):
+def play_game_with_friend(request):
 	friend_id = request.POST['friend']
 	friend = get_object_or_404(UserProfile, id=friend_id)
 
-	if friend not in request.user.userprofile.friends.all():
+	if friend not in request.user.friends.all():
 		messages.error(request, 'You are not friends with this user.')
 		return redirect('profile')
 
 	game = Game.objects.create(
-		player1=request.user.userprofile,
+		player1=request.user,
 		player2=friend
 	)
 	return JsonResponse({'status': 'success', 'game_id':game.id})
@@ -164,11 +165,11 @@ def create_tournament(request):
         invited_friends_ids = request.POST.getlist('friends')
         friends = UserProfile.objects.filter(id__in=invited_friends_ids)
 
-        tournament = Tournament.objects.create(name=tournament_name, creator=request.user.userprofile)
-        tournament.participants.add(request.user.userprofile, *friends)
+        tournament = Tournament.objects.create(name=tournament_name)
+        tournament.participants.add(request.user, *friends)
         return JsonResponse({'status': 'success', 'tournament_id': tournament.id})
 
-    friends = request.user.userprofile.friends.all()
+    friends = request.user.friends.all()
     return render(request, 'play/create_tournament.html', {'friends': friends})
 
 
@@ -187,13 +188,13 @@ def history_view(request):
 #display all matches the user has played
 @login_required
 def match_history_view(request):
-	match_history = MatchHistory.objects.filter(user=request.user.userprofile).order_by('-created_at')
-	return render(request, 'history/match-history.html', {'matches':match_history})
+	match_history = MatchHistory.objects.filter(user=request.user).order_by('-date')
+	return render(request, 'history/match_history.html', {'matches':match_history})
 
 #Display all tournaments the user has participated in
 @login_required
 def tournament_history_view(request):
-    tournaments = Tournament.objects.filter(participants=request.user.userprofile).order_by('-created_at')
+    tournaments = Tournament.objects.filter(participants=request.user).order_by('-date')
     return render(request, 'history/tournament_history.html', {'tournaments': tournaments})
 
 #Display all games played in a specific tournament
@@ -208,13 +209,13 @@ def tournament_recap_view(request, tournament_id):
 #Main profile page
 @login_required
 def profile_view(request):
-    user_profile = request.user.userprofile
+    user_profile = request.user
     return render(request, 'profile/profile.html', {'user_profile': user_profile})
 
 #update profile
 @login_required
 def update_profile(request):
-    user_profile = request.user.userprofile
+    user_profile = request.user
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=user_profile)
         if form.is_valid():
@@ -245,7 +246,7 @@ def change_password(request):
 #customize
 @login_required
 def customize_profile(request):
-    user_profile = request.user.userprofile
+    user_profile = request.user
     if request.method == 'POST':
         form = CustomizationForm(request.POST, request.FILES, instance=user_profile)
         if form.is_valid():
@@ -259,7 +260,7 @@ def customize_profile(request):
 #do we really need this ? ai settings change
 # @login_required
 # def ai_settings(request):
-#     user_profile = request.user.userprofile
+#     user_profile = request.user
 #     if request.method == 'POST':
 #         form = AISettingsForm(request.POST, instance=user_profile)
 #         if form.is_valid():
@@ -274,6 +275,7 @@ def customize_profile(request):
 def sign_out(request):
     logout(request)
     return redirect('login')
+
 
 #----------------------------FRIENDS PROFILE----------------------------
 #view friend profile
@@ -295,7 +297,7 @@ def friend_profile(request, friend_id):
 #/!\ implement differently if user not in friendlist
 @login_required
 def remove_friend(request, friend_id):
-    user_profile = request.user.userprofile
+    user_profile = request.user
     friend = get_object_or_404(UserProfile, id=friend_id)
 
     # Remove the friend from the user's friend list

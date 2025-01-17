@@ -13,6 +13,7 @@ urlpatterns = [
     path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
     path('signup/', views.signup, name='signup'),
     path('logout/', LogoutView.as_view(), name='logout'),
+	path('sign_out/', views.sign_out, name='sign_out'),
 
     # Password reset
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
@@ -27,8 +28,9 @@ urlpatterns = [
 	#PLAY
     path('play/', views.play_view, name='play'),
     # path('play/quick-game-ia/', views.quick_game_ia, name='quick_game_ia'),
-    path('play/quick-game-friend/', views.quick_game_friend, name='quick_game_friend'),
-    path('play/create-tournament/', views.create_tournament, name='create_tournament'),
+    path('play/quick_game_friend/', views.quick_game_friend, name='quick_game_friend'),
+    path('play/play_game_with_friend/', views.play_game_with_friend, name='play_game_with_friend'),
+    path('play/create_tournament/', views.create_tournament, name='create_tournament'),
 
 
 	#HISTORY
