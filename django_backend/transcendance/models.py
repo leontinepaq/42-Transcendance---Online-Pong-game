@@ -1,37 +1,57 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 #think about on_delete=SET_NULL instead of CASCADE. See https://stackoverflow.com/questions/38388423/what-does-on-delete-do-on-django-models
 
+class UserProfileManager(BaseUserManager):
+    def create_user(self, username, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        if not username:
+            raise ValueError('Username is required')
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-class UserProfile(models.Model):
+    def create_superuser(self, username, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        return self.create_user(username, email, password, **extra_fields)
+
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+    REQUIRED_FIELDS = ["email"]
+    USERNAME_FIELD = "username"
+
     id = models.AutoField(primary_key=True)
-
     username = models.CharField(max_length=30, unique=True)
-    password_hash = models.CharField(max_length=255)
-
     email = models.EmailField(unique=True)
+    password_hash = models.CharField(max_length=255, default='defaultpassword')
     avatar_url = models.URLField(blank=True, null=True)
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    is_logged_in = models.BooleanField(default=False)
-
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
     friends = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="friend_of")
-
-    friends_requests_sent = models.ManyToManyField("self", blank=True)
-
-    THEME_CHOICES = [
-        ('light', 'Light'),
-        ('dark', 'Dark'),
-    ]
     theme = models.CharField(
         max_length=5,
-        choices=THEME_CHOICES,
-        default='light',
+        choices=[("light", "Light"), ("dark", "Dark")],
+        default="light",
     )
+
+    objects = UserProfileManager()
+
+    def __str__(self):
+        return self.username
+
+    def save(self, *args, **kwargs):
+        if not self.password_hash:
+            self.password_hash = self.password
+        super().save(*args, **kwargs)
 
 class Friendship(models.Model):
     user = models.ForeignKey(UserProfile, related_name='friendships', on_delete=models.CASCADE)

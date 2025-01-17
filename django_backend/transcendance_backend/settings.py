@@ -69,7 +69,7 @@ DATABASES = {
         'USER': 'postgres',
         'PASSWORD': 'postgres',
         'HOST': 'db',
-        'PORT': 5432
+        'PORT': 5432,
     }
 }
 
@@ -121,8 +121,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # In settings.py, configure the email backend for password reset
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # For development
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'thomas.lam0411@gmail.com'
+EMAIL_HOST_PASSWORD = 'ngno ewpv dfho dudn'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 LOGIN_REDIRECT_URL = 'home'
-LOGOUT_REDURECT_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
+
+LOGIN_URL = '/login'
+
+AUTH_USER_MODEL = 'transcendance.UserProfile'

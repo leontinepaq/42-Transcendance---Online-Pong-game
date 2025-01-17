@@ -8,7 +8,7 @@ class CustomUserCreationForm(UserCreationForm):
     password2 = forms.CharField(label="Confirm password", widget=forms.PasswordInput)
 
     class Meta:
-        model = User
+        model = UserProfile
         fields = ['username', 'email', 'password1', 'password2']
 
     def clean_password2(self):

@@ -2,16 +2,17 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView, LogoutView
 from transcendance import views
+from django.contrib import admin
 
 urlpatterns = [
+	#admin
+	path('admin/', admin.site.urls, name='admin'),
+
     #Login page
     path('login/', views.login_view, name='login'),
-
-    # 2FA verification page
     path('verify_2fa/', views.verify_2fa, name='verify_2fa'),
-
-    # Sign up page
     path('signup/', views.signup, name='signup'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 
     # Password reset
     path('password_reset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
@@ -22,10 +23,6 @@ urlpatterns = [
     
 	#HOME
     path('', views.home_view, name='home'),
-    path('play/', views.play_game, name='play'),
-    path('history/', views.history_view, name='history'),
-    path('profile/', views.profile_view, name='profile'),
-
 
 	#PLAY
     path('play/', views.play_view, name='play'),
@@ -47,7 +44,6 @@ urlpatterns = [
     path('profile/password/', views.change_password, name='change_password'),
     path('profile/customize/', views.customize_profile, name='customize_profile'),
     # path('profile/ai-settings/', views.ai_settings, name='ai_settings'),
-    path('logout/', LogoutView.as_view(), name='logout'),
 
 	#FRIENDS
     path('friend/<int:friend_id>/', views.friend_profile, name='friend_profile'),

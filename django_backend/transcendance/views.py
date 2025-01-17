@@ -1,7 +1,7 @@
 import random
 import string
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, get_user_model
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.conf import settings
@@ -17,6 +17,9 @@ from .models import UserProfile, Tournament, Game, MatchHistory
 
 #----------------------------LOGIN----------------------------
 # Custom SignUp view with confirm password
+
+User = get_user_model()
+
 def signup(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST)
@@ -26,7 +29,7 @@ def signup(request):
             return redirect('login')  # Redirect to login after successful sign up
     else:
         form = CustomUserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'registration/signup.html', {'form': form})
 
 
 # Utility function to generate random 6-digit code for 2FA
@@ -40,27 +43,30 @@ def login_view(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            # Generate 2FA code
             code = generate_2fa_code()
             request.session['2fa_code'] = code
             request.session['user_id'] = user.id
 
             # Send 2FA code to user's email
-            send_mail(
-                'Your 2FA Code',
-                f'Your 2FA code is: {code}',
-                settings.DEFAULT_FROM_EMAIL,
-                [user.email],
-                fail_silently=False,
-            )
-            return redirect('verify_2fa')
+            try:
+                send_mail(
+                    'Your 2FA Code',
+                    f'Your 2FA code is: {code}',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
+                return redirect('verify_2fa')
+            except Exception as e:
+                messages.error(request, f'Failed to send 2FA code: {str(e)}')
+                return render(request, 'registration/login.html', {'form': form})
         else:
             messages.error(request, 'Invalid credentials')
 
     else:
         form = AuthenticationForm()
 
-    return render(request, 'login.html', {'form': form})
+    return render(request, 'registration/login.html', {'form': form})
 
 
 # View for 2FA code verification
@@ -70,61 +76,68 @@ def verify_2fa(request):
         user_id = request.session.get('user_id')
         correct_code = request.session.get('2fa_code')
 
+        if not all([code, user_id, correct_code]):
+            messages.error(request, 'Session expired. Please login again.')
+            return redirect('login')
+
         if code == correct_code:
-            user = User.objects.get(id=user_id)
-            login(request, user)
-            del request.session['2fa_code']
-            del request.session['user_id']
-            return redirect('home')  # Redirect to home or dashboard
+            try:
+                user = User.objects.get(id=user_id)
+                login(request, user)
+                del request.session['2fa_code']
+                del request.session['user_id']
+                return redirect('home')
+            except User.DoesNotExist:
+                messages.error(request, 'User not found. Please login again.')
+                return redirect('login')
         else:
             messages.error(request, 'Invalid 2FA code')
 
-    return render(request, 'verify_2fa.html')
+    return render(request, 'registration/verify_2fa.html')
 
 
 
 #----------------------------HOME----------------------------
 @login_required
 def home_view(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-
-    friends = user_profile.friends.all()
-
-    return render(request, 'home.html', {
-        'user_profile': user_profile,
-        'friends': friends,
-    })
+    friends = request.user.friends.all()
+    context = {
+		'user_profile': request.user,
+		'friends': friends,
+		'theme': request.user.theme,
+	}
+    return render(request, 'home/home.html', context)
 
 @login_required
 def play_game(request):
     # add game logic here
-    return render(request, 'play.html')
+    return render(request, 'play/play.html')
 
 @login_required
 def profile_view(request):
     user_profile = UserProfile.objects.get(user=request.user)
 
-    return render(request, 'profile.html', {'user_profile': user_profile})
+    return render(request, 'profile/profile.html', {'user_profile': user_profile})
 
 #----------------------------PLAY----------------------------
 #main play page
 @login_required
 def play_view(request):
 	friends = request.user.userprofile.friends.all()
-	return render(request, 'play.html', {'friends': friends})
+	return render(request, 'play/play.html', {'friends': friends})
 
 
 #quick game vs IA
-@login_required
-def quick_game(request):
-	#placeholder logic for IA
-	return render(request, 'quick_game_ia.html')
+# @login_required
+# def quick_game(request):
+# 	#placeholder logic for IA
+# 	return render(request, 'play/quick_game_ia.html')
 
 #Quick game vs friend, invite and play
 @login_required
 def quick_game_friend(request):
     friends = request.user.userprofile.friends.all()
-    return render(request, 'quick_game_friend.html', {'friends': friends})
+    return render(request, 'play/quick_game_friend.html', {'friends': friends})
 
 
 #Create a game with friend
@@ -156,7 +169,7 @@ def create_tournament(request):
         return JsonResponse({'status': 'success', 'tournament_id': tournament.id})
 
     friends = request.user.userprofile.friends.all()
-    return render(request, 'create_tournament.html', {'friends': friends})
+    return render(request, 'play/create_tournament.html', {'friends': friends})
 
 
 #----------------------------HISTORY----------------------------
@@ -169,26 +182,26 @@ def create_tournament(request):
 def history_view(request):
     history = MatchHistory.objects.filter(user=request.user)
 
-    return render(request, 'history.html', {'history': history})
+    return render(request, 'history/history.html', {'history': history})
 
 #display all matches the user has played
 @login_required
 def match_history_view(request):
 	match_history = MatchHistory.objects.filter(user=request.user.userprofile).order_by('-created_at')
-	return render(request, 'match-history.html', {'matches':match_history})
+	return render(request, 'history/match-history.html', {'matches':match_history})
 
 #Display all tournaments the user has participated in
 @login_required
 def tournament_history_view(request):
     tournaments = Tournament.objects.filter(participants=request.user.userprofile).order_by('-created_at')
-    return render(request, 'tournament_history.html', {'tournaments': tournaments})
+    return render(request, 'history/tournament_history.html', {'tournaments': tournaments})
 
 #Display all games played in a specific tournament
 @login_required
 def tournament_recap_view(request, tournament_id):
     tournament = Tournament.objects.get(id=tournament_id)
     games = tournament.games.all()
-    return render(request, 'tournament_recap.html', {'tournament': tournament, 'games': games})
+    return render(request, 'history/tournament_recap.html', {'tournament': tournament, 'games': games})
 
 
 #--------------------------------PROFILE----------------------------
@@ -196,7 +209,7 @@ def tournament_recap_view(request, tournament_id):
 @login_required
 def profile_view(request):
     user_profile = request.user.userprofile
-    return render(request, 'profile.html', {'user_profile': user_profile})
+    return render(request, 'profile/profile.html', {'user_profile': user_profile})
 
 #update profile
 @login_required
@@ -210,7 +223,7 @@ def update_profile(request):
             return redirect('profile')
     else:
         form = UserProfileForm(instance=user_profile)
-    return render(request, 'update_profile.html', {'form': form})
+    return render(request, 'profile/update_profile.html', {'form': form})
 
 
 #change password
@@ -227,7 +240,7 @@ def change_password(request):
             messages.error(request, 'Please correct the errors below.')
     else:
         form = PasswordChangeForm(request.user)
-    return render(request, 'change_password.html', {'form': form})
+    return render(request, 'profile/change_password.html', {'form': form})
 
 #customize
 @login_required
@@ -241,7 +254,7 @@ def customize_profile(request):
             return redirect('profile')
     else:
         form = CustomizationForm(instance=user_profile)
-    return render(request, 'customize_profile.html', {'form': form})
+    return render(request, 'profile/customize_profile.html', {'form': form})
 
 #do we really need this ? ai settings change
 # @login_required
@@ -272,7 +285,7 @@ def friend_profile(request, friend_id):
 	match_history = MatchHistory.objects.filter(user=friend)
 	tournament_history = Tournament.objects.filter(user=friend)
 
-	return render(request, 'friend_profile.html', {
+	return render(request, 'profile/friend_profile.html', {
 		'friend': friend,
 		'match_history': match_history,
 		'tournament_history': tournament_history,

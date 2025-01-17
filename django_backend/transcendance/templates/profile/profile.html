@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>My Profile</h1>
-    <p>Username: {{ user_profile.username }}</p>
+    <p>Username: {{ user_profilename }}</p>
     <p>Email: {{ user_profile.email }}</p>
     <button onclick="location.href='{% url 'update_profile' %}'">Update Information</button>
     <button onclick="location.href='{% url 'customize_profile' %}'">Customization</button>
