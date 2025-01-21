@@ -24,19 +24,18 @@ class UserProfileManager(BaseUserManager):
         return self.create_user(username, email, password, **extra_fields)
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
-    REQUIRED_FIELDS = ["email"]
     USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["email"]
 
     id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=30, unique=True)
     email = models.EmailField(unique=True)
-    password_hash = models.CharField(max_length=255, default='defaultpassword')
+
     avatar_url = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    friends = models.ManyToManyField("self", blank=True, symmetrical=False, related_name="friend_of")
     theme = models.CharField(
         max_length=5,
         choices=[("light", "Light"), ("dark", "Dark")],
@@ -48,12 +47,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.username
 
-    def save(self, *args, **kwargs):
-        if not self.password_hash:
-            self.password_hash = self.password
-        super().save(*args, **kwargs)
-
 class Friendship(models.Model):
+	class Meta:
+		        unique_together = ('user', 'friend')
+
     user = models.ForeignKey(UserProfile, related_name='friendships', on_delete=models.CASCADE)
     friend = models.ForeignKey(UserProfile, related_name='friend_of_friendships', on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted')], default='pending')
@@ -68,9 +65,15 @@ class Friendship(models.Model):
 class Game(models.Model):
     player1 = models.ForeignKey(UserProfile, related_name='player1_session', on_delete=models.CASCADE)
     player2 = models.ForeignKey(UserProfile, related_name='player2_session', on_delete=models.CASCADE)
-    score_player1 = models.IntegerField(default=0)
-    score_player2 = models.IntegerField(default=0)
-    winner = models.ForeignKey(UserProfile, related_name='won_session', on_delete=models.CASCADE)
+    score_player1 = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)]  # Empêche les scores négatifs
+    )
+    score_player2 = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)]  # Empêche les scores négatifs
+    )
+    winner = models.ForeignKey(UserProfile, related_name='won_session', on_delete=models.CASCAD)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -107,6 +110,16 @@ class Tournament(models.Model):
     games = models.ForeignKey(Game, related_name='tournaments', on_delete=models.CASCADE, null=True, blank=True)
     winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='won_tournaments')
     date = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ('pending', 'Pending'),
+            ('in_progress', 'In Progress'),
+            ('completed', 'Completed')
+        ],
+        default='pending'
+    )
 
     def get_rankings(self):
         players = list(self.participants.all())
@@ -216,6 +229,7 @@ class AllTimeStatistics(models.Model):
     total_matches = models.IntegerField(default=0)
     total_tournaments = models.IntegerField(default=0)
     total_points_scored = models.IntegerField(default=0)
+    active_users_last_month = models.IntegerField(default=0)
 
     def update_stats(self):
         self.total_users = UserProfile.objects.count()

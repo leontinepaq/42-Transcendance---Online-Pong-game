@@ -2,14 +2,12 @@ Transcendance notes :
 
 --BACKEND--
 
-language : Ruby
-overriden by : Framework Module
-if database -> follow Database module for database
+language : Django
+Database : Postgres
 
 --FRONTEND--
 
-language : Javascript
-can be altered by : Frontend Module
+language : Javascript / Bootstrap
 
 MUST : 
 
@@ -22,9 +20,9 @@ MUST :
 
  - under linux, Docker must be used in rootless mode : 
     -> Docker runtime files must be located in /goinfre or /sgoinfre
-    -> Can't use bind-mount volumes between the host and t he container if non root UIDs are used in the container
+    -> Can't use bind-mount volumes between the host and the container if non root UIDs are used in the container
 
-Solutions : Docker in a VM, rebuild container after changes, create own docker image with root as unique UID
+/!\ Solutions : Docker in a VM, rebuild container after changes, create own docker image with root as unique UID
 
 --GAME--
 
@@ -61,11 +59,11 @@ Solutions : Docker in a VM, rebuild container after changes, create own docker i
 WEB : 
  - Use a framework to build the backend = Django						OK
  - (minor) Use a database for the backend								OK
- - (minor) Use a framework to build the frontend
+ - (minor) Use a framework to build the frontend = Bootstrap
 
 USER MANAGEMENT : 
  - Standard user management authentication, users across tournaments
- - Implementing remote authentication
+ - Implementing remote authentication = OAuth 2.0
 
 GAMEPLAY AND USER EXP :
  - Remote players ?
