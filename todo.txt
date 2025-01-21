@@ -1,0 +1,9 @@
+TODOLIST
+
+BACKEND :
+1/ Modify views.py method : Games should not have POST requests as 
+players should not be able to manually create new games. Create def create_game(player1, player2) 
+function to trigger game creation when game is being created
+
+2/ Be able to play on the same keyboard
+2b/ Each player enter their username and then take turns playing against each other
