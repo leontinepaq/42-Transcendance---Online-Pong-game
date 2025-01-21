@@ -1,310 +1,380 @@
-import random
-import string
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login, get_user_model, update_session_auth_hash, logout
+
+# !!!!!! IF ANYTHIHNG WRONG GO BACK TO https://claude.ai/chat/9380f71a-b04a-451d-881d-2376956769a5
+
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.core.mail import send_mail
-from django.contrib import messages
 from django.conf import settings
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, PasswordChangeForm
-from django.contrib.auth.models import User
-from .forms import CustomUserCreationForm, UserProfileForm, CustomizationForm
-from django.utils.crypto import get_random_string
-from .models import UserProfile
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.urls import reverse
-from .models import UserProfile, Tournament, Game, MatchHistory
+from django.shortcuts import get_object_or_404
+from .serializers import (
+    UserProfileSerializer, GameSerializer, TournamentSerializer,
+    MatchHistorySerializer, PlayerStatisticsSerializer, FriendshipSerializer
+)
+from .models import (
+    UserProfile, Game, Tournament, MatchHistory,
+    PlayerStatistics, Friendship
+)
 
-
-#----------------------------LOGIN----------------------------
-# Custom SignUp view with confirm password
-
-User = get_user_model()
-
+# -------------------------------------- Authentication Views --------------------------------------
+# signup
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def signup(request):
-    if request.method == "POST":
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Account created successfully! You can now log in.')
-            return redirect('login')  # Redirect to login after successful sign up
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'registration/signup.html', {'form': form})
+    serializer = UserProfileSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# Utility function to generate random 6-digit code for 2FA
-def generate_2fa_code():
-    return get_random_string(length=6, allowed_chars=string.digits)
-
-
-# View for login (email and password)
+# login
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            code = generate_2fa_code()
-            request.session['2fa_code'] = code
-            request.session['user_id'] = user.id
+    username = request.data.get('username')
+    password = request.data.get('password')
+    
+    user = authenticate(username=username, password=password)
+    if user:
+        # Generate and send 2FA code
+        code = generate_2fa_code()
+        request.session['2fa_code'] = code
+        request.session['user_id'] = user.id
+        
+        try:
+            send_mail(
+                'Your 2FA Code',
+                f'Your 2FA code is: {code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [user.email],
+                fail_silently=False,
+            )
+            return Response({'message': '2FA code sent'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            # Send 2FA code to user's email
-            try:
-                send_mail(
-                    'Your 2FA Code',
-                    f'Your 2FA code is: {code}',
-                    settings.DEFAULT_FROM_EMAIL,
-                    [user.email],
-                    fail_silently=False,
-                )
-                return redirect('verify_2fa')
-            except Exception as e:
-                messages.error(request, f'Failed to send 2FA code: {str(e)}')
-                return render(request, 'registration/login.html', {'form': form})
-        else:
-            messages.error(request, 'Invalid credentials')
-
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'registration/login.html', {'form': form})
-
-
-# View for 2FA code verification
+#verify 2fa
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def verify_2fa(request):
-    if request.method == 'POST':
-        code = request.POST.get('code')
-        user_id = request.session.get('user_id')
-        correct_code = request.session.get('2fa_code')
+    code = request.data.get('code')
+    user_id = request.session.get('user_id')
+    correct_code = request.session.get('2fa_code')
 
-        if not all([code, user_id, correct_code]):
-            messages.error(request, 'Session expired. Please login again.')
-            return redirect('login')
+    if not all([code, user_id, correct_code]):
+        return Response({'error': 'Session expired'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if code == correct_code:
-            try:
-                user = User.objects.get(id=user_id)
-                login(request, user)
-                del request.session['2fa_code']
-                del request.session['user_id']
-                return redirect('home')
-            except User.DoesNotExist:
-                messages.error(request, 'User not found. Please login again.')
-                return redirect('login')
-        else:
-            messages.error(request, 'Invalid 2FA code')
+    if code == correct_code:
+        try:
+            user = UserProfile.objects.get(id=user_id)
+            login(request, user)
+            del request.session['2fa_code']
+            del request.session['user_id']
+            serializer = UserProfileSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except UserProfile.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    return Response({'error': 'Invalid 2FA code'}, status=status.HTTP_400_BAD_REQUEST)
 
-    return render(request, 'registration/verify_2fa.html')
-
-
-
-#----------------------------HOME----------------------------
-@login_required
-def home_view(request):
-    friends = request.user.friends.all()
-    context = {
-		'user_profile': request.user,
-		'friends': friends,
-		'theme': request.user.theme,
-	}
-    return render(request, 'home/home.html', context)
-
-@login_required
-def play_game(request):
-    # add game logic here
-    return render(request, 'play/play.html')
-
-@login_required
-def profile_view(request):
-    user_profile = UserProfile.objects.get(user=request.user)
-
-    return render(request, 'profile/profile.html', {'user_profile': user_profile})
-
-#----------------------------PLAY----------------------------
-#main play page
-@login_required
-def play_view(request):
-	friends = request.user.friends.all()
-	return render(request, 'play/play.html', {'friends': friends})
-
-
-#quick game vs IA
-# @login_required
-# def quick_game(request):
-# 	#placeholder logic for IA
-# 	return render(request, 'play/quick_game_ia.html')
-
-#Quick game vs friend, invite and play
-@login_required
-def quick_game_friend(request):
-    friends = request.user.friends.all()
-    return render(request, 'play/quick_game_friend.html', {'friends': friends})
-
-
-#Create a game with friend
-@login_required
-def play_game_with_friend(request):
-	friend_id = request.POST['friend']
-	friend = get_object_or_404(UserProfile, id=friend_id)
-
-	if friend not in request.user.friends.all():
-		messages.error(request, 'You are not friends with this user.')
-		return redirect('profile')
-
-	game = Game.objects.create(
-		player1=request.user,
-		player2=friend
-	)
-	return JsonResponse({'status': 'success', 'game_id':game.id})
-
-#Create a tournament
-@login_required
-def create_tournament(request):
-    if request.method == 'POST':
-        tournament_name = request.POST['tournament_name']
-        invited_friends_ids = request.POST.getlist('friends')
-        friends = UserProfile.objects.filter(id__in=invited_friends_ids)
-
-        tournament = Tournament.objects.create(name=tournament_name)
-        tournament.participants.add(request.user, *friends)
-        return JsonResponse({'status': 'success', 'tournament_id': tournament.id})
-
-    friends = request.user.friends.all()
-    return render(request, 'play/create_tournament.html', {'friends': friends})
-
-
-#----------------------------HISTORY----------------------------
-#Main history page
-# @login_required
-# def history_view(request):
-# 	return render(request, 'history.html')
-
-@login_required
-def history_view(request):
-    history = MatchHistory.objects.filter(user=request.user)
-
-    return render(request, 'history/history.html', {'history': history})
-
-#display all matches the user has played
-@login_required
-def match_history_view(request):
-	match_history = MatchHistory.objects.filter(user=request.user).order_by('-date')
-	return render(request, 'history/match_history.html', {'matches':match_history})
-
-#Display all tournaments the user has participated in
-@login_required
-def tournament_history_view(request):
-    tournaments = Tournament.objects.filter(participants=request.user).order_by('-date')
-    return render(request, 'history/tournament_history.html', {'tournaments': tournaments})
-
-#Display all games played in a specific tournament
-@login_required
-def tournament_recap_view(request, tournament_id):
-    tournament = Tournament.objects.get(id=tournament_id)
-    games = tournament.games.all()
-    return render(request, 'history/tournament_recap.html', {'tournament': tournament, 'games': games})
-
-
-#--------------------------------PROFILE----------------------------
-#Main profile page
-@login_required
-def profile_view(request):
-    user_profile = request.user
-    return render(request, 'profile/profile.html', {'user_profile': user_profile})
-
-#update profile
-@login_required
-def update_profile(request):
-    user_profile = request.user
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=user_profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('profile')
-    else:
-        form = UserProfileForm(instance=user_profile)
-    return render(request, 'profile/update_profile.html', {'form': form})
-
-
-#change password
-@login_required
-def change_password(request):
-    if request.method == 'POST':
-        form = PasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)  # Keep the user logged in
-            messages.success(request, 'Your password was successfully updated!')
-            return redirect('profile')
-        else:
-            messages.error(request, 'Please correct the errors below.')
-    else:
-        form = PasswordChangeForm(request.user)
-    return render(request, 'profile/change_password.html', {'form': form})
-
-#customize
-@login_required
-def customize_profile(request):
-    user_profile = request.user
-    if request.method == 'POST':
-        form = CustomizationForm(request.POST, request.FILES, instance=user_profile)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Customization saved successfully!')
-            return redirect('profile')
-    else:
-        form = CustomizationForm(instance=user_profile)
-    return render(request, 'profile/customize_profile.html', {'form': form})
-
-#do we really need this ? ai settings change
-# @login_required
-# def ai_settings(request):
-#     user_profile = request.user
-#     if request.method == 'POST':
-#         form = AISettingsForm(request.POST, instance=user_profile)
-#         if form.is_valid():
-#             form.save()
-#             messages.success(request, 'AI settings updated successfully!')
-#             return redirect('profile')
-#     else:
-#         form = AISettingsForm(instance=user_profile)
-#     return render(request, 'ai_settings.html', {'form': form})
-
-@login_required
+#signout
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def sign_out(request):
     logout(request)
-    return redirect('login')
+    return Response(status=status.HTTP_200_OK)
 
 
-#----------------------------FRIENDS PROFILE----------------------------
-#view friend profile
-#/!\ CAREFUL MAYBE ADD TOURNAMENTHISTORY.OBJECTS.FILTER INSTEAD OF TOURNAMENT.OBJECTS.FILTER AND ADD TOURNAMENT HISTORY MODEL
+# -------------------------------------- Game Views --------------------------------------
+#Game View
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def game_view(request):
+	games = Game.objects.filter(player1=request.user) | Game.objects.filter(player2=request.user)
+	serializer = GameSerializer(games, many=True)
+	return Response(serializer.data)
 
-@login_required
-def friend_profile(request, friend_id):
-	friend = get_object_or_404(UserProfile, id=friend_id)
-	match_history = MatchHistory.objects.filter(user=friend)
-	tournament_history = Tournament.objects.filter(user=friend)
-
-	return render(request, 'profile/friend_profile.html', {
-		'friend': friend,
-		'match_history': match_history,
-		'tournament_history': tournament_history,
-	})
-
-#remove friend from friendlist
-#/!\ implement differently if user not in friendlist
-@login_required
-def remove_friend(request, friend_id):
-    user_profile = request.user
+# Invite to game
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_game_invitation(request):
+    friend_id = request.data.get('friend_id')
     friend = get_object_or_404(UserProfile, id=friend_id)
 
-    # Remove the friend from the user's friend list
-    if friend in user_profile.friends.all():
-        user_profile.friends.remove(friend)
-        messages.success(request, f'{friend.username} has been removed from your friends list.')
-    else:
-        messages.error(request, 'You are not friends with this user.')
+    is_friend = Friendship.objects.filter(
+        (Q(user=request.user) & Q(friend=friend) & Q(status='accepted')) |
+        (Q(user=friend) & Q(friend=request.user) & Q(status='accepted'))
+    ).exists()
 
-    return JsonResponse({'status': 'success', 'message': f'{friend.username} has been removed from your friends list.'})
+    if not is_friend:
+        return Response({'error': 'Not friends with this user'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create a game in "pending" status
+    game = Game.objects.create(player1=request.user, player2=friend, status=Game.STATUS_PENDING)
+    serializer = GameSerializer(game)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+# Accept invitation
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def accept_game_invitation(request, game_id):
+    game = get_object_or_404(Game, id=game_id, player2=request.user, status=Game.STATUS_PENDING)
+
+    game.status = Game.STATUS_ACTIVE
+    game.save()
+
+    serializer = GameSerializer(game)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Show friendlist
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def friends_list(request):
+    friendships = Friendship.objects.filter(
+        Q(user=request.user, status='accepted') | Q(friend=request.user, status='accepted')
+    )
+    friends = [fs.friend if fs.user == request.user else fs.user for fs in friendships]
+    serializer = UserProfileSerializer(friends, many=True)
+    return Response(serializer.data)
+
+
+# -------------------------------------- Tournament View --------------------------------------
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def tournament_view(request):
+    tournaments = Tournament.objects.filter(participants=request.user)
+    serializer = TournamentSerializer(tournaments, many=True)
+    return Response(serializer.data)
+
+# Create tourney
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_tournament_view(request):
+    organizer = request.user
+    tournament_name = request.data.get('name')
+    invited_player_ids = request.data.get('invited_players', [])  # List of player IDs for remote players
+    local_player_count = request.data.get('local_players', 0)  # Number of local players (on the same keyboard)
+
+    # Validate that the tournament name is provided
+    if not tournament_name:
+        return Response({'error': 'Tournament name is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Create the tournament
+    tournament = Tournament.objects.create(
+        name=tournament_name,
+        organizer=organizer
+    )
+
+    # Add the organizer to the tournament as a participant
+    tournament.participants.add(organizer)
+
+    # Add invited players to the tournament
+    if invited_player_ids:
+        invited_players = UserProfile.objects.filter(id__in=invited_player_ids, is_active=True).exclude(id=organizer.id)
+        tournament.participants.add(*invited_players)
+
+    # Add placeholders for local players
+    for i in range(local_player_count):
+        local_player_name = f"Local Player {i + 1}"
+        local_player = LocalPlayer.objects.create(name=local_player_name, tournament=tournament)
+        tournament.local_players.add(local_player)
+
+    # Serialize and return the tournament details
+    serializer = TournamentSerializer(tournament)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+# Invite to tourney
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def invite_to_tournament(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id, organizer=request.user, status='pending')
+    
+    # Invite remote player by username
+    username = request.data.get('username', None)
+    if username:
+        participant = get_object_or_404(UserProfile, username=username)
+
+        if participant in tournament.participants.all():
+            return Response({'error': 'User is already a participant.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        tournament.participants.add(participant)
+        tournament.save()
+        return Response({'message': f'{username} invited to the tournament.'}, status=status.HTTP_200_OK)
+
+    # Add local players directly
+    local_player_names = request.data.get('local_players', [])
+    for name in local_player_names:
+        local_player, _ = LocalPlayer.objects.get_or_create(name=name, organizer=request.user)
+        tournament.local_players.add(local_player)
+
+    tournament.save()
+    return Response({'message': 'Players added to the tournament.'}, status=status.HTTP_200_OK)
+
+
+
+# Accept tourney invite
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def accept_tournament_invitation(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id, status='pending')
+
+    # Ensure the user is a remote participant
+    if request.user not in tournament.participants.all():
+        return Response({'error': 'You are not a participant of this tournament.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'message': 'Tournament invitation accepted.'}, status=status.HTTP_200_OK)
+
+
+# Launch tourney after everyone accepted
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def launch_tournament(request, tournament_id):
+    tournament = get_object_or_404(Tournament, id=tournament_id, organizer=request.user, status='pending')
+
+    # Ensure there are exactly 4 players (remote + local)
+    total_players = tournament.participants.count() + tournament.local_players.count()
+    if total_players != 4:
+        return Response({'error': 'Tournament must have exactly 4 players (remote + local).'}, status=status.HTTP_400_BAD_REQUEST)
+
+    tournament.status = 'active'
+    tournament.save()
+    return Response({'message': 'Tournament launched successfully.'}, status=status.HTTP_200_OK)
+
+
+
+# -------------------------------------- History Views --------------------------------------
+#history view
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def history_view(request):
+    # Fetch match history
+    match_history = MatchHistory.objects.filter(user=request.user)
+    match_serializer = MatchHistorySerializer(match_history, many=True)
+
+    # Fetch tournament history
+    tournaments = Tournament.objects.filter(participants=request.user)
+    tournament_serializer = TournamentSerializer(tournaments, many=True)
+
+    # Combine both histories into a single response
+    return Response({
+        'match_history': match_serializer.data,
+        'tournament_history': tournament_serializer.data,
+    })
+
+
+# -------------------------------------- Profile Views --------------------------------------
+#Profile View
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def profile_view(request):
+    if request.method == 'GET':
+        serializer = UserProfileSerializer(request.user)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        # Create a copy of the data to avoid modifying the original
+        data = request.data.copy()
+        
+        # If email is being updated ensure it's unique
+        if 'email' in data:
+            if UserProfile.objects.exclude(id=request.user.id).filter(email=data['email']).exists():
+                return Response(
+                    {'error': 'This email is already in use'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        if 'username' in data:
+            if UserProfile.objects.exclude(id=request.user.id).filter(username=data['username']).exists():
+                return Response(
+                    {'error': 'This username is already taken'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        if 'avatar_url' in data:
+            try:
+                URLValidator()(data['avatar_url'])
+            except ValidationError:
+                return Response(
+                    {'error': 'Invalid URL format for avatar'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        if 'theme' in data:
+            allowed_themes = ['light', 'dark', 'system']  # Add your allowed themes
+            if data['theme'] not in allowed_themes:
+                return Response(
+                    {'error': f'Theme must be one of: {", ".join(allowed_themes)}'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        serializer = UserProfileSerializer(request.user, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def friend_profile(request, friend_id):
+    friend = get_object_or_404(UserProfile, id=friend_id)
+    serializer = UserProfileSerializer(friend)
+    return Response(serializer.data)
+
+# Friend Management Views
+@api_view(['POST', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def manage_friend(request, friend_id):
+    friend = get_object_or_404(UserProfile, id=friend_id)
+    
+    if request.method == 'POST':
+        friendship = Friendship.objects.create(user=request.user, friend=friend)
+        serializer = FriendshipSerializer(friendship)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    elif request.method == 'DELETE':
+        friendship = get_object_or_404(Friendship, user=request.user, friend=friend)
+        friendship.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# -------------------------------------- Updating Profile Views --------------------------------------
+#update password
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_password(request):
+    user = request.user
+    old_password = request.data.get('old_password')
+    new_password = request.data.get('new_password')
+    
+    # verify old password
+    if not user.check_password(old_password):
+        return Response(
+            {'error': 'Current password is incorrect'}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Validate and set new password
+    try:
+        # This will run password validators configured in settings.py
+        validate_password(new_password, user)
+        user.set_password(new_password)
+        user.save()
+        
+        # Force a new login since password changed
+        update_session_auth_hash(request, user)
+        
+        return Response(
+            {'message': 'Password updated successfully'}, 
+            status=status.HTTP_200_OK
+        )
+    except ValidationError as e:
+        return Response(
+            {'error': e.messages}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )

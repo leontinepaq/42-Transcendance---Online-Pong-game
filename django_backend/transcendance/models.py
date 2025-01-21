@@ -49,7 +49,11 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
 class Friendship(models.Model):
 	class Meta:
-		        unique_together = ('user', 'friend')
+		unique_together = ('user', 'friend')
+		index = [
+			models.Index(fields=['user', 'friend']),
+			models.Index(fields=['status'])
+		]
 
     user = models.ForeignKey(UserProfile, related_name='friendships', on_delete=models.CASCADE)
     friend = models.ForeignKey(UserProfile, related_name='friend_of_friendships', on_delete=models.CASCADE)
@@ -63,21 +67,36 @@ class Friendship(models.Model):
 #if multiple games implemented : create Game Class with id, game type, created at. Create Game_session class exactly like Game + game = ForeignKey(game).
 
 class Game(models.Model):
+	status = models.CharField(
+		max_length=20,
+		choices=[
+		('pending', 'Pending'),
+		('in_progress', 'In Progress'),
+		('completed', 'Completed'),
+		],
+		default='pending'
+	)
+
     player1 = models.ForeignKey(UserProfile, related_name='player1_session', on_delete=models.CASCADE)
-    player2 = models.ForeignKey(UserProfile, related_name='player2_session', on_delete=models.CASCADE)
+    player2 = models.ForeignKe39y(UserProfile, related_name='player2_session', on_delete=models.CASCADE)
     score_player1 = models.IntegerField(
         default=0,
-        validators=[MinValueValidator(0)]  # Empêche les scores négatifs
+        validators=[MinValueValidator(0)]
     )
     score_player2 = models.IntegerField(
         default=0,
-        validators=[MinValueValidator(0)]  # Empêche les scores négatifs
+        validators=[MinValueValidator(0)]
     )
-    winner = models.ForeignKey(UserProfile, related_name='won_session', on_delete=models.CASCAD)
+    winner = models.ForeignKey(UserProfile, related_name='won_session', on_delete=models.CASCADE)
+	status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.player1.username} vs {self.player2.username} ({self.winner.username if self.winner else "TBD"})'
+
+	@classmethod
+	def create_game(cls, player1, player2):
+		return cls.objects.create(player1=player1, player2=player2)
 
 class MatchHistory(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -106,7 +125,9 @@ class PlayerStatistics(models.Model):
 class Tournament(models.Model):
     name = models.CharField(max_length=100)
     id = models.AutoField(primary_key=True)
+	organizer = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='organized_tournament')
     participants = models.ManyToManyField(UserProfile, related_name='tournaments', blank=True)
+	local_players = models.ManyToManyField('LocalPlayer', related_name='tournaments', blank=True)
     games = models.ForeignKey(Game, related_name='tournaments', on_delete=models.CASCADE, null=True, blank=True)
     winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='won_tournaments')
     date = models.DateTimeField(auto_now_add=True)
@@ -120,6 +141,9 @@ class Tournament(models.Model):
         ],
         default='pending'
     )
+
+	def __str__(self):
+		return f'Tournament {self.id} - {self.status}'
 
     def get_rankings(self):
         players = list(self.participants.all())
@@ -161,6 +185,10 @@ class Tournament(models.Model):
         else:
             return None, None
 
+#MaybeToModify ?
+class LocalPlayer(models.Model):
+    name = models.CharField(max_length=100)
+    tournament = models.ForeignKey('Tournament', related_name='local_players', on_delete=models.CASCADE)
 
 #change Group in return ? 
 class Message(models.Model):
@@ -224,7 +252,7 @@ def update_tournament_winner(sender, instance, created, **kwargs):
                 player_stats.tournaments_won += 1
             player_stats.save()
 
-class AllTimeStatistics(models.Model):
+class AllTimeStatistics(models.Model): #A modifier ? https://claude.ai/chat/6aa88d28-3db8-4838-8e13-c0479bae8d99
     total_users = models.IntegerField(default=0)
     total_matches = models.IntegerField(default=0)
     total_tournaments = models.IntegerField(default=0)

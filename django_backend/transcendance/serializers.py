@@ -10,7 +10,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['id', 'username', 'email', 'avatar_url', 'theme', 
                  'is_active', 'created_at', 'updated_at']
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['created_at', 'updated_at', 'id']
         extra_kwargs = {
             'password': {'write_only': True},
             'email': {'required': True}
@@ -93,7 +93,7 @@ class TournamentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tournament
-        fields = ['id', 'name', 'participants', 'games', 'winner', 'date',
+        fields = ['id', 'organizer', 'name', 'participants', 'games', 'winner', 'date',
                  'status', 'participants_details', 'winner_details', 'games_details']
         read_only_fields = ['date']
 

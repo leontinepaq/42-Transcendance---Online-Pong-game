@@ -66,8 +66,8 @@ USER MANAGEMENT :
  - Implementing remote authentication = OAuth 2.0
 
 GAMEPLAY AND USER EXP :
- - Remote players ?
- - Live chat ? Not sure looks annoying
+ - Remote players														OK
+ - Live chat
 
 AI - Algo :
  - (minor) User and Game Stats dashboard
