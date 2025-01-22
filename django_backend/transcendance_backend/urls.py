@@ -1,7 +1,7 @@
 from django.urls import path
-from . import views
+from transcendance import views
 
-app_name = 'api'
+app_name = 'transcendance'
 
 urlpatterns = [
     # Auth

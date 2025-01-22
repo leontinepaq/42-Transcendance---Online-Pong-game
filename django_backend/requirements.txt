@@ -1,5 +1,7 @@
-Django>=5.1.4
+Django<5
 psycopg[binary]>=3.2.3
 djangorestframework
 django-filter
 markdown
+django-cors-headers
+django-bootstrap-v5

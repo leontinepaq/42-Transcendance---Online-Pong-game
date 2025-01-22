@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.validators import MinValueValidator
 
 #think about on_delete=SET_NULL instead of CASCADE. See https://stackoverflow.com/questions/38388423/what-does-on-delete-do-on-django-models
 
@@ -48,37 +49,36 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 class Friendship(models.Model):
-	class Meta:
-		unique_together = ('user', 'friend')
-		index = [
-			models.Index(fields=['user', 'friend']),
-			models.Index(fields=['status'])
-		]
-
     user = models.ForeignKey(UserProfile, related_name='friendships', on_delete=models.CASCADE)
     friend = models.ForeignKey(UserProfile, related_name='friend_of_friendships', on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=[('pending', 'Pending'), ('accepted', 'Accepted')], default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'friend')
+        indexes = [
+            models.Index(fields=['user', 'friend']),
+            models.Index(fields=['status'])
+        ]
 
     def __str__(self):
         return f'{self.user.username} -> {self.friend.username} ({self.status})'
 
 
 #if multiple games implemented : create Game Class with id, game type, created at. Create Game_session class exactly like Game + game = ForeignKey(game).
-
 class Game(models.Model):
-	status = models.CharField(
-		max_length=20,
-		choices=[
-		('pending', 'Pending'),
-		('in_progress', 'In Progress'),
-		('completed', 'Completed'),
-		],
-		default='pending'
-	)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ],
+        default='pending'
+    )
 
     player1 = models.ForeignKey(UserProfile, related_name='player1_session', on_delete=models.CASCADE)
-    player2 = models.ForeignKe39y(UserProfile, related_name='player2_session', on_delete=models.CASCADE)
+    player2 = models.ForeignKey(UserProfile, related_name='player2_session', on_delete=models.CASCADE)
     score_player1 = models.IntegerField(
         default=0,
         validators=[MinValueValidator(0)]
@@ -88,15 +88,14 @@ class Game(models.Model):
         validators=[MinValueValidator(0)]
     )
     winner = models.ForeignKey(UserProfile, related_name='won_session', on_delete=models.CASCADE)
-	status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.player1.username} vs {self.player2.username} ({self.winner.username if self.winner else "TBD"})'
 
-	@classmethod
-	def create_game(cls, player1, player2):
-		return cls.objects.create(player1=player1, player2=player2)
+    @classmethod
+    def create_game(cls, player1, player2):
+        return cls.objects.create(player1=player1, player2=player2)
 
 class MatchHistory(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
@@ -125,9 +124,9 @@ class PlayerStatistics(models.Model):
 class Tournament(models.Model):
     name = models.CharField(max_length=100)
     id = models.AutoField(primary_key=True)
-	organizer = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='organized_tournament')
+    organizer = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='organized_tournament')
     participants = models.ManyToManyField(UserProfile, related_name='tournaments', blank=True)
-	local_players = models.ManyToManyField('LocalPlayer', related_name='tournaments', blank=True)
+    local_players = models.ManyToManyField('LocalPlayer', related_name='tournaments', blank=True)
     games = models.ForeignKey(Game, related_name='tournaments', on_delete=models.CASCADE, null=True, blank=True)
     winner = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, blank=True, related_name='won_tournaments')
     date = models.DateTimeField(auto_now_add=True)
@@ -142,8 +141,8 @@ class Tournament(models.Model):
         default='pending'
     )
 
-	def __str__(self):
-		return f'Tournament {self.id} - {self.status}'
+    def __str__(self):
+        return f'Tournament {self.id} - {self.status}'
 
     def get_rankings(self):
         players = list(self.participants.all())
@@ -188,7 +187,7 @@ class Tournament(models.Model):
 #MaybeToModify ?
 class LocalPlayer(models.Model):
     name = models.CharField(max_length=100)
-    tournament = models.ForeignKey('Tournament', related_name='local_players', on_delete=models.CASCADE)
+    tournament = models.ForeignKey('Tournament', related_name='local_players_in_tournament', on_delete=models.CASCADE)
 
 #change Group in return ? 
 class Message(models.Model):
