@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from transcendance import views
-from oauth2_provider.views import TokenView
+from django.views.generic import TemplateView
 
 app_name = 'transcendance'
 
@@ -37,4 +37,8 @@ urlpatterns = [
 
 	# Update
 	path('update-password/', views.update_password, name='update-password'),
+
+    #catch all route
+    path('', TemplateView.as_view(template_name='index.html'), name='home'),
+    path('<path:path>', TemplateView.as_view(template_name='index.html')),
 ]
