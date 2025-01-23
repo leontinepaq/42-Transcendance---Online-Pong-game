@@ -1,9 +1,13 @@
-from django.urls import path
+from django.contrib import admin
+from django.urls import path, include
 from transcendance import views
+from oauth2_provider.views import TokenView
 
 app_name = 'transcendance'
 
 urlpatterns = [
+    #Admin
+    path('admin/', admin.site.urls),
     # Auth
     path('auth/signup/', views.signup, name='signup'),
     path('auth/login/', views.login_view, name='login'),

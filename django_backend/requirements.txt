@@ -5,3 +5,4 @@ django-filter
 markdown
 django-cors-headers
 django-bootstrap-v5
+django-oauth-toolkit

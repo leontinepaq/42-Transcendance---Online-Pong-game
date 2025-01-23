@@ -46,6 +46,9 @@ def login_view(request):
         code = generate_2fa_code()
         request.session['2fa_code'] = code
         request.session['user_id'] = user.id
+
+        code_expiry = timezone.now() + timedelta(minutes=5)
+        request.session['2fa_expiry'] = code_expiry
         
         try:
             send_mail(
@@ -67,20 +70,28 @@ def verify_2fa(request):
     code = request.data.get('code')
     user_id = request.session.get('user_id')
     correct_code = request.session.get('2fa_code')
+    code_expiry = request.session.get('2fa_expiry')
 
-    if not all([code, user_id, correct_code]):
+    if not all([code, user_id, correct_code, code_expiry]):
         return Response({'error': 'Session expired'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if timezone.now() > code_expiry:
+        return Response({'error': '2FA code has expired'}, status=status.HTTP_400_BAD_REQUEST)
 
     if code == correct_code:
         try:
             user = UserProfile.objects.get(id=user_id)
             login(request, user)
+
             del request.session['2fa_code']
             del request.session['user_id']
+            del request.session['2fa_expiry']
+
             serializer = UserProfileSerializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
     return Response({'error': 'Invalid 2FA code'}, status=status.HTTP_400_BAD_REQUEST)
 
 #signout
@@ -88,6 +99,9 @@ def verify_2fa(request):
 @permission_classes([IsAuthenticated])
 def sign_out(request):
     logout(request)
+    del request.session['2fa_code']
+    del request.session['user_id']
+    del request.session['2fa_expiry']
     return Response(status=status.HTTP_200_OK)
 
 
@@ -333,7 +347,13 @@ def friend_profile(request, friend_id):
 def manage_friend(request, friend_id):
     friend = get_object_or_404(UserProfile, id=friend_id)
     
+    if request.user == friend:
+        return Response({'error': 'You cannot add yourself as a friend.'}, status=status.HTTP_400_BAD_REQUEST)
+
     if request.method == 'POST':
+        if Friendship.objects.filter(user=request.user, friend=friend).exists():
+            return Response({'error': 'Friendship already exists.'}, status=status.HTTP_400_BAD_REQUEST)
+        
         friendship = Friendship.objects.create(user=request.user, friend=friend)
         serializer = FriendshipSerializer(friendship)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -354,27 +374,16 @@ def update_password(request):
     
     # verify old password
     if not user.check_password(old_password):
-        return Response(
-            {'error': 'Current password is incorrect'}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
     
     # Validate and set new password
     try:
-        # This will run password validators configured in settings.py
         validate_password(new_password, user)
         user.set_password(new_password)
         user.save()
         
-        # Force a new login since password changed
         update_session_auth_hash(request, user)
         
-        return Response(
-            {'message': 'Password updated successfully'}, 
-            status=status.HTTP_200_OK
-        )
+        return Response({'message': 'Password updated successfully'}, status=status.HTTP_200_OK)
     except ValidationError as e:
-        return Response(
-            {'error': e.messages}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'error': e.messages}, status=status.HTTP_400_BAD_REQUEST)

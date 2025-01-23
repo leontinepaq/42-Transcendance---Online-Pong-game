@@ -7,3 +7,15 @@ function to trigger game creation when game is being created
 
 2/ Be able to play on the same keyboard
 2b/ Each player enter their username and then take turns playing against each other
+
+3/ email validation before saving in profile_view ? 
+
+4/ sanitize ? 
+from django.shortcuts import render
+from django.utils.html import escape
+
+def comment_view(request):
+    if request.method == "POST":
+        user_comment = request.POST.get("comment")
+        safe_comment = escape(user_comment)  # Escapes dangerous characters
+        # Store or display safe_comment
