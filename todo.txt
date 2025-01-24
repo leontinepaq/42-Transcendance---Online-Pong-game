@@ -21,4 +21,4 @@ def comment_view(request):
         # Store or display safe_comment
 
 
-GENERATE 2FA CODE
+GERER front back arrow

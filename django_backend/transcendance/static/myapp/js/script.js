@@ -138,8 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         'X-CSRFToken': getCookie('csrftoken')
                     },
                     body: JSON.stringify({ 
-                        username: username, 
-                        verification_code: inputCode 
+                        code: inputCode 
                     }),
                 });
 

@@ -10,6 +10,11 @@ from django.contrib.auth import authenticate, login, logout, update_session_auth
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
+import string
+from django.utils.crypto import get_random_string
+from django.utils import timezone
+from datetime import timedelta
+from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -23,6 +28,11 @@ from .models import (
 )
 
 # -------------------------------------- Authentication Views --------------------------------------
+
+#utils
+def generate_2fa_code():
+    return get_random_string(length=6, allowed_chars=string.digits)
+
 # signup
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -48,7 +58,7 @@ def login_view(request):
         request.session['user_id'] = user.id
 
         code_expiry = timezone.now() + timedelta(minutes=5)
-        request.session['2fa_expiry'] = code_expiry
+        request.session['2fa_expiry'] = code_expiry.isoformat()
         
         try:
             send_mail(
@@ -74,6 +84,8 @@ def verify_2fa(request):
 
     if not all([code, user_id, correct_code, code_expiry]):
         return Response({'error': 'Session expired'}, status=status.HTTP_400_BAD_REQUEST)
+
+    code_expiry = parse_datetime(code_expiry)
 
     if timezone.now() > code_expiry:
         return Response({'error': '2FA code has expired'}, status=status.HTTP_400_BAD_REQUEST)
