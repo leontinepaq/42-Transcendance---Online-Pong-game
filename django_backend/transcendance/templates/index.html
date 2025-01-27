@@ -5,9 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Transcendance girlz</title>
     <link rel="stylesheet" href="/static/myapp/css/styles.css">
-    <script defer src="/static/myapp/js/script.js"></script>
+    <script type="module" src="/static/myapp/js/transcendance.js"></script>
 </head>
 <body>
+    {% csrf_token %}
     <div id="app"></div>
 </body>
 </html>

@@ -56,10 +56,15 @@ def login_view(request):
         code = generate_2fa_code()
         request.session['2fa_code'] = code
         request.session['user_id'] = user.id
-
-        code_expiry = timezone.now() + timedelta(minutes=5)
+        code_expiry = timezone.now() + timedelta(minutes=15)
         request.session['2fa_expiry'] = code_expiry.isoformat()
         
+        print("Session variables set:", {
+            '2fa_code': code,
+            'user_id': user.id,
+            'code_expiry': code_expiry.isoformat()
+        })
+
         try:
             send_mail(
                 'Your 2FA Code',
