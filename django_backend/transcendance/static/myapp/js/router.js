@@ -9,12 +9,48 @@ class Router {
             '2fa': this.render2faView.bind(this),
             home: this.renderHomeView.bind(this)
         };
+        this.previousRoute = null;
+        this.isFirstNavigation = true; // Track initial navigation
+
+        window.addEventListener('popstate', (event) => {
+            if (event.state) {
+                const view = this.routes[event.state.route];
+                if (view) {
+                    view(...(event.state.params || []));
+                    this.previousRoute = event.state.route;
+                }
+            }
+        });
+    }
+
+    getUserConnectionStatus() {
+        // Check if a cookie like `user_session` exists
+        console.log (document.cookie.split('; ').some(cookie => cookie.startsWith('user_session=')));
+        return document.cookie.split('; ').some(cookie => cookie.startsWith('user_session='));
     }
 
     navigate(route, ...params) {
         const view = this.routes[route];
         if (view) {
             view(...params);
+
+            const state = { route, params };
+            const title = `${route.charAt(0).toUpperCase() + route.slice(1)} - My SPA`;
+
+            if (this.isFirstNavigation && route === 'login') {
+                // Replace the initial history entry for login
+                window.history.replaceState(state, title, '/login');
+                this.isFirstNavigation = false;
+            } else if (route === 'home' && this.getUserConnectionStatus()) {
+                // Clear history when transitioning to Home and user is connected
+                window.history.pushState(null, '', '/'); // Pop previous states
+                window.history.replaceState(state, title, '/home');
+            } else {
+                // Normal navigation
+                window.history.pushState(state, title, `/${route}`);
+            }
+
+            this.previousRoute = route;
         }
     }
 
@@ -86,6 +122,7 @@ class Router {
         this.setupHomeHandlers();
     }
 
+    //maybe look into this to display content https://developer.mozilla.org/en-US/docs/Web/API/History_API/Working_with_the_History_API
     setupLoginHandlers() {
         document.getElementById('login-form').addEventListener('submit', async (event) => {
             event.preventDefault();
