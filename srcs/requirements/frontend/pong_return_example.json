@@ -1,0 +1,6 @@
+{
+	"game_over": true,
+	"ball": [0, 1],
+	"paddle_left": 10,
+	"paddle_right": 10
+}
