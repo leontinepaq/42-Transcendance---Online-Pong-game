@@ -1,0 +1,55 @@
+services:
+
+  postgre:
+    build: ./requirements/postgre
+    image: postgre
+    container_name: postgre
+    volumes:
+      - db:/var/lib/postgresql/data
+    env_file:
+      - ".env"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  backend:
+    build: ./requirements/backend
+    image: backend
+    container_name: backend
+    restart: always
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgre:
+          condition: service_healthy
+
+  frontend:
+    build: ./requirements/frontend
+    image: frontend
+    container_name: frontend
+    restart: always
+    ports:
+      - "9999:80"
+    depends_on:
+      - backend
+
+  # pong:
+  #   build: ./requirements/pong
+  #   container_name: pong
+  #   restart: always
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     postgre:
+  #         condition: service_healthy
+
+volumes:
+  db:
+    name: db
+    driver: local
+    driver_opts:
+      device: $HOME/data/db
+      type: none
