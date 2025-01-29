@@ -1,1 +1,4 @@
-/django_backend/data/
+/django_backend/data
+*.env
+*.venv
+*.sqlite*
