@@ -9,24 +9,19 @@ class Router {
             '2fa': this.render2faView.bind(this),
             home: this.renderHomeView.bind(this)
         };
-        this.previousRoute = null;
-        this.isFirstNavigation = true; // Track initial navigation
 
         window.addEventListener('popstate', (event) => {
             if (event.state) {
                 const view = this.routes[event.state.route];
                 if (view) {
                     view(...(event.state.params || []));
-                    this.previousRoute = event.state.route;
                 }
             }
         });
     }
 
     getUserConnectionStatus() {
-        // Check if a cookie like `user_session` exists
-        console.log (document.cookie.split('; ').some(cookie => cookie.startsWith('user_session=')));
-        return document.cookie.split('; ').some(cookie => cookie.startsWith('user_session='));
+        return api.accessToken !== null;
     }
 
     navigate(route, ...params) {
@@ -35,22 +30,26 @@ class Router {
             view(...params);
 
             const state = { route, params };
-            const title = `${route.charAt(0).toUpperCase() + route.slice(1)} - My SPA`;
+            const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
 
-            if (this.isFirstNavigation && route === 'login') {
-                // Replace the initial history entry for login
-                window.history.replaceState(state, title, '/login');
-                this.isFirstNavigation = false;
-            } else if (route === 'home' && this.getUserConnectionStatus()) {
-                // Clear history when transitioning to Home and user is connected
-                window.history.pushState(null, '', '/'); // Pop previous states
-                window.history.replaceState(state, title, '/home');
-            } else {
-                // Normal navigation
-                window.history.pushState(state, title, `/${route}`);
+            if (this.getUserConnectionStatus()) {
+                if (route === 'login' || route === '2fa' || route === 'signup') {
+                    history.pushState({ route: 'home', params: [] }, '', '/home');
+                    this.renderHomeView();
+                }
+                else {
+                    window.history.pushState(state, title, `/${route}`);
+                }
             }
-
-            this.previousRoute = route;
+            else {
+                if (route !== 'login' && route !== '2fa' && route !== 'signup') {
+                    history.pushState({ route: 'login', params: [] }, '', '/login');
+                    this.renderLoginView();
+                }
+                else {
+                    window.history.pushState(state, title, `/${route}`);
+                }
+            }
         }
     }
 
@@ -184,6 +183,7 @@ class Router {
 
             try {
                 const data = await api.verify2FA(code);
+                console.log(data);
                 if (data.ok) {
                     this.navigate('home');
                 } else {
@@ -197,9 +197,14 @@ class Router {
     }
 
     setupHomeHandlers() {
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            // Implement logout logic here
-            this.navigate('login');
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await api.logout();
+                this.navigate('login');
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Logout failed. Please try again.');
+            }
         });
     }
 }

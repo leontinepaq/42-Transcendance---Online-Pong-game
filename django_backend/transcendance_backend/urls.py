@@ -10,13 +10,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     #JWT
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify-2fa/', views.verify_2fa, name='verify_2fa'),
+    path('api/token/refresh/', views.refresh_token_view, name='token_refresh'),
 
     # Auth
     path('auth/signup/', views.signup, name='signup'),
     path('auth/login/', views.login_view, name='login'),
-    path('auth/verify-2fa/', views.verify_2fa, name='verify_2fa'),
     path('auth/logout/', views.sign_out, name='logout'),
     
     # Game
