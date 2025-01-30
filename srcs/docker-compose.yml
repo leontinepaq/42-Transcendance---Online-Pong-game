@@ -1,13 +1,15 @@
 services:
 
-  postgre:
-    build: ./requirements/postgre
-    image: postgre
-    container_name: postgre
+  postgres:
+    build: ./requirements/postgres
+    image: postgres
+    container_name: postgres
     volumes:
       - db:/var/lib/postgresql/data
     env_file:
       - ".env"
+    # port:
+    #   - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -20,10 +22,12 @@ services:
     image: backend
     container_name: backend
     restart: always
-    # ports:
-    #   - "8000:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./requirements/backend/django_backend/:/apps/
     depends_on:
-      postgre:
+      postgres:
           condition: service_healthy
 
   frontend:
@@ -31,6 +35,8 @@ services:
     image: frontend
     container_name: frontend
     restart: always
+    volumes:
+      - ./requirements/frontend/site:/site/
     ports:
       - "9999:80"
     depends_on:

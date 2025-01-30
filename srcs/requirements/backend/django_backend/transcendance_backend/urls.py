@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from transcendance import views
 from django.views.generic import TemplateView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 app_name = 'transcendance'
 
@@ -11,14 +10,13 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     #JWT
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify-2fa/', views.verify_2fa, name='verify_2fa'),
+    path('api/token/refresh/', views.refresh_token_view, name='token_refresh'),
 
     # Auth
-    path('auth/signup/', views.signup, name='signup'),
-    path('auth/login/', views.login_view, name='login'),
-    path('auth/verify-2fa/', views.verify_2fa, name='verify_2fa'),
-    path('auth/logout/', views.sign_out, name='logout'),
+    path('api/auth/signup/', views.signup, name='signup'),
+    path('api/auth/login/', views.login_view, name='login'),
+    path('api/auth/logout/', views.sign_out, name='logout'),
     
     # Game
     path('games/', views.game_view, name='games'),

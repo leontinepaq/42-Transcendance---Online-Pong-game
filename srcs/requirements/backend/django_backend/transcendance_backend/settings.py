@@ -1,13 +1,6 @@
-"""
-For more information on this file, see
-https://docs.djangoproject.com/en/5.1/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/5.1/ref/settings/
-"""
-
 import os
 from pathlib import Path
+from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -15,6 +8,21 @@ SECRET_KEY = 'django-insecure-o4bzi&28dib%s97hl=c4n4#*4_kxushn+@vm&*oikz!p$56o6o
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+# Security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+# FIRST IMPLEMENT HTTPS THEN : 
+# SECURE_HSTS_SECONDS = 31536000  # 1 year
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_HSTS_PRELOAD = True
+
+# In production, set these:
+# if not DEBUG:
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
 
 ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', 'localhost']
 
@@ -27,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 	'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 	'bootstrap5',
 	'corsheaders',
     'transcendance',
@@ -43,13 +52,37 @@ REST_FRAMEWORK = { #ASK
     'PAGE_SIZE': 10
 }
 
-CORS_ALLOWED_ORIGINS = [
-	"http://localhost:3000",
-	"http://localhost:9999",
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_COOKIE": "refresh_token",
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_PATH": "/",
+    "AUTH_COOKIE_SAMESITE": "None",
+}
+
+# CORS_ALLOWED_ORIGINS = [
+# 	"http://localhost:3000",
+# 	"http://localhost:9999"
+#     #ADD FRONTEND DOMAIN
+# ]
+
+# CSRF_TRUSTED_ORIGINS = [
+# 	"http://localhost:3000",
+#     "http://localhost:9999"
+#     #ADD FRONTEND DOMAIN
+# ]
+
+# CORS_ALLOW_CREDENTIALS = True
+
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
 ]
-
-CORS_ALLOW_CREDENTIALS = True
-
 
 MIDDLEWARE = [
 	'corsheaders.middleware.CorsMiddleware',
@@ -92,7 +125,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'postgre',
+        'HOST': 'postgres',
         'PORT': 5432,
     }
 }
