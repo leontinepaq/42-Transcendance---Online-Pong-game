@@ -5,5 +5,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const router = new Router(app);
     
     // Start with login view
-    // router.navigate('login');
+    router.navigate('login');
 });

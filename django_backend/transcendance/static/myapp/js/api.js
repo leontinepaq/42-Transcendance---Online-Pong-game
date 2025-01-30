@@ -1,5 +1,5 @@
 const api = {
-    accessToken: null, //Store JWT in Memory to avoid XSS attacks ? 
+    accessToken: null,
 
     getCookie(name) {
         const value = `; ${document.cookie}`;
@@ -7,7 +7,6 @@ const api = {
         return parts.length === 2 ? parts.pop().split(';').shift() : null;
     },
 
-    // Add authorization header if access token exists
     getHeaders() {
         const headers = {
             'Content-Type': 'application/json',

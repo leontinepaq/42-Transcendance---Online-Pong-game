@@ -128,7 +128,7 @@ def verify_2fa(request):
         value=str(refresh),
         httponly=True,  # Prevents JavaScript access (XSS protection)
         secure=True,  # Ensures HTTPS usage in production
-        samesite="Strict",  # Prevents CSRF attacks
+        samesite="None",  # Prevents CSRF attacks
         max_age=7 * 24 * 60 * 60,  # 7 days (in seconds)
     )
 
