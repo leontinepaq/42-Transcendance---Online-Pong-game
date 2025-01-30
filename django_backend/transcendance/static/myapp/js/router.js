@@ -9,48 +9,55 @@ class Router {
             '2fa': this.render2faView.bind(this),
             home: this.renderHomeView.bind(this)
         };
-        this.previousRoute = null;
-        this.isFirstNavigation = true; // Track initial navigation
+
+        // this.referrer = document.referrer && !document.referrer.includes(window.location.origin) 
+        //     ? document.referrer 
+        //     : null;
 
         window.addEventListener('popstate', (event) => {
             if (event.state) {
-                const view = this.routes[event.state.route];
-                if (view) {
-                    view(...(event.state.params || []));
-                    this.previousRoute = event.state.route;
-                }
+                (async () => {
+                    await this.navigate(event.state.route, ...(event.state.params || []));
+                })();
             }
         });
     }
 
-    getUserConnectionStatus() {
-        // Check if a cookie like `user_session` exists
-        console.log (document.cookie.split('; ').some(cookie => cookie.startsWith('user_session=')));
-        return document.cookie.split('; ').some(cookie => cookie.startsWith('user_session='));
+    isFirstNav = true;
+
+    async getUserConnectionStatus() {
+        await api.checkAndRefreshToken();
+        return api.accessToken !== null;
     }
 
-    navigate(route, ...params) {
+    async navigate(route, ...params) {
         const view = this.routes[route];
-        if (view) {
-            view(...params);
-
-            const state = { route, params };
-            const title = `${route.charAt(0).toUpperCase() + route.slice(1)} - My SPA`;
-
-            if (this.isFirstNavigation && route === 'login') {
-                // Replace the initial history entry for login
-                window.history.replaceState(state, title, '/login');
-                this.isFirstNavigation = false;
-            } else if (route === 'home' && this.getUserConnectionStatus()) {
-                // Clear history when transitioning to Home and user is connected
-                window.history.pushState(null, '', '/'); // Pop previous states
-                window.history.replaceState(state, title, '/home');
-            } else {
-                // Normal navigation
-                window.history.pushState(state, title, `/${route}`);
-            }
-
-            this.previousRoute = route;
+        if (!view) return;
+    
+        const isAuthenticated = await this.getUserConnectionStatus();
+    
+        if (isAuthenticated && (route === 'login' || route === 'signup' || route === '2fa')) {
+            history.replaceState({ route: 'home', params: [] }, '', '/home');
+            this.renderHomeView();
+            return;
+        }
+        else if (!isAuthenticated && route !== 'login' && route !== 'signup' && route !== '2fa') {
+            history.pushState({ route: 'login', params: [] }, '', '/login');
+            this.renderLoginView();
+            return;
+        }
+    
+        view(...params);
+    
+        const state = { route, params };
+        const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
+    
+        if (this.isFirstNav && !isAuthenticated) {
+            history.pushState(state, title, '/login');
+            this.isFirstNav = false;
+        } 
+        else {
+            history.pushState(state, title, `/${route}`);
         }
     }
 
@@ -73,57 +80,7 @@ class Router {
             </div>
         `;
 
-        this.setupLoginHandlers();
-    }
-
-    renderSignupView() {
-        this.app.innerHTML = `
-            <div id="signup-form-container">
-                <h2>Sign Up</h2>
-                <form id="signup-form">
-                    <input type="text" id="new-username" placeholder="Username" required>
-                    <input type="email" id="new-email" placeholder="Email" required>
-                    <input type="password" id="new-password" placeholder="Password" required>
-                    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
-                    <button type="submit">Sign Up</button>
-                    <button type="button" id="back-to-login-btn">Back to Login</button>
-                </form>
-            </div>
-        `;
-
-        this.setupSignupHandlers();
-    }
-
-    render2faView(username) {
-        this.app.innerHTML = `
-            <div class="container">
-                <h1>Two-Factor Authentication</h1>
-                <form id="2fa-form">
-                    <div class="form-group">
-                        <label for="verification-code">Enter Verification Code</label>
-                        <input type="text" id="verification-code" name="verification-code" required>
-                    </div>
-                    <button type="submit">Verify</button>
-                </form>
-            </div>
-        `;
-
-        this.setup2FAHandlers();
-    }
-
-    renderHomeView() {
-        this.app.innerHTML = `
-            <div class="container">
-                <h1>Welcome to Dashboard</h1>
-                <button id="logout-btn">Logout</button>
-            </div>
-        `;
-
-        this.setupHomeHandlers();
-    }
-
     //maybe look into this to display content https://developer.mozilla.org/en-US/docs/Web/API/History_API/Working_with_the_History_API
-    setupLoginHandlers() {
         document.getElementById('login-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const username = document.getElementById('username').value;
@@ -145,8 +102,21 @@ class Router {
         document.getElementById('signup-btn').addEventListener('click', () => this.navigate('signup'));
     }
 
-    // REPLACE DATA.SUCCESS WITH DATA.OK ? IDK MAN THIS LOOKS LIKE SHIT
-    setupSignupHandlers() {
+    renderSignupView() {
+        this.app.innerHTML = `
+            <div id="signup-form-container">
+                <h2>Sign Up</h2>
+                <form id="signup-form">
+                    <input type="text" id="new-username" placeholder="Username" required>
+                    <input type="email" id="new-email" placeholder="Email" required>
+                    <input type="password" id="new-password" placeholder="Password" required>
+                    <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+                    <button type="submit">Sign Up</button>
+                    <button type="button" id="back-to-login-btn">Back to Login</button>
+                </form>
+            </div>
+        `;
+
         document.getElementById('signup-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             
@@ -160,6 +130,7 @@ class Router {
                 return;
             }
 
+            // Replace datasuccess by dataok
             try {
                 const data = await api.signup(username, email, password);
                 if (data.success) {
@@ -177,13 +148,27 @@ class Router {
         document.getElementById('back-to-login-btn').addEventListener('click', () => this.navigate('login'));
     }
 
-    setup2FAHandlers() {
+    render2faView(username) {
+        this.app.innerHTML = `
+            <div class="container">
+                <h1>Two-Factor Authentication</h1>
+                <form id="2fa-form">
+                    <div class="form-group">
+                        <label for="verification-code">Enter Verification Code</label>
+                        <input type="text" id="verification-code" name="verification-code" required>
+                    </div>
+                    <button type="submit">Verify</button>
+                </form>
+            </div>
+        `;
+
         document.getElementById('2fa-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const code = document.getElementById('verification-code').value;
 
             try {
                 const data = await api.verify2FA(code);
+                console.log(data);
                 if (data.ok) {
                     this.navigate('home');
                 } else {
@@ -196,10 +181,22 @@ class Router {
         });
     }
 
-    setupHomeHandlers() {
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            // Implement logout logic here
-            this.navigate('login');
+    renderHomeView() {
+        this.app.innerHTML = `
+            <div class="container">
+                <h1>Welcome to Dashboard</h1>
+                <button id="logout-btn">Logout</button>
+            </div>
+        `;
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            try {
+                await api.logout();
+                this.navigate('login');
+            } catch (error) {
+                console.error('Logout error:', error);
+                alert('Logout failed. Please try again.');
+            }
         });
     }
 }

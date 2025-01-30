@@ -1,19 +1,21 @@
 
 # !!!!!! IF ANYTHIHNG WRONG GO BACK TO https://claude.ai/chat/9380f71a-b04a-451d-881d-2376956769a5
 
+import string
+from datetime import timedelta
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED
-from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash, get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
-import string
+from django.http import JsonResponse
 from django.utils.crypto import get_random_string
 from django.utils import timezone
-from datetime import timedelta
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
 from django.conf import settings
@@ -26,6 +28,9 @@ from .models import (
     UserProfile, Game, Tournament, MatchHistory,
     PlayerStatistics, Friendship
 )
+
+#not sure if i need this
+User = get_user_model()
 
 # -------------------------------------- Authentication Views --------------------------------------
 
@@ -84,36 +89,77 @@ def verify_2fa(request):
     if not all([code, user_id, correct_code, code_expiry]):
         return Response({'error': 'Session expired'}, status=status.HTTP_400_BAD_REQUEST)
 
-    code_expiry = parse_datetime(code_expiry)
+    try:
+        code_expiry = parse_datetime(code_expiry)
+        if not code_expiry or timezone.now() > code_expiry:
+            return Response({'error': '2FA code has expired'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception:
+        return Response({'error': 'Invalid expiry format'}, status=status.HTTP_400_BAD_REQUEST)
 
-    if timezone.now() > code_expiry:
-        return Response({'error': '2FA code has expired'}, status=status.HTTP_400_BAD_REQUEST)
+    #Prevents replay attack since ression(2fa_code) is already saved as correct_code
+    request.session.pop('2fa_code', None)
 
-    if code == correct_code:
-        try:
-            user = UserProfile.objects.get(id=user_id)
-            login(request, user)
+    if code != correct_code:
+        return Response({'error': 'Invalid 2FA code'}, status=status.HTTP_400_BAD_REQUEST)
 
-            del request.session['2fa_code']
-            del request.session['user_id']
-            del request.session['2fa_expiry']
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-            serializer = UserProfileSerializer(user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except UserProfile.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
 
-    return Response({'error': 'Invalid 2FA code'}, status=status.HTTP_400_BAD_REQUEST)
+    request.session.pop('2fa_code', None)
+    request.session.pop('user_id', None)
+    request.session.pop('2fa_expiry', None)
+
+    serializer = UserProfileSerializer(user)
+
+    response = Response({
+        'access': access_token,
+        'user': serializer.data
+    }, status=status.HTTP_200_OK)
+
+    # Set refresh token in an HttpOnly cookie
+    response.set_cookie(
+        key="refresh_token",
+        value=str(refresh),
+        httponly=True,  # Prevents JavaScript access (XSS protection)
+        secure=True,  # Ensures HTTPS usage in production
+        samesite="None",  # Prevents CSRF attacks
+        max_age=7 * 24 * 60 * 60,  # 7 days (in seconds)
+    )
+
+    return response
+
+#Refresh Token
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def refresh_token_view(request):
+    refresh_token = request.COOKIES.get('refresh_token')
+
+    if not refresh_token:
+        return Response({'error': 'No refresh token provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        refresh = RefreshToken(refresh_token)
+        access_token = str(refresh.access_token)
+        return Response({'access': access_token}, status=status.HTTP_200_OK)
+    except TokenError:
+        return Response({'error': 'Invalid or expired refresh token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 #signout
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def sign_out(request):
+    request.session.flush()
     logout(request)
-    del request.session['2fa_code']
-    del request.session['user_id']
-    del request.session['2fa_expiry']
-    return Response(status=status.HTTP_200_OK)
+    response = Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+    response.delete_cookie('refresh_token')
+
+    return response
 
 
 # -------------------------------------- Game Views --------------------------------------

@@ -26,8 +26,85 @@ def comment_view(request):
         safe_comment = escape(user_comment)  # Escapes dangerous characters
         # Store or display safe_comment
 
+5/ verify_2fa: Prevent Replay Attacks
 
-GERER front back arrow
+Currently, a valid 2FA code can be reused within its expiration window.
+Fix: Delete the 2FA code from the session before checking it to prevent replay attacks.
+
+    # Prevent replay attack by removing the 2FA code immediately
+    request.session.pop('2fa_code', None)
+
+    if code != correct_code:
+        return Response({'error': 'Invalid 2FA code'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+TODO : Gerer if user connected then dont arrow back to 2fa view and login + is connected cookies
+
+
+-------------------------------- SPA WORKFLOW ----------------------------
+
+ 1. Frontend (script.js)
+
+    Event Binding and Login Form Submission:
+    When the DOM is fully loaded (DOMContentLoaded event), you render the login view using renderLoginView.
+    When the user submits the login form, you intercept the default behavior with event.preventDefault() and send an asynchronous POST request using fetch to the endpoint /auth/login/.
+    ✅ This is correct.
+
+    Cookie Handling:
+    The getCookie function retrieves a cookie value, likely for CSRF tokens. This ensures the fetch request includes proper security headers.
+    ✅ This is good practice.
+
+2. Django URL Configuration (urls.py)
+
+    The endpoint /auth/login/ is correctly routed to the login_view function in your views.
+    ✅ This is correct.
+
+3. Backend (views.py)
+
+    Login Authentication Flow:
+        Extract username and password from the request.data (assuming JSON data is sent).
+        Use authenticate() to check the user's credentials against Django’s authentication system.
+        If authentication succeeds:
+            Generate a 2FA code using a generate_2fa_code() function.
+            Store the 2FA code, the user ID, and the code's expiry time in the session.
+            Send the 2FA code to the user's email using send_mail.
+
+    ✅ This flow is correct.
+
+    Session Storage: The 2FA code, user ID, and expiry time are stored in the session (request.session). The session mechanism is secure if used over HTTPS and with proper settings (e.g., SESSION_COOKIE_SECURE, SESSION_ENGINE).
+    ✅ This is standard practice.
+
+    Response to the Frontend: If the email is successfully sent, the response returns a success message (2FA code sent) with a 200 status. If there’s an error (e.g., in send_mail), it returns an error message and a 500 status. If authentication fails, it returns a 401 error.
+    ✅ This aligns with REST principles.
+
+Flow Summary
+
+    The frontend (script.js) sends a POST request to /auth/login/ with the username and password from the login form.
+    The Django REST API:
+        Validates the credentials using authenticate().
+        Generates a 2FA code if authentication is successful.
+        Stores the 2FA code, user ID, and expiry time in the session.
+        Sends the 2FA code to the user's email.
+        Responds with a JSON object indicating success or failure.
+
+✅ Your understanding of the flow is correct!
+Additional Tips
+
+    Error Handling in the Frontend:
+    In your fetch call, ensure you handle all possible responses (e.g., 401 for invalid credentials, 500 for server errors).
+
+    Debugging in Development:
+    Log session data (request.session) in the backend to confirm it’s being stored as expected. Example:
+
+    print(request.session.items())
+
+    Testing Email Sending:
+    If testing locally, use Django’s EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' to print emails to the console instead of sending them.
+
+By following this approach, you’re building a robust SPA with RESTful backend integration. 🎉
+
+
+JWT AND CSRF TOKENS : https://codefinity.com/blog/Understanding-JWT-and-CSRF-Tokens%3A-A-Web-Security-Overview
 
 =============================   DJANGO TABLES   ================================
 
@@ -126,8 +203,6 @@ Customization Options
 
 AI Settings
    For storing AI opponent behavior or difficulty levels.
-
-
 
 -----------------------------------------------------------------------
 
@@ -277,66 +352,3 @@ TODATABASE :
  - number of match played
  - number of tournaments played
  - number of points scored
-
-
--------------------------------- SPA WORKFLOW ----------------------------
-
- 1. Frontend (script.js)
-
-    Event Binding and Login Form Submission:
-    When the DOM is fully loaded (DOMContentLoaded event), you render the login view using renderLoginView.
-    When the user submits the login form, you intercept the default behavior with event.preventDefault() and send an asynchronous POST request using fetch to the endpoint /auth/login/.
-    ✅ This is correct.
-
-    Cookie Handling:
-    The getCookie function retrieves a cookie value, likely for CSRF tokens. This ensures the fetch request includes proper security headers.
-    ✅ This is good practice.
-
-2. Django URL Configuration (urls.py)
-
-    The endpoint /auth/login/ is correctly routed to the login_view function in your views.
-    ✅ This is correct.
-
-3. Backend (views.py)
-
-    Login Authentication Flow:
-        Extract username and password from the request.data (assuming JSON data is sent).
-        Use authenticate() to check the user's credentials against Django’s authentication system.
-        If authentication succeeds:
-            Generate a 2FA code using a generate_2fa_code() function.
-            Store the 2FA code, the user ID, and the code's expiry time in the session.
-            Send the 2FA code to the user's email using send_mail.
-
-    ✅ This flow is correct.
-
-    Session Storage: The 2FA code, user ID, and expiry time are stored in the session (request.session). The session mechanism is secure if used over HTTPS and with proper settings (e.g., SESSION_COOKIE_SECURE, SESSION_ENGINE).
-    ✅ This is standard practice.
-
-    Response to the Frontend: If the email is successfully sent, the response returns a success message (2FA code sent) with a 200 status. If there’s an error (e.g., in send_mail), it returns an error message and a 500 status. If authentication fails, it returns a 401 error.
-    ✅ This aligns with REST principles.
-
-Flow Summary
-
-    The frontend (script.js) sends a POST request to /auth/login/ with the username and password from the login form.
-    The Django REST API:
-        Validates the credentials using authenticate().
-        Generates a 2FA code if authentication is successful.
-        Stores the 2FA code, user ID, and expiry time in the session.
-        Sends the 2FA code to the user's email.
-        Responds with a JSON object indicating success or failure.
-
-✅ Your understanding of the flow is correct!
-Additional Tips
-
-    Error Handling in the Frontend:
-    In your fetch call, ensure you handle all possible responses (e.g., 401 for invalid credentials, 500 for server errors).
-
-    Debugging in Development:
-    Log session data (request.session) in the backend to confirm it’s being stored as expected. Example:
-
-    print(request.session.items())
-
-    Testing Email Sending:
-    If testing locally, use Django’s EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' to print emails to the console instead of sending them.
-
-By following this approach, you’re building a robust SPA with RESTful backend integration. 🎉
