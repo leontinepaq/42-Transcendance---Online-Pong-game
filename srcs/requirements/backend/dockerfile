@@ -1,7 +1,6 @@
-FROM python
-ENV PYTHONUNBUFFERED=1
-COPY ./requirements.txt ./requirements.txt
-RUN pip install -r requirements.txt
-COPY ./apps ./apps
-RUN python ./apps/manage.py migrate
-CMD	["python", "./apps/manage.py", "runserver", "0.0.0.0:8000"]
+FROM	python
+ENV		PYTHONUNBUFFERED=1
+COPY	./requirements.txt ./requirements.txt
+RUN		pip install -r requirements.txt
+COPY	./django_backend ./apps
+CMD		["python", "./apps/manage.py", "runserver", "0.0.0.0:8000"]

@@ -18,6 +18,8 @@ function to trigger game creation when game is being created
 from django.shortcuts import render
 from django.utils.html import escape
 
+5/ add migrate to dockerfile
+
 def comment_view(request):
     if request.method == "POST":
         user_comment = request.POST.get("comment")

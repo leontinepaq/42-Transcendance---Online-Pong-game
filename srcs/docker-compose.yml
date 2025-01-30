@@ -20,8 +20,8 @@ services:
     image: backend
     container_name: backend
     restart: always
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     depends_on:
       postgre:
           condition: service_healthy
@@ -49,7 +49,7 @@ services:
 volumes:
   db:
     name: db
-    driver: local
-    driver_opts:
-      device: $HOME/data/db
-      type: none
+    # driver: local
+    # driver_opts:
+    #   device: $HOME/data/db
+    #   type: none
