@@ -12,11 +12,8 @@ class Router {
         };
 
         window.addEventListener('popstate', async (event) => {
-            console.log('popstating');
             if (event.state) {
-                console.log('has popstate', {event});
                 const newRoute = await this.authRedirector(event.state.route);
-                console.log('newRoute = ', newRoute);
                 this.routes[newRoute]();
             }
         });
@@ -24,20 +21,17 @@ class Router {
 
     async getUserConnectionStatus() {
         await api.checkAndRefreshToken();
-        console.log('GetUserConnectionStatus Success');
         return api.accessToken !== null;
     }
     
-    async authRedirector(route, params) {
+    async authRedirector(route) {
         const isAuthenticated = await this.getUserConnectionStatus();
 
         console.log({isAuthenticated});
 
         if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
-            console.log('authenticated, redirecting to home');
             return ('home');
         } else if (!isAuthenticated && !['login', 'signup', '2fa', ''].includes(route)) {
-            console.log('not authenticated, redirecting to login');
             return ('login');
         }
         return route;
@@ -47,28 +41,16 @@ class Router {
         if (!this.routes[route]) return;
         console.log('navigating : ', route);
 
-        const url = new URL(window.location.href);
-        const newRoute = await this.authRedirector(route, params);
+        const newRoute = await this.authRedirector(route);
+        route = newRoute;
 
-        console.log({newRoute, route});
-
-        if (newRoute !== route) {
-            console.log()
-            navigation.navigate(`/${newRoute}`, {
-                state: { newRoute, params },
-                title: route.charAt(0).toUpperCase() + newRoute.slice(1),
-            })
-        }
-        else {
-            try {
-                const state = { route, params };
-                const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
-                console.log('PUSHING STATE BATARD');
-                history.pushState(state, title, `/${route}`);
-                this.routes[route](...params);
-            } catch (error) {
-                console.error('Navigation error:', error);
-            }
+        try {
+            const state = { route, params };
+            const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
+            history.pushState(state, title, `/${route}`);
+            this.routes[route](...params);
+        } catch (error) {
+            console.error('Navigation error:', error);
         }
     }
     
