@@ -7,60 +7,98 @@ class Router {
             login: this.renderLoginView.bind(this),
             signup: this.renderSignupView.bind(this),
             '2fa': this.render2faView.bind(this),
-            home: this.renderHomeView.bind(this)
+            home: this.renderHomeView.bind(this),
+            profile: this.renderProfileView.bind(this)
         };
 
-        // this.referrer = document.referrer && !document.referrer.includes(window.location.origin) 
-        //     ? document.referrer 
-        //     : null;
-
-        window.addEventListener('popstate', (event) => {
+        window.addEventListener('popstate', async (event) => {
+            console.log('popstating');
             if (event.state) {
-                (async () => {
-                    await this.navigate(event.state.route, ...(event.state.params || []));
-                })();
+                console.log('has popstate', {event});
+                const newRoute = await this.authRedirector(event.state.route);
+                console.log('newRoute = ', newRoute);
+                this.routes[newRoute]();
             }
         });
     }
 
-    isFirstNav = true;
-
     async getUserConnectionStatus() {
         await api.checkAndRefreshToken();
+        console.log('GetUserConnectionStatus Success');
         return api.accessToken !== null;
     }
-
-    async navigate(route, ...params) {
-        const view = this.routes[route];
-        if (!view) return;
     
+    async authRedirector(route, params) {
         const isAuthenticated = await this.getUserConnectionStatus();
-    
-        if (isAuthenticated && (route === 'login' || route === 'signup' || route === '2fa')) {
-            history.replaceState({ route: 'home', params: [] }, '', '/home');
-            this.renderHomeView();
-            return;
+
+        console.log({isAuthenticated});
+
+        if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
+            console.log('authenticated, redirecting to home');
+            return ('home');
+        } else if (!isAuthenticated && !['login', 'signup', '2fa', ''].includes(route)) {
+            console.log('not authenticated, redirecting to login');
+            return ('login');
         }
-        else if (!isAuthenticated && route !== 'login' && route !== 'signup' && route !== '2fa') {
-            history.pushState({ route: 'login', params: [] }, '', '/login');
-            this.renderLoginView();
-            return;
-        }
-    
-        view(...params);
-    
-        const state = { route, params };
-        const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
-    
-        if (this.isFirstNav && !isAuthenticated) {
-            history.pushState(state, title, '/login');
-            this.isFirstNav = false;
-        } 
-        else {
-            history.pushState(state, title, `/${route}`);
-        }
+        return route;
     }
 
+    async navigate(route, params = []) {
+        if (!this.routes[route]) return;
+        console.log('navigating : ', route);
+
+        const url = new URL(window.location.href);
+        const newRoute = await this.authRedirector(route, params);
+
+        console.log({newRoute, route});
+
+        if (newRoute !== route) {
+            console.log()
+            navigation.navigate(`/${newRoute}`, {
+                state: { newRoute, params },
+                title: route.charAt(0).toUpperCase() + newRoute.slice(1),
+            })
+        }
+        else {
+            try {
+                const state = { route, params };
+                const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
+                console.log('PUSHING STATE BATARD');
+                history.pushState(state, title, `/${route}`);
+                this.routes[route](...params);
+            } catch (error) {
+                console.error('Navigation error:', error);
+            }
+        }
+    }
+    
+        // async navigate(route, params = [], pushState = true) {
+        //     if (!this.routes[route]) return; // Ignore unknown routes
+    
+        //     try {
+        //         const isAuthenticated = await this.getUserConnectionStatus();
+    
+        //         if (isAuthenticated && ['login', 'signup', '2fa'].includes(route)) {
+        //             route = 'home';
+        //         } else if (!isAuthenticated && !['login', 'signup', '2fa'].includes(route)) {
+        //             route = 'login';
+        //         }
+    
+        //         // Render the view
+        //         this.routes[route](...params);
+    
+        //         // Update state if needed
+        //         if (pushState) {
+        //             navigation.navigate(`/${route}`, {
+        //                 state: { route, params },
+        //                 title: route.charAt(0).toUpperCase() + route.slice(1),
+        //             });
+        //         }
+        //     } catch (error) {
+        //         console.error('Navigation error:', error);
+        //     }
+        // }
+    
     renderLoginView() {
         this.app.innerHTML = `
             <div class="container">
@@ -186,8 +224,18 @@ class Router {
             <div class="container">
                 <h1>Welcome to Dashboard</h1>
                 <button id="logout-btn">Logout</button>
+                <button id="profile-btn">Profile</button>
             </div>
         `;
+
+        document.getElementById('profile-btn').addEventListener('click', async () => {
+            try {
+                this.navigate('profile');
+            } catch (error) {
+                console.error('Profile error:', error);
+                alert('An error occured. Please try again.');
+            }
+        })
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             try {
@@ -198,6 +246,14 @@ class Router {
                 alert('Logout failed. Please try again.');
             }
         });
+    }
+
+    renderProfileView() {
+        this.app.innerHTML = `
+            <div class="container">
+                <h1>PROFILE</h1>
+            </div>
+        `;
     }
 }
 

@@ -26,6 +26,8 @@ def comment_view(request):
 
 5/ verify_2fa: Prevent Replay Attacks
 
+6/ IF 2FA FAILS ONCE IT DOESNT WORK ANYMORE
+
 Currently, a valid 2FA code can be reused within its expiration window.
 Fix: Delete the 2FA code from the session before checking it to prevent replay attacks.
 

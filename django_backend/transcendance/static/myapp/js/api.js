@@ -52,6 +52,9 @@ const api = {
                 window.location.href = '/login';  // Redirect to login page if refresh fails
             }
         }
+        else {
+            console.log('No Refresh Token Available');
+        }
     },
 
     // Wrapper for authenticated requests
