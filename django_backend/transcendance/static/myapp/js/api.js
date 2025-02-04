@@ -66,7 +66,7 @@ const api = {
             credentials: 'include'
         });
 
-        // If unauthorized, try refreshing token
+        // If unauthorized, try refreshing token (maybe add 403 ?)
         if (response.status === 401) {
             const refreshSuccess = await this.refreshAccessToken();
             if (refreshSuccess) {
@@ -168,15 +168,34 @@ const api = {
     // Example of an authenticated request
     async getUserProfile() {
         try {
-            const response = await this.authFetch('/profile/', {
-                method: 'GET'
-            });
+            const response = await this.authFetch('/profile/', { method: 'GET' });
+            if (!response.ok) {
+                throw new Error('Failed to fetch profile')
+            }
             return await response.json();
+
         } catch (error) {
             console.error('Profile fetch error:', error);
             throw error;
         }
-    }
+    },
+
+    // async updateUserProfile(profileData) {
+    //     try {
+    //         const response = await this.authFetch('/profile/', { 
+    //             method: 'PUT',
+    //             body:JSON.stringify(profileData)
+    //     });
+    //         if (!response.ok) {
+    //             throw new Error('Failed to update profile')
+    //         }
+    //         return await response.json();
+
+    //     } catch (error) {
+    //         console.error('Profile update error:', error);
+    //         throw error;
+    //     }
+    // }
 };
 
 export default api;
