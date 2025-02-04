@@ -6,9 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const router = new Router(app);
     
     const url = new URL(window.location.href);
-    const route = await router.authRedirector(url.pathname.splice(1));
-
     //SI PATH AVEC /BLABLA/BLABLA = 2 slashs changer cette merde
+    const route = await router.authRedirector(url.pathname.replace('/', ''));
+
     router.navigate(route);
 });
 

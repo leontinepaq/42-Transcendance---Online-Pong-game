@@ -29,6 +29,7 @@ class Router {
 
         console.log({isAuthenticated});
 
+        //remove '' ? 
         if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
             return ('home');
         } else if (!isAuthenticated && !['login', 'signup', '2fa', ''].includes(route)) {
