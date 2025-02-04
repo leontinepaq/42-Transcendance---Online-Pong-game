@@ -29,10 +29,9 @@ class Router {
 
         console.log({isAuthenticated});
 
-        //remove '' ? 
         if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
             return ('home');
-        } else if (!isAuthenticated && !['login', 'signup', '2fa', ''].includes(route)) {
+        } else if (!isAuthenticated && !['login', 'signup', '2fa'].includes(route)) {
             return ('login');
         }
         return route;
@@ -54,33 +53,6 @@ class Router {
             console.error('Navigation error:', error);
         }
     }
-    
-        // async navigate(route, params = [], pushState = true) {
-        //     if (!this.routes[route]) return; // Ignore unknown routes
-    
-        //     try {
-        //         const isAuthenticated = await this.getUserConnectionStatus();
-    
-        //         if (isAuthenticated && ['login', 'signup', '2fa'].includes(route)) {
-        //             route = 'home';
-        //         } else if (!isAuthenticated && !['login', 'signup', '2fa'].includes(route)) {
-        //             route = 'login';
-        //         }
-    
-        //         // Render the view
-        //         this.routes[route](...params);
-    
-        //         // Update state if needed
-        //         if (pushState) {
-        //             navigation.navigate(`/${route}`, {
-        //                 state: { route, params },
-        //                 title: route.charAt(0).toUpperCase() + route.slice(1),
-        //             });
-        //         }
-        //     } catch (error) {
-        //         console.error('Navigation error:', error);
-        //     }
-        // }
     
     renderLoginView() {
         this.app.innerHTML = `

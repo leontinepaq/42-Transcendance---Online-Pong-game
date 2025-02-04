@@ -89,7 +89,7 @@ const api = {
     
     async login(username, password) {
         try {
-            const response = await fetch('/auth/login/', {
+            const response = await fetch('/api/auth/login/', {
                 method: 'POST',
                 headers: this.getHeaders(),
                 credentials: 'include',
@@ -110,7 +110,7 @@ const api = {
 
     async signup(username, email, password) {
         try {
-            const response = await fetch('/auth/signup/', {
+            const response = await fetch('/api/auth/signup/', {
                 method: 'POST',
                 headers: this.getHeaders(),
                 credentials: 'include',
@@ -150,7 +150,7 @@ const api = {
 
     async logout() {
         try {
-            const response = await this.authFetch('/auth/logout/', {
+            const response = await this.authFetch('/api/auth/logout/', {
                 method: 'POST'
             });
             

@@ -18,15 +18,15 @@ function to trigger game creation when game is being created
 from django.shortcuts import render
 from django.utils.html import escape
 
+5/ add migrate to dockerfile
+
 def comment_view(request):
     if request.method == "POST":
         user_comment = request.POST.get("comment")
         safe_comment = escape(user_comment)  # Escapes dangerous characters
         # Store or display safe_comment
 
-5/ verify_2fa: Prevent Replay Attacks
-
-6/ IF 2FA FAILS ONCE IT DOESNT WORK ANYMORE
+5/ verify_2fa: Prevent Replay Attacksww
 
 Currently, a valid 2FA code can be reused within its expiration window.
 Fix: Delete the 2FA code from the session before checking it to prevent replay attacks.
