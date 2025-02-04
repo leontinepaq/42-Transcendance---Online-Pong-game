@@ -126,10 +126,9 @@ class Router {
                 return;
             }
 
-            // Replace datasuccess by dataok ?
             try {
                 const data = await api.signup(username, email, password);
-                if (data.success) {
+                if (data.ok) {
                     alert('Account created successfully');
                     this.navigate('login');
                 } else {
