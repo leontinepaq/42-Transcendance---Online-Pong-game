@@ -26,15 +26,16 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email", "password"]
 
-    id =                models.AutoField(primary_key=True)
-    username =          models.CharField(max_length=30, unique=True)
-    email =             models.EmailField(unique=True)
-    avatar_url =        models.URLField(blank=True, null=True)
-    created_at =        models.DateTimeField(auto_now_add=True)
-    is_active =         models.BooleanField(default=True)
-    is_staff =          models.BooleanField(default=False)
-    two_factor_code =   models.CharField(max_length=6, blank=True, null=True)
-    two_factor_expiry = models.DateTimeField(blank=True, null=True, default=None)
+    id =                    models.AutoField(primary_key=True)
+    username =              models.CharField(max_length=30, unique=True)
+    email =                 models.EmailField(unique=True)
+    avatar_url =            models.URLField(blank=True, null=True)
+    created_at =            models.DateTimeField(auto_now_add=True)
+    is_active =             models.BooleanField(default=True)
+    is_staff =              models.BooleanField(default=False)
+    is_two_factor_active =  models.BooleanField(default=True)
+    two_factor_code =       models.CharField(max_length=6, blank=True, null=True)
+    two_factor_expiry =     models.DateTimeField(blank=True, null=True, default=None)
     
     objects = UserProfileManager()
     theme = models.CharField(

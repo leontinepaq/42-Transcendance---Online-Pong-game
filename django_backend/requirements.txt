@@ -1,9 +1,0 @@
-Django<5
-psycopg[binary]>=3.2.3
-djangorestframework
-djangorestframework-simplejwt
-django-filter
-markdown
-django-cors-headers
-django-bootstrap-v5
-django-oauth-toolkit

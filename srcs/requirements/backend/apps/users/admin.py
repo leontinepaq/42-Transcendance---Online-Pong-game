@@ -11,6 +11,9 @@ class CustomUserAdmin(UserAdmin):
                     "is_staff",
                     "is_superuser",
                     "is_active",
+                    "is_two_factor_active",
+                    "two_factor_code",
+                    "two_factor_expiry",
                     "theme")
     search_fields = ("email", "username")
     ordering = ("email",)

@@ -167,7 +167,7 @@ class Router {
             const code = document.getElementById('verification-code').value;
 
             try {
-                const data = await api.verify2FA(code);
+                const data = await api.verify2FA(code, username);
                 console.log(data);
                 if (data.ok) {
                     this.navigate('home');
@@ -191,7 +191,8 @@ class Router {
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             try {
-                await api.logout();
+                // await api.logout();
+                this.accessToken = null;
                 this.navigate('login');
             } catch (error) {
                 console.error('Logout error:', error);

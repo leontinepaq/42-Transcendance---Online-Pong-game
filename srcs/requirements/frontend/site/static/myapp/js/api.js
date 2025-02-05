@@ -149,13 +149,13 @@ const api = {
         }
     },
 
-    async verify2FA(code) {
+    async verify2FA(code, username) {
         try {
-            const response = await fetch('api/token/verify-2fa/', {
+            const response = await fetch('/api/user/verify_2fa/', {
                 method: 'POST',
                 headers: this.getHeaders(),
                 credentials: 'include',
-                body: JSON.stringify({ code }),
+                body: JSON.stringify({ code, username }),
             });
             
             const data = await response.json();

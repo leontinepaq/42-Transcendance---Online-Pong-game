@@ -12,6 +12,9 @@ from django.conf import settings
 from rest_framework import status
 from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
+import string
+from django.utils import timezone
+from datetime import timedelta
 
 User = get_user_model()
 
@@ -88,7 +91,7 @@ def	activate(request, uidb64, token):
 def send_2fa(user):
     user.two_factor_code = get_random_string(length=6,
                                              allowed_chars=string.digits)
-    user.auth.two_factor_expiry = timezone.now() + timedelta(minutes=15)
+    user.two_factor_expiry = timezone.now() + timedelta(minutes=15)
     user.save()
     
     try:
@@ -105,10 +108,10 @@ def send_2fa(user):
         return Response({'error': str(e)},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@permission_classes([IsAuthenticated])
+@api_view(["POST"])
 def verify_2fa(request):
     code = request.data.get('code')
-    username = request.session.get('username')
+    username = request.data.get('username')
     
     if not all([code, username]):
         return Response({'error': 'missing info'},
@@ -118,7 +121,7 @@ def verify_2fa(request):
     if user.two_factor_code != code:
         return Response({"message": "wrong code"},
                         status = status.HTTP_403_FORBIDDEN)
-    if parse_datetime(user.two_factor_expiry) > timezone.now():
+    if user.two_factor_expiry < timezone.now():
         return Response({"message": "expired code"},
                         status = status.HTTP_403_FORBIDDEN)
 
@@ -146,7 +149,7 @@ def login(request):
     #     send_mail(request)
     #     return Response({"is_activated: false"},
     #                     status=status.HTTP_200_OK)
-    if user.two_factor_active:
-        return send_2FA(user)
+    if user.is_two_factor_active:
+        return send_2fa(user)
     return Response({"message": "Somethign went wrong"},
                     status=status.HTTP_404_NOT_FOUND)
