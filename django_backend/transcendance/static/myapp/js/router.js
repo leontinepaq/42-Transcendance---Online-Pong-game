@@ -7,60 +7,56 @@ class Router {
             login: this.renderLoginView.bind(this),
             signup: this.renderSignupView.bind(this),
             '2fa': this.render2faView.bind(this),
-            home: this.renderHomeView.bind(this)
+            home: this.renderHomeView.bind(this),
+            profile: this.renderProfileView.bind(this),
+            // play: this.renderPlayView.bind(this),
+            // history: this.renderHistoryView.bind(this),
+            
         };
 
-        // this.referrer = document.referrer && !document.referrer.includes(window.location.origin) 
-        //     ? document.referrer 
-        //     : null;
-
-        window.addEventListener('popstate', (event) => {
+        window.addEventListener('popstate', async (event) => {
             if (event.state) {
-                (async () => {
-                    await this.navigate(event.state.route, ...(event.state.params || []));
-                })();
+                const newRoute = await this.authRedirector(event.state.route);
+                this.routes[newRoute]();
             }
         });
     }
-
-    isFirstNav = true;
 
     async getUserConnectionStatus() {
         await api.checkAndRefreshToken();
         return api.accessToken !== null;
     }
-
-    async navigate(route, ...params) {
-        const view = this.routes[route];
-        if (!view) return;
     
+    async authRedirector(route) {
         const isAuthenticated = await this.getUserConnectionStatus();
-    
-        if (isAuthenticated && (route === 'login' || route === 'signup' || route === '2fa')) {
-            history.replaceState({ route: 'home', params: [] }, '', '/home');
-            this.renderHomeView();
-            return;
+
+        console.log({isAuthenticated});
+
+        if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
+            return ('home');
+        } else if (!isAuthenticated && !['login', 'signup', '2fa'].includes(route)) {
+            return ('login');
         }
-        else if (!isAuthenticated && route !== 'login' && route !== 'signup' && route !== '2fa') {
-            history.pushState({ route: 'login', params: [] }, '', '/login');
-            this.renderLoginView();
-            return;
-        }
-    
-        view(...params);
-    
-        const state = { route, params };
-        const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
-    
-        if (this.isFirstNav && !isAuthenticated) {
-            history.pushState(state, title, '/login');
-            this.isFirstNav = false;
-        } 
-        else {
-            history.pushState(state, title, `/${route}`);
-        }
+        return route;
     }
 
+    async navigate(route, params = []) {
+        if (!this.routes[route]) return;
+        console.log('navigating : ', route);
+
+        const newRoute = await this.authRedirector(route);
+        route = newRoute;
+
+        try {
+            const state = { route, params };
+            const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
+            history.pushState(state, title, `/${route}`);
+            this.routes[route](...params);
+        } catch (error) {
+            console.error('Navigation error:', error);
+        }
+    }
+    
     renderLoginView() {
         this.app.innerHTML = `
             <div class="container">
@@ -130,10 +126,9 @@ class Router {
                 return;
             }
 
-            // Replace datasuccess by dataok
             try {
                 const data = await api.signup(username, email, password);
-                if (data.success) {
+                if (data.ok) {
                     alert('Account created successfully');
                     this.navigate('login');
                 } else {
@@ -148,7 +143,7 @@ class Router {
         document.getElementById('back-to-login-btn').addEventListener('click', () => this.navigate('login'));
     }
 
-    render2faView(username) {
+    render2faView() {
         this.app.innerHTML = `
             <div class="container">
                 <h1>Two-Factor Authentication</h1>
@@ -186,8 +181,18 @@ class Router {
             <div class="container">
                 <h1>Welcome to Dashboard</h1>
                 <button id="logout-btn">Logout</button>
+                <button id="profile-btn">Profile</button>
             </div>
         `;
+
+        document.getElementById('profile-btn').addEventListener('click', async () => {
+            try {
+                this.navigate('profile');
+            } catch (error) {
+                console.error('Profile error:', error);
+                alert('An error occured. Please try again.');
+            }
+        })
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             try {
@@ -199,6 +204,68 @@ class Router {
             }
         });
     }
+
+    renderProfileView() {
+        this.app.innerHTML = `
+            <div class="container">
+                <h1>PROFILE</h1>
+            </div>
+        `;
+    }
+
+    // renderHomeView() {
+    //     this.app.innerHTML = `
+    //         <div class="container">
+    //             <h1 class="mb-4">Welcome to the Home Page!</h1>
+    //             <button id="logout-btn" class="btn btn-danger">Logout</button>
+    //             <button id="profile-btn" class="btn btn-primary">Profile</button>
+    //             <button id="play-btn" class="btn btn-success">Play</button>
+    //         </div>
+    //     `;
+    
+    //     const buttonActions = {
+    //         "logout-btn": async () => {
+    //             try {
+    //                 await api.logout();
+    //                 this.navigate('login');
+    //             } catch (error) {
+    //                 console.error('Logout error:', error);
+    //                 alert('Logout failed. Please try again.');
+    //             }
+    //         },
+    //         "profile-btn": () => this.navigate('profile'),
+    //         "play-btn": () => this.navigate('play'),
+    //     };
+    
+    //     Object.entries(buttonActions).forEach(([id, action]) => {
+    //         document.getElementById(id).addEventListener('click', async () => {
+    //             try {
+    //                 await action();
+    //             } catch (error) {
+    //                 console.error(`${id} error:`, error);
+    //                 alert('An error occurred. Please try again.');
+    //             }
+    //         });
+    //     });
+    // }
+
+    // renderProfileView() {
+    //     this.app.innerHTML = `
+    //         <div class="container">
+    //              <h1 class="text-center mb-4">Profile</h1>
+    //             <button id="history-btn" class="btn btn-secondary">History</button>
+    //         </div>
+    //     `;
+
+    //     document.getElementById('history-btn').addEventListener('click', async () => {
+    //         try {
+    //             this.navigate('history');
+    //         } catch (error) {
+    //             console.error('History error:', error);
+    //             alert('An error occured. Please try again.');
+    //         }
+    //     })
+    // }
 }
 
 export default Router;
