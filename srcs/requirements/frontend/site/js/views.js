@@ -2,8 +2,7 @@ async function loadView(view) {
     const app = document.getElementById("app");
 
     try {
-        console.log("HIHI");
-        const response = await fetch(`/views/${view}.html`);
+        const response = await fetch(`./views/${view}.html`);
         if (!response.ok) throw new Error("View not found");
 
         const html = await response.text();

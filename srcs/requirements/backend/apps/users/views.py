@@ -145,7 +145,7 @@ def login(request):
     if user is None:
         return Response({"error": "Invalid credentials"},
                         status=status.HTTP_202_ACCEPTED)
-    # if user.is_active == False:
+    # if user.is_mail_activated == False:
     #     send_mail(request)
     #     return Response({"is_activated: false"},
     #                     status=status.HTTP_200_OK)
