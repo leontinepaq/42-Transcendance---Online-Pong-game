@@ -25,7 +25,7 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./requirements/backend/django_backend/:/apps/
+      - ./requirements/backend/apps/:/apps/
     depends_on:
       postgres:
           condition: service_healthy

@@ -86,7 +86,7 @@ const api = {
     
     async login(username, password) {
         try {
-            const response = await fetch('/api/auth/login/', {
+            const response = await fetch('/api/user/login/', {
                 method: 'POST',
                 headers: this.getHeaders(),
                 credentials: 'include',
@@ -107,7 +107,7 @@ const api = {
 
     async signup(username, email, password) {
         try {
-            const response = await fetch('/api/auth/signup/', {
+            const response = await fetch('/api/user/register/', {
                 method: 'POST',
                 headers: this.getHeaders(),
                 credentials: 'include',
@@ -120,6 +120,31 @@ const api = {
             };
         } catch (error) {
             console.error('Signup failed:', error);
+            throw error;
+        }
+    },
+
+    async send_activation_link(username)
+    {
+        try
+        {
+            const response = await fetch("/api/user/send_link",
+                {
+                    method: "POST",
+                    headers: this.getHeaders(),
+                    credentials: 'include',
+                    body: JSON.stringify({username})
+                }
+            );
+            const data = await response.json();
+            return {
+                ok: response.ok,
+                ...data
+            }
+        }
+        catch
+        {
+            console.error('Sending mail failed', error);
             throw error;
         }
     },

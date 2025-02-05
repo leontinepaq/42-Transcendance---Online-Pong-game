@@ -7,7 +7,7 @@ class Router {
             login: this.renderLoginView.bind(this),
             signup: this.renderSignupView.bind(this),
             '2fa': this.render2faView.bind(this),
-            home: this.renderHomeView.bind(this)
+            home: this.renderHomeView.bind(this),
         };
 
         // this.referrer = document.referrer && !document.referrer.includes(window.location.origin) 
@@ -135,7 +135,7 @@ class Router {
                 const data = await api.signup(username, email, password);
                 if (data.success) {
                     alert('Account created successfully');
-                    this.navigate('login');
+                    this.navigate('send_link');
                 } else {
                     alert(data.message || 'Signup failed');
                 }
