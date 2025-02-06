@@ -14,3 +14,4 @@ pypng==0.20220715.0
 qrcode==7.4.2
 sqlparse==0.5.3
 typing_extensions==4.12.2
+pillow==11.1.0

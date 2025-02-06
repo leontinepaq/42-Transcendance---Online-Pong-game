@@ -97,8 +97,9 @@ const api = {
                 credentials: 'include',
                 body: JSON.stringify({ username, password }),
             });
-    
+            
             const data = await response.json();
+            console.log({data})
             return {
                 ok: response.ok,
                 message: data.message,
@@ -150,6 +151,26 @@ const api = {
         }
     },
 
+    async verifyAuthenticator(code, username) {
+        try {
+            const response = await fetch('/api/user/authenticator/', {
+                method: 'POST',
+                headers: this.getHeaders(),
+                credentials: 'include',
+                body: JSON.stringify({ code, username}),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                this.accessToken = data.access;
+            }
+            return { ok: response.ok, ...data};
+        } catch (error) {
+            console.error('2FA Auhenticator verification error:', error);
+            throw error;
+        }
+    },
+
     async logout() {
         try {
             const response = await this.authFetch('/auth/logout/', {
@@ -182,22 +203,22 @@ const api = {
         }
     },
 
-    // async updateUserProfile(profileData) {
-    //     try {
-    //         const response = await this.authFetch('/profile/', { 
-    //             method: 'PUT',
-    //             body:JSON.stringify(profileData)
-    //     });
-    //         if (!response.ok) {
-    //             throw new Error('Failed to update profile')
-    //         }
-    //         return await response.json();
+    async updateUserProfile(profileData) {
+        try {
+            const response = await this.authFetch('/profile/', { 
+                method: 'PUT',
+                body:JSON.stringify(profileData)
+        });
+            if (!response.ok) {
+                throw new Error('Failed to update profile')
+            }
+            return await response.json();
 
-    //     } catch (error) {
-    //         console.error('Profile update error:', error);
-    //         throw error;
-    //     }
-    // }
+        } catch (error) {
+            console.error('Profile update error:', error);
+            throw error;
+        }
+    }
 };
 
 export default api;

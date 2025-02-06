@@ -31,12 +31,15 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     email =                 models.EmailField(unique=True)
     avatar_url =            models.URLField(blank=True, null=True)
     created_at =            models.DateTimeField(auto_now_add=True)
-    is_active =             models.BooleanField(default=False)
+    is_active =             models.BooleanField(default=True)
     is_mail_activated =     models.BooleanField(default=False)
     is_staff =              models.BooleanField(default=False)
     is_two_factor_active =  models.BooleanField(default=True)
+    is_two_factor_mail =    models.BooleanField(default=True)
+    is_two_factor_auth =    models.BooleanField(default=False)
     two_factor_code =       models.CharField(max_length=6, blank=True, null=True)
     two_factor_expiry =     models.DateTimeField(blank=True, null=True, default=None)
+    totp_secret =           models.CharField(max_length=32, blank=True, null=True)
     
     objects = UserProfileManager()
     theme = models.CharField(
@@ -44,6 +47,19 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         choices=[("light", "Light"), ("dark", "Dark")],
         default="light",
     )
+
+    def generate_totp_secret(self):
+        self.totp_secret = pyotp.TOTP(pyotp.random_base32())
+        self.save()
+        return self.totp_secret
+
+    def verify_totp(self, token):
+        totp = pyotp.TOTP(self.totp_secret)
+        return totp.verify(token)
+
+    def get_totp_uri(self):
+        totp = pyotp.TOTP(self.totp_secret)
+        return totp.provisioning_uri(self.username, issuer_name="Transcendance")
 
     def is_2fa_valid(self, code):
         return (self.two_factor_code == code 

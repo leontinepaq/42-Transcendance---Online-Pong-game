@@ -15,6 +15,7 @@ from django.utils.dateparse import parse_datetime
 import string
 from django.utils import timezone
 from datetime import timedelta
+from io import BytesIO
 
 User = get_user_model()
 
@@ -136,6 +137,46 @@ def refreshToken(user):
                      'refresh': str(refresh)},
                     status = status.HTTP_200_OK)
     
+@permission_classes([IsAuthenticated])
+def generate_totp_secret_and_qr(request):
+    user = request.user
+    totp = pyotp.TOTP(pyotp.random_base32())
+    user.totp_secret = totp.secret
+    user.save()
+    
+    uri = totp.provisioning_uri(user.username, issuer_name="Transcendance")
+
+    img = qrcode.make(uri)
+    img_buffer = BytesIO()
+    img.save(img_buffer)
+    img_buffer.seek(0)
+    img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+
+    return Response({'qr_code': img_base64})
+
+@api_view(["POST"])
+def verify_authenticator(request):
+    username = request.data.get('username')
+    token = request.data.get('code')
+
+    if not username or not token:
+        return Response({"message": "Username and code are required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.get(username=username)
+
+    if not user.totp_secret:
+        return Response({"message": "Authenticator not set up"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    totp = pyotp.TOTP(user.totp_secret)
+    
+    if totp.verify(token):
+        return refreshToken(user)
+    return Response({"message": "Invalid code, please try again"}, status=status.HTTP_403_FORBIDDEN)
+
+def refreshToken(user):
+    refresh = RefreshToken.for_user(user)
+    return Response({'access': str(refresh.access_token), 'refresh': str(refresh)}, status = status.HTTP_200_OK)
+    
 @permission_classes([AllowAny])
 @api_view(["POST"])
 def login(request):
@@ -143,13 +184,15 @@ def login(request):
     password = request.data.get("password")
     user = authenticate(request, username=username, password=password)
     if user is None:
-        return Response({"error": "Invalid credentials"},
-                        status=status.HTTP_202_ACCEPTED)
-    # if user.is_mail_activated == False:
+        return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+    # if user.is_active == False:
     #     send_mail(request)
     #     return Response({"is_activated: false"},
     #                     status=status.HTTP_200_OK)
     if user.is_two_factor_active:
-        return send_2fa(user)
-    return Response({"message": "Somethign went wrong"},
-                    status=status.HTTP_404_NOT_FOUND)
+        if user.is_two_factor_mail:
+            return send_2fa(user)
+        elif user.is_two_factor_auth:
+            return Response({"redirect_url": "/verify_authenticator/"}, status=status.HTTP_200_OK)
+
+    return Response({"Message": "Success!"}, status=status.HTTP_200_OK)
