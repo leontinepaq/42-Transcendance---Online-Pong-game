@@ -1,17 +1,137 @@
-body {
-    background-color: #f8f9fa;
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    z-index: -1;
 }
 
-.card {
-    max-width: 400px;
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle, #000 20%, #001B2E);
+    overflow: hidden;
+    display: grid;
+    align-items: start;
+    justify-content: center;
+    padding: 1.25rem;
+    font-family: "Jersey 15", serif;
+    color: #F1EBDA;
+    margin: 0;
+    width: 100vw;
+
+}
+
+#app {
     width: 100%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    display: grid;
+    gap: 1.25rem;
+    justify-items: center;
+    width: 100%;
+    padding: 1.25rem;
+    box-sizing: border-box;
+}
+
+h1, h2 {
+    text-align: center;
+    font-weight: normal;
+}
+
+h1 {
+    font-size: 4rem;
+    margin-bottom: 1.25rem;
+    font-family: "Jersey 10", serif;
 }
 
 h2 {
-    margin-bottom: 20px;
+    font-size: 2.5rem;
+    margin-bottom: 1.25rem;
+    font-family: "Jersey 15", serif;
 }
 
-a {
-    text-decoration: none;
+form {
+    display: grid;
+    gap: 1.25rem;
+    width: 100%;
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+     -webkit-box-sizing:border-box;
+     -moz-box-sizing: border-box;
+    padding: 0.75rem 1rem;
+    border: 2px solid #F1EBDA;
+    border-radius: 1rem;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.20) 100%), #001B2E;
+    color: #F1EBDA;
+    font-family: "Jersey 15", serif;
+    font-size: 1.25rem;
+}
+
+.div {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+    width: 100%;
+}
+
+button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    width: 100%;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 2.5rem;
+    background: #F1EBDA;
+    color: #001B2E;
+    font: 1.5rem "Jersey 15", serif;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+button .div
+{
+    width: auto;
+}
+
+
+#forgot-btn {
+    background: #313d46;
+    color: #F1EBDA;
+}
+
+button:hover,  #forgot-btn:hover{
+    background: #F24C00;
+}
+
+.view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.view.active {
+    opacity: 1;
+}
+
+.view.fade-out {
+    opacity: 0;
 }

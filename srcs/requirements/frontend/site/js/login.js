@@ -4,7 +4,7 @@ import observeAndAttachEvent from './observeAndAttachEvent.js'
 
 observeAndAttachEvent(
     'login-form',
-    'submit',
+    'signin-btn',
     async (event) => {
         event.preventDefault();
         const username = document.getElementById('username').value;
