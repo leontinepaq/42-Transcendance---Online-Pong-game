@@ -15,9 +15,9 @@ function drawBackground() {
 
 // Couches d'étoiles pour le parallax
 const layers = [
-    { numStars: 20 * (canvas.width / 1440), speed: 0.3, maxRadius: 1 },  
-    { numStars: 40 * (canvas.width / 1440), speed: 0.2, maxRadius: 2 },  
-    { numStars: 50 * (canvas.width / 1440), speed: 0.1, maxRadius: 3 }  
+	{ numStars: 20 * (canvas.width / 1440), speed: 0.0003, maxRadius: 1 },  
+	{ numStars: 40 * (canvas.width / 1440), speed: 0.0002, maxRadius: 2 },  
+	{ numStars: 50 * (canvas.width / 1440), speed: 0.0001, maxRadius: 3 }  
 ];
 
 let stars = [];
@@ -93,16 +93,25 @@ function drawScene() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBackground();
 
-    stars.forEach(star => {
-        star.opacity += star.flickerSpeed * Math.sin(performance.now() / 1000);
-        star.opacity = Math.min(1, Math.max(0.3, star.opacity));
-        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-        ctx.fill();
-        star.y += star.speed;
-        if (star.y > canvas.height) star.y = 0;
-    });
+	// Dessiner les étoiles
+	stars.forEach(star => {
+		// Changement d'opacité pour le scintillement
+		star.opacity += star.flickerSpeed * (Math.random() > 0.5 ? 1 : -1);
+		if (star.opacity > 1) star.opacity = 1;
+		if (star.opacity < 0.3) star.opacity = 0.3;
+
+		ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+		ctx.beginPath();
+		ctx.arc(star.x * canvas.width, star.y * canvas.height, star.radius, 0, Math.PI * 2);
+		ctx.fill();
+
+		// Déplacer l'étoile vers le bas pour l'effet de défilement
+		star.y += star.speed;
+		if (star.y > 1) {
+		star.y = 0;
+		star.x = Math.random(); // Nouvelle position X aléatoire
+		}
+	});
 
     shootingStars.forEach((star, index) => {
         ctx.strokeStyle = `rgba(255, 255, 255, ${star.opacity})`;

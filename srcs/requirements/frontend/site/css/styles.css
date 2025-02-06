@@ -16,17 +16,19 @@ body {
     background: radial-gradient(circle, #000 20%, #001B2E);
     overflow: hidden;
     display: grid;
-    align-items: start;
     justify-content: center;
     padding: 1.25rem;
     font-family: "Jersey 15", serif;
     color: #F1EBDA;
     margin: 0;
     width: 100vw;
+    height: 100vh;
+
 }
 
 #app {
     width: 100%;
+    height: 50%;
     display: flex; 
     justify-content: center;
     align-items: center;
@@ -38,7 +40,6 @@ body {
     justify-items: center;
     width: 100%;
     padding: 1.25rem;
-    box-sizing: border-box;
 }
 
 h1, h2 {
