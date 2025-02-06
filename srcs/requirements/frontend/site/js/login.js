@@ -29,3 +29,9 @@ observeAndAttachEvent(
     'click',
     () => navigate('signup')
 );
+
+observeAndAttachEvent(
+    'pong',
+    'click',
+    () => navigate('pong')
+);
