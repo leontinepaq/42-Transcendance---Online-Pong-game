@@ -7,7 +7,7 @@ observeAndAttachEvent(
 	'click',
 	async () => {
 		try {
-			navigate('activateAuthenticator');
+			navigate('settingsActivateAuthenticator');
 		} catch (error) {
 			console.error('Profile error:', error);
 			alert('An error occured. Please try again.');

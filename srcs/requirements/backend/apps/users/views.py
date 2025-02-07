@@ -138,38 +138,36 @@ def refreshToken(user):
                     status = status.HTTP_200_OK)
     
 @permission_classes([IsAuthenticated])
-def generate_totp_secret_and_qr(request):
+def activate_authenticator(request):
     user = request.user
     totp = pyotp.TOTP(pyotp.random_base32())
     user.totp_secret = totp.secret
+    user.is_two_factor_mail = False
+    user.is_two_factor_auth = True
     user.save()
     
     uri = totp.provisioning_uri(user.username, issuer_name="Transcendance")
-
     img = qrcode.make(uri)
-    img_buffer = BytesIO()
-    img.save(img_buffer)
-    img_buffer.seek(0)
-    img_base64 = base64.b64encode(img_buffer.getvalue()).decode('utf-8')
+    buffer = BytesIO()
+    qr.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
 
-    return Response({'qr_code': img_base64})
+    return Response({"qr_code": f"data:image/png;base64,{qr_base64}"}, status=200)
 
 @api_view(["POST"])
 def verify_authenticator(request):
-    username = request.data.get('username')
-    token = request.data.get('code')
+    user = request.user
+    code = request.data.get('code')
 
-    if not username or not token:
-        return Response({"message": "Username and code are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-    user = User.objects.get(username=username)
+    if not code:
+        return Response({"message": "code is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     if not user.totp_secret:
         return Response({"message": "Authenticator not set up"}, status=status.HTTP_400_BAD_REQUEST)
     
     totp = pyotp.TOTP(user.totp_secret)
     
-    if totp.verify(token):
+    if totp.verify(code):
         return refreshToken(user)
     return Response({"message": "Invalid code, please try again"}, status=status.HTTP_403_FORBIDDEN)
 
@@ -196,3 +194,8 @@ def login(request):
             return Response({"redirect_url": "/verify_authenticator/"}, status=status.HTTP_200_OK)
 
     return Response({"Message": "Success!"}, status=status.HTTP_200_OK)
+
+@permission_classes([IsAuthenticated])
+@api_view(["PUT"])
+def update_profile(request):
+    user = request.user

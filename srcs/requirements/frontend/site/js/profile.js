@@ -7,6 +7,7 @@ observeAndAttachEvent(
 	'click',
 	async () => {
 		try {
+			console.log('clicked');
 			navigate('updateProfile');
 		} catch (error) {
 			console.error('Profile error:', error);
