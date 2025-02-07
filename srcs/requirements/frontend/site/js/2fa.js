@@ -1,4 +1,4 @@
-import api from "./api.js"
+import verify2FA from "./api.js"
 import navigate from "./router.js"
 import observeAndAttachEvent from './observeAndAttachEvent.js'
 
@@ -10,7 +10,7 @@ observeAndAttachEvent(
 		const code = document.getElementById('verification-code').value;
 
 		try {
-			const data = await api.verify2FA(code, sessionStorage.getItem("username"));
+			const data = await verify2FA(code, sessionStorage.getItem("username"));
 			if (data.ok) {
 				navigate('home');
 			} else {

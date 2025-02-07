@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -15,6 +16,8 @@ from django.utils.dateparse import parse_datetime
 import string
 from django.utils import timezone
 from datetime import timedelta
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 User = get_user_model()
 
@@ -24,7 +27,7 @@ def register(request):
     email = request.data.get("email")
     username = request.data.get("username")
     password = request.data.get("password")
-
+    
     if User.objects.filter(email=email).exists():
         return Response({"error": "Email already registered."},
                         status=status.HTTP_404_NOT_FOUND)
@@ -76,7 +79,7 @@ def	activate(request, uidb64, token):
         user = get_user_model().objects.get(pk=uid)
     except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
-    
+
     if (user is not None
         and default_token_generator.check_token(user, token)):
         user.is_active = True
@@ -87,13 +90,12 @@ def	activate(request, uidb64, token):
         return Response({"message": "Expired link"},
                         status = status.HTTP_404_NOT_FOUND)
 
-@permission_classes([IsAuthenticated])
 def send_2fa(user):
     user.two_factor_code = get_random_string(length=6,
                                              allowed_chars=string.digits)
     user.two_factor_expiry = timezone.now() + timedelta(minutes=15)
     user.save()
-    
+
     try:
         send_mail(
             'Your 2FA Code',
@@ -112,7 +114,7 @@ def send_2fa(user):
 def verify_2fa(request):
     code = request.data.get('code')
     username = request.data.get('username')
-    
+
     if not all([code, username]):
         return Response({'error': 'missing info'},
                         status=status.HTTP_400_BAD_REQUEST)
@@ -132,12 +134,46 @@ def verify_2fa(request):
     
 def refreshToken(user):
     refresh = RefreshToken.for_user(user)
-    return Response({'access': str(refresh.access_token),
-                     'refresh': str(refresh)},
-                    status = status.HTTP_200_OK)
+    response = Response({"message": "Login successful"})
     
-@permission_classes([AllowAny])
+    # Set JWT as HttpOnly Cookie
+    response.set_cookie(
+        key="access_token",
+        value=str(refresh.access_token),
+        httponly=True,
+        secure=True,  # Enable this for HTTPS
+        samesite="Strict"
+    )
+    
+    response.set_cookie(
+        key="refresh_token",
+        value=str(refresh),
+        httponly=True,
+        secure=True,
+        samesite="Strict"
+    )
+    return response
+    
+login_request_body = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        'username': openapi.Schema(type=openapi.TYPE_STRING,
+                                   description="Username or email of the user"),
+        'password': openapi.Schema(type=openapi.TYPE_STRING,
+                                   description="Password associated with the username/email",
+                                   writeOnly=True),
+    },
+    required=['username',
+              'password']
+)
+@swagger_auto_schema(
+    method="post",
+    request_body=login_request_body,
+    responses={200: "Login successful",
+               400: "Invalid credentials"}
+)
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def login(request):
     username = request.data.get("username")
     password = request.data.get("password")
@@ -151,5 +187,17 @@ def login(request):
     #                     status=status.HTTP_200_OK)
     if user.is_two_factor_active:
         return send_2fa(user)
-    return Response({"message": "Somethign went wrong"},
+    return Response({"message": "Something went wrong"},
                     status=status.HTTP_404_NOT_FOUND)
+
+@api_view(["POST"])
+def logout(request):
+    response = Response({"message": "Logged out"})
+    response.delete_cookie("access_token")
+    response.delete_cookie("refresh_token")
+    return response
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def auth_check(request):
+    return Response({"authenticated": True, "user": request.user.username})

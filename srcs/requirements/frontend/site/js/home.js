@@ -1,4 +1,4 @@
-import api from "./api.js"
+import logout from "./api.js"
 import navigate from "./router.js"
 import observeAndAttachEvent from './observeAndAttachEvent.js'
 
@@ -20,7 +20,7 @@ observeAndAttachEvent(
 	'click',
 	async () => {
 		try {
-			await api.logout();
+			await logout();
 			navigate('login');
 		} catch (error) {
 			console.error('Logout error:', error);

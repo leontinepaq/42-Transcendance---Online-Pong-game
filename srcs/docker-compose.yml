@@ -39,6 +39,7 @@ services:
       - ./requirements/frontend/site:/site/
     ports:
       - "9999:80"
+      - "8888:443"
     depends_on:
       - backend
 

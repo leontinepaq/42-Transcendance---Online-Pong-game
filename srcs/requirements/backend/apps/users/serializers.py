@@ -1,12 +1,22 @@
 from rest_framework import serializers
 from .models import UserProfile
+from drf_yasg.utils import swagger_serializer_method
+from drf_yasg import openapi
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'username', 'email', 'avatar_url', 'theme', 
-                 'is_active', 'created_at', 'password']
-        read_only_fields = ['created_at', 'updated_at', 'id']
+        fields = ['id',
+                  'username',
+                  'email',
+                  'avatar_url',
+                  'theme',
+                  'is_active',
+                  'created_at',
+                  'password']
+        read_only_fields = ['created_at',
+                            'updated_at',
+                            'id']
         extra_kwargs = {
             'password': {'write_only': True},
         }

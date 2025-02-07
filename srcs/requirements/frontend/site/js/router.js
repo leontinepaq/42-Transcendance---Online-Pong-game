@@ -1,36 +1,42 @@
-import api from './api.js';
+import checkAuth from './api.js';
 import loadView from './views.js';
 
-// window.addEventListener('popstate', async (event) => {
-//     if (event.state) {
-//         const newRoute = await authRedirector(event.state.route);
-//         routes[newRoute]();
-//     }
-// });
+window.addEventListener(
+    'popstate', 
+    async (event) => {
+        if (event.state) {
+        console.log("route is ", event.state.route);
+        const newRoute = await authRedirector(event.state.route);
+        console.log("new route is ", newRoute);
+        loadView(newRoute);
+    }
+});
 
-async function getUserConnectionStatus() {
-    await api.checkAndRefreshToken();
-    return api.accessToken !== null;
-}
+const publicRoutes = new Set(['login', 'signup', '2fa']);
 
 export async function authRedirector(route)
 {
-    const isAuthenticated = await getUserConnectionStatus();
-
+    const isAuthenticated = await checkAuth();
     console.log({isAuthenticated});
-
-    if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
-        return ('home');
-    } else if (!isAuthenticated && !['login', 'signup', '2fa', 'pong'].includes(route)) {
-        return ('login');
+    if (isAuthenticated && publicRoutes.has(route)) {
+        return 'home';
+    } else if (!isAuthenticated && !publicRoutes.has(route)) {
+        return 'login';
     }
     else if (['pong'].includes(route))
         return ('pong');
     return route;
 }
 
-export async function navigate(route, ...params) {
-    // if (!routes[route]) return;
+export async function navigate(route, ...params)
+{
+    const currentRoute = window.location.pathname.split('/')[1];  // Extract current route from URL
+    
+    if (currentRoute === route) {
+        console.log('Already on the target route:', route);
+        return;
+    }
+
     console.log('navigating : ', route);
 
     const newRoute = await authRedirector(route);
@@ -39,6 +45,9 @@ export async function navigate(route, ...params) {
     try {
         const state = { route, params };
         const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
+        // if (currentRoute == "2fa" || currentRoute == "login")
+        //     history.replaceState(state, title, `/${route}`);
+        // else
         history.pushState(state, title, `/${route}`);
         loadView(route);
     } catch (error) {

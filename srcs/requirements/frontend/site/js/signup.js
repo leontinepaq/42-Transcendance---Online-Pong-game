@@ -1,4 +1,4 @@
-import api from "./api.js"
+import signup from "./api.js"
 import navigate from "./router.js"
 import observeAndAttachEvent from './observeAndAttachEvent.js'
 
@@ -19,7 +19,7 @@ observeAndAttachEvent(
 		}
 
 		try {
-			const data = await api.signup(username, email, password);
+			const data = await signup(username, email, password);
 			if (data.ok) {
 				alert('Account created successfully');
 				navigate('login');

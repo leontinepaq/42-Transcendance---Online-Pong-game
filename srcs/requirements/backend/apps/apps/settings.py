@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-o4r1!m^8xhfg1f*x)v1ts_pf5i97#x486ty6a!m9bnp%7&uygw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost"]
-CSRF_TRUSTED_ORIGINS = ["http://localhost:9999"]
+ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "bess-f3r1s9"]
+# CSRF_TRUSTED_ORIGINS = ["http://localhost:9999"]
 
 # Application definition
 
@@ -53,10 +53,17 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_COOKIE": "access_token",  # Name of the cookie
+    "AUTH_COOKIE_HTTP_ONLY": True,  # Prevent XSS attacks
+    "AUTH_COOKIE_SECURE": True,  # Enable for HTTPS
+    "AUTH_COOKIE_SAMESITE": "Strict",  # CSRF protection
 }
+
 
 
 MIDDLEWARE = [
