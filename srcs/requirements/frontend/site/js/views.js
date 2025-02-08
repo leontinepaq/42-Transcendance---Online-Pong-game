@@ -15,7 +15,7 @@ async function loadView(view) {
         // else    
         //     app.innerHTML = html;
         app.innerHTML = html;
-        if (view == 'home' || view == 'login' || view == 'signup--') //todo: fix signup-- to signup
+        if (view == 'home' || view == 'login' || view == 'signup')
             PlanetAnimation.init();
         else 
             PlanetAnimation.exit();
