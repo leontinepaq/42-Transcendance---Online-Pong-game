@@ -1,12 +1,29 @@
-<div id="signup-form-container">
-	<h2>Sign Up</h2>
-	<form id="signup-form">
-		<input type="text" id="new-username" placeholder="Username" required>
-		<input type="email" id="new-email" placeholder="Email" required>
-		<input type="password" id="new-password" placeholder="Password" required>
-		<input type="password" id="confirm-password" placeholder="Confirm Password" required>
-		<button type="submit">SIGN UP</button>
-		<button type="button" id="back-to-login-btn">BACK TO LOGIN</button>
-		<dotlottie-wc src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie" autoplay loop style="width: 200px; height: 200px;" ></dotlottie-wc >
-	</form>
+<div id="signup-form-container" class="container-fluid d-flex justify-content-center align-items-center">
+	<div class="login-form">
+		<div class="row">
+			<div class="col-lg-12 col-10">
+				<h2 id="title" class="text-center">Sign Up</h2>
+				<form id="signup-form" class="form-control-xl w-100">
+					<div class="mb-3">
+						<input type="text" class="form-control" id="new-username" placeholder="Username" required>
+					</div>
+					<div class="mb-3">
+						<input type="email" class="form-control" id="new-email" placeholder="Email" required>
+					</div>
+					<div class="mb-3">
+						<input type="password" class="form-control" id="new-password" placeholder="Password" required>
+					</div>
+					<div class="mb-3">
+						<input type="password" class="form-control" id="confirm-password" placeholder="Confirm Password" required>
+					</div>
+					<div class="d-flex justify-content-between">
+						<button id="signup" type="submit" class="btn w-100">SIGN UP</button>
+					</div>
+					<div class="mt-3 d-flex justify-content-center ">
+						<button id="back-to-login-btn" type="button" class="btn w-100">BACK TO LOGIN</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>

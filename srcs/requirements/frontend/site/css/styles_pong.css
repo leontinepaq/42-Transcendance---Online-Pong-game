@@ -1,0 +1,53 @@
+/*game*/
+
+#game-area
+{
+	background-color: #052f4d;
+    position: relative;
+    /* width: 60vw; La largeur du rectangle de jeu est 80% de la largeur de la fenetre */
+    /* height: 0; */
+    width: 60vmin; /* 60% du plus petit cote (largeur ou hauteur) */
+    height: 40vmin; 
+    /* padding-bottom: 40%; Pour un ratio 16:9, la hauteur est 56.25% de la largeur */
+    margin: 0 auto; /* Centrer le rectangle de jeu */
+    border-radius: 16px;
+}
+
+#ball
+{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ebedee;
+}
+
+#leftPaddle, #rightPaddle
+{
+    position: absolute;
+    width: 15px;
+    height: 20%;
+	border-radius: 16px;
+    border: 8px solid;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+
+#rightPaddle
+{
+    right: 5px;
+}
+
+#score
+{
+    position: relative;
+	font-family: "Karantina-Bold", Helvetica;
+	font-weight: 700;
+	color: #001b2e;
+	font-size: 5vw; /*largeur hauteur ajsutement en fonction*/
+    font-size: 5vh; /* a revoir lajustement*/
+	text-align: center;
+}
