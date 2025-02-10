@@ -48,19 +48,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         default="light",
     )
 
-    def generate_totp_secret(self):
-        self.totp_secret = pyotp.TOTP(pyotp.random_base32())
-        self.save()
-        return self.totp_secret
-
-    def verify_totp(self, token):
-        totp = pyotp.TOTP(self.totp_secret)
-        return totp.verify(token)
-
-    def get_totp_uri(self):
-        totp = pyotp.TOTP(self.totp_secret)
-        return totp.provisioning_uri(self.username, issuer_name="Transcendance")
-
     def is_2fa_valid(self, code):
         return (self.two_factor_code == code 
             and self.two_factor_expiry

@@ -21,7 +21,7 @@ export async function authRedirector(route)
 
     if (isAuthenticated && ['login', 'signup', '2fa', ''].includes(route)) {
         return ('home');
-    } else if (!isAuthenticated && !['login', 'signup', '2fa', 'pong'].includes(route)) {
+    } else if (!isAuthenticated && !['login', 'signup', '2fa', 'pong', 'authenticator'].includes(route)) {
         return ('login');
     }
     else if (['pong'].includes(route))

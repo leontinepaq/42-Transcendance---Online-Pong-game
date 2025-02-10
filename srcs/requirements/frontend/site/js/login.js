@@ -14,8 +14,10 @@ observeAndAttachEvent(
             const data = await api.login(username, password);
             sessionStorage.setItem("username", username);
             if (data.ok)
-                if (data.redirect_url)
+                if (data.redirect_url) {
+                    console.log('AUTHENTICATOOOR')
                     navigate('authenticator')
+                }
                 else if (data.message === "2FA code sent")
                     navigate('2fa')
                 else

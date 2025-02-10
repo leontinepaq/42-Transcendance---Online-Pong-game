@@ -14,8 +14,12 @@ from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 import string
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta, datetime
 from io import BytesIO
+import pyotp
+import qrcode
+import base64
+import time
 
 User = get_user_model()
 
@@ -136,44 +140,55 @@ def refreshToken(user):
     return Response({'access': str(refresh.access_token),
                      'refresh': str(refresh)},
                     status = status.HTTP_200_OK)
-    
-@permission_classes([IsAuthenticated])
-def activate_authenticator(request):
-    user = request.user
-    totp = pyotp.TOTP(pyotp.random_base32())
-    user.totp_secret = totp.secret
-    user.is_two_factor_mail = False
-    user.is_two_factor_auth = True
-    user.save()
-    
-    uri = totp.provisioning_uri(user.username, issuer_name="Transcendance")
-    img = qrcode.make(uri)
-    buffer = BytesIO()
-    qr.save(buffer, format="PNG")
-    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
-
-    return Response({"qr_code": f"data:image/png;base64,{qr_base64}"}, status=200)
-
-@api_view(["POST"])
-def verify_authenticator(request):
-    user = request.user
-    code = request.data.get('code')
-
-    if not code:
-        return Response({"message": "code is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if not user.totp_secret:
-        return Response({"message": "Authenticator not set up"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    totp = pyotp.TOTP(user.totp_secret)
-    
-    if totp.verify(code):
-        return refreshToken(user)
-    return Response({"message": "Invalid code, please try again"}, status=status.HTTP_403_FORBIDDEN)
 
 def refreshToken(user):
     refresh = RefreshToken.for_user(user)
     return Response({'access': str(refresh.access_token), 'refresh': str(refresh)}, status = status.HTTP_200_OK)
+
+@api_view(["PUT"])    
+@permission_classes([IsAuthenticated])
+def activate_authenticator(request):
+    user = request.user
+
+    secret = pyotp.random_base32()
+    user.totp_secret = secret
+    user.is_two_factor_mail = False
+    user.is_two_factor_auth = True
+    user.save()
+    
+    totp = pyotp.TOTP(secret)
+    uri = totp.provisioning_uri(name=user.username, issuer_name="Transcendance")
+
+    print(f"Generated secret: {secret}")
+    print(f"Generated URI: {uri}")
+    print(f"Current valid code: {totp.now()}")
+    
+    img = qrcode.make(uri)
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return Response({"qr_code": f"data:image/png;base64,{qr_base64}"}, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+def verify_authenticator(request):
+    code = request.data.get('code')
+    username = request.data.get('username')
+
+    if not all([code, username]):
+        return Response({'error': 'missing info'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.get(username=username)
+
+    if not user.totp_secret:
+        return Response({"message": "Authenticator not set up"}, status=status.HTTP_400_BAD_REQUEST)
+
+    totp = pyotp.TOTP(user.totp_secret)
+    
+    if totp.verify(code, valid_window=1):
+        return refreshToken(user)
+
+    return Response({"message": "Invalid code, please try again"}, status=status.HTTP_403_FORBIDDEN)
     
 @permission_classes([AllowAny])
 @api_view(["POST"])
@@ -194,8 +209,3 @@ def login(request):
             return Response({"redirect_url": "/verify_authenticator/"}, status=status.HTTP_200_OK)
 
     return Response({"Message": "Success!"}, status=status.HTTP_200_OK)
-
-@permission_classes([IsAuthenticated])
-@api_view(["PUT"])
-def update_profile(request):
-    user = request.user

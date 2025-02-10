@@ -151,6 +151,38 @@ const api = {
         }
     },
 
+    async activateAuthenticator() {
+        try {
+            console.log('clicked');
+            const response = await fetch("/api/user/activate_authenticator/", {
+                method: "PUT",
+                headers: this.getHeaders(),
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to activate authenticatooor");
+            }
+
+            const data = await response.json();
+
+            if (data.qr_code) {
+                const qrCodeImg = document.getElementById("qrCodeImg");
+                const qrContainer = document.getElementById("qrContainer");
+                const verifyContainer = document.getElementById("verifyContainer");
+    
+                qrCodeImg.src = data.qr_code;
+                qrContainer.style.display = "block";
+                verifyContainer.style.display = "block";
+            } else {
+                throw new Error("QR code not received");
+            }
+        } catch (error) {
+            console.error("Error activating authenticator:", error);
+            alert("Failed to activate 2FA. Please try again.");
+        }
+    },
+
     async verifyAuthenticator(code, username) {
         try {
             const response = await fetch('/api/user/authenticator/', {
