@@ -9,8 +9,8 @@ async function login(username, password)
             credentials: 'include',
             body: JSON.stringify({ username, password }),
         });
-        console.log(data.message);
         const data = await response.json();
+        console.log(data.message);
         return {
             ok: response.ok,
             message: data.message,
