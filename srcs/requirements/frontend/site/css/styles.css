@@ -1,201 +1,166 @@
+/* COLORS */
+:root {
+	--color-dark:				#001B2E;
+	--color-light:				#F1EBDA;
+	--color-accent:				#511DB2;
+	--color-accent-light:		#FFFFFF;
+	--color-accent-secondary:	#9628b3;
+
+	--color-dark-transparent:	#00000066;
+	--color-light-transparent:	#FFFFFFCC;
+	--color-accent-transparent:	#511DB266;
+
+}
+
+/* GENERAL */
 canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: block;
-    z-index: -1;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	display: block;
+	z-index: -1;
 }
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
-body {
-    background: radial-gradient(circle, #000 20%, #001B2E);
-    overflow: hidden;
-    display: grid;
-    justify-content: center;
-    padding: 1.25rem;
-    font-family: "Jersey 15", serif;
-    color: #F1EBDA;
-    margin: 0;
-    width: 100vw;
-    height: 100vh;
-
+body
+{
+	background: radial-gradient(circle, #000 20%, var(--color-dark));
+	font-family: "Jersey 15", serif;
+	color: var(--color-light);
 }
 
 #app {
-    width: 100%;
-    height: 50%;
-    display: flex; 
-    justify-content: center;
-    align-items: center;
+	min-height: calc(100vh - 24rem);  /* 100vh minus navbar height * 2 to be centered*/
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
-.container {
-    display: grid;
-    gap: 1.25rem;
-    justify-items: center;
-    width: 100%;
-    padding: 1.25rem;
-}
-
-h1, h2 {
-    text-align: center;
-    font-weight: normal;
-}
-
-h1 {
-    font-size: 4rem;
-    margin-bottom: 1.25rem;
-    font-family: "Jersey 10", serif;
-}
-
-h2 {
-    font-size: 2.5rem;
-    margin-bottom: 1.25rem;
-    font-family: "Jersey 15", serif;
-}
-
-form {
-    display: grid;
-    gap: 1.25rem;
-    width: 100%;
-}
-
-input {
-    width: 100%;
-    box-sizing: border-box;
-     -webkit-box-sizing:border-box;
-     -moz-box-sizing: border-box;
-    padding: 0.75rem 1rem;
-    border: 2px solid #F1EBDA;
-    border-radius: 1rem;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.20) 0%, rgba(0, 0, 0, 0.20) 100%), #001B2E;
-    color: #F1EBDA;
-    font-family: "Jersey 15", serif;
-    font-size: 1.25rem;
-}
-
-input:focus {
-    outline: none;
-    border: 4px solid #F1EBDA;
-}
-
-.div {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
-    width: 100%;
-}
-
-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 3rem;
-    width: 100%;
-    padding: 0.75rem 1.25rem;
-    border: none;
-    border-radius: 2.5rem;
-    background: #F1EBDA;
-    color: #001B2E;
-    font: 1.5rem "Jersey 15", serif;
-    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-button .div
+.container
 {
-    width: auto;
+	height: 100%;
+	flex-wrap: wrap;
 }
 
-
-#forgot-btn {
-    background: #313d46;
-    color: #F1EBDA;
+/* NAVBAR */
+.navbar {
+	height: 12rem;
 }
 
-button:hover,  #forgot-btn:hover{
-    background: #F24C00;
-}
-
-.view {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-}
-
-.view.active {
-    opacity: 1;
-}
-
-.view.fade-out {
-    opacity: 0;
-}
-
-
-/*game*/
-
-#game-area
+.navbar-brand, .navbar-brand:focus
 {
-	background-color: #052f4d;
-    position: relative;
-    /* width: 60vw; La largeur du rectangle de jeu est 80% de la largeur de la fenetre */
-    /* height: 0; */
-    width: 60vmin; /* 60% du plus petit cote (largeur ou hauteur) */
-    height: 40vmin; 
-    /* padding-bottom: 40%; Pour un ratio 16:9, la hauteur est 56.25% de la largeur */
-    margin: 0 auto; /* Centrer le rectangle de jeu */
-    border-radius: 16px;
+	background: none;
+	border: none;
+	margin: 0;
+	font-family: "Jersey 10", serif;
+	font-size: 4rem;
+	color: var(--color-light);
+	text-shadow: 4px 4px 0px var(--color-accent-secondary), 8px 8px 0px var(--color-accent); /* si garde mettre rem*/
+	transition: color 0.3s, font-size 0.3s;
 }
 
-#ball
+.navbar-brand:hover
 {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #ebedee;
+	color: var(--color-accent-light);
+	font-size: 4.25rem;
 }
 
-#leftPaddle, #rightPaddle
+/* PAGE TITLE */
+h1
 {
-    position: absolute;
-    width: 15px;
-    height: 20%;
-	border-radius: 16px;
-    border: 8px solid;
-    top: 50%;
-    transform: translateY(-50%);
+	font-size: 2.5rem;
+	margin-bottom: 1.25rem;
+	font-family: "Jersey 15", serif;
 }
 
-#leftPaddle
+/* FORM */
+form
 {
-    left: 5px;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
 }
 
-#rightPaddle
+.form-control
 {
-    right: 5px;
+	background: var(--color-dark-transparent);
+	border: 0.15rem solid var(--color-light);
+	border-radius: 0.7rem;
+	color: var(--color-light);
+	font-size: 1.2rem;
+	padding-left: 1rem;
 }
 
-#score
+.form-control::placeholder
 {
-    position: relative;
-	font-family: "Karantina-Bold", Helvetica;
-	font-weight: 700;
-	color: #001b2e;
-	font-size: 5vw; /*largeur hauteur ajsutement en fonction*/
-    font-size: 5vh; /* a revoir lajustement*/
+	color: var(--color-light);
+	opacity: 0.6;
+}
+
+.form-control:focus
+{
+	color: var(--color-accent-light);
+	background: var(--color-dark-transparent);
+	border: 0.2rem solid var(--color-accent-light);
+	box-shadow: 0 0 1rem var(--color-accent);
+}
+
+
+/* BUTTONS */
+.btn
+{
+	background: var(--color-light-transparent);
+	border: 0.2rem solid var(--color-light);
+	border-radius: 1.5rem;
+	padding: 0.3rem 2rem;
+	color: var(--color-dark);
+	font-size: 1.2rem;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: all 0.3s ease-in-out;
 	text-align: center;
 }
+
+.btn:hover
+{
+	color: var(--color-accent-light);
+	background: var(--color-accent-transparent);
+	border: solid var(--color-accent);
+}
+
+/* NAVIGATION MENU */
+.nav-btn
+{
+	background: var(--color-dark-transparent);
+	border-radius: 1rem;
+	font-size: 1.5rem;
+	padding: 1rem 2rem;
+	color: var(--color-light);
+	transition: all 0.3 ease-in-out, border 0.15s ease-in-out;
+}
+
+.nav-btn:hover
+{
+	font-size: 1.75rem;
+	border: 0.32rem solid var(--color-accent);
+	transform: scale(1.1);
+}
+
+/* VIEW TRANSITIONS */
+.view-transition {
+	opacity: 0;
+	transform: translateY(10px) scale(0.95);
+	transition: all 0.3s ease-in-out;
+}
+
+.view-transition.active {
+	opacity: 1;
+	transform: translateY(0) scale(1);
+
+}
+
+
+
+
+

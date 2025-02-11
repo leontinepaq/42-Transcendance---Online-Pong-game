@@ -18,13 +18,14 @@ export async function authRedirector(route)
 {
     const isAuthenticated = await checkAuth();
     console.log({isAuthenticated});
-    if (isAuthenticated && publicRoutes.has(route)) {
-        return 'home';
-    } else if (!isAuthenticated && !publicRoutes.has(route)) {
-        return 'login';
-    }
-    else if (['pong'].includes(route))
-        return ('pong');
+    // todo @leontinepaq / @TuanLam94? a remettre quand auth fonctionne
+    // if (isAuthenticated && publicRoutes.has(route)) {
+    //     return 'home';
+    // } else if (!isAuthenticated && !publicRoutes.has(route)) {
+    //     return 'login';
+    // }
+    // else if (['pong'].includes(route))
+    //     return ('pong');
     return route;
 }
 
@@ -39,7 +40,7 @@ export async function navigate(route, ...params)
 
     console.log('navigating : ', route);
 
-    const newRoute = await authRedirector(route);
+    const newRoute = await authRedirector(route); // todo @leontinepaq en doublon avec main.js processRoute --> cheker avec Sai mais a supp je pense
     route = newRoute;
 
     try {

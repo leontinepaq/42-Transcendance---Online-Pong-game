@@ -75,7 +75,7 @@ export const SkyAnimation = {
 	},
 
 	animate(ts = performance.now()) {
-		const deltaTime = ts - this.lastTs;
+		const deltaTime =Math.min(ts - this.lastTs, 100);
 		
 		this.tryCreateShootingStar(ts);
 
