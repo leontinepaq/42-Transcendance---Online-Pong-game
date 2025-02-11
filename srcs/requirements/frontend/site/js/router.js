@@ -1,59 +1,57 @@
 import checkAuth from './api.js';
 import loadView from './views.js';
 
+// todo @leontinepaq / @samihelal: regarder si casert a qqch ???
 window.addEventListener(
-    'popstate', 
-    async (event) => {
-        if (event.state) {
-        console.log("route is ", event.state.route);
-        const newRoute = await authRedirector(event.state.route);
-        console.log("new route is ", newRoute);
-        loadView(newRoute);
-    }
+	'popstate', 
+	async (event) => {
+		if (event.state) {
+		console.log("route is ", event.state.route);
+		const newRoute = await authRedirector(event.state.route);
+		console.log("new route is ", newRoute);
+		loadView(newRoute);
+	}
 });
 
 const publicRoutes = new Set(['login', 'signup', '2fa']);
 
 export async function authRedirector(route)
 {
-    const isAuthenticated = await checkAuth();
-    console.log({isAuthenticated});
-    // todo @leontinepaq / @TuanLam94? a remettre quand auth fonctionne
-    // if (isAuthenticated && publicRoutes.has(route)) {
-    //     return 'home';
-    // } else if (!isAuthenticated && !publicRoutes.has(route)) {
-    //     return 'login';
-    // }
-    // else if (['pong'].includes(route))
-    //     return ('pong');
-    return route;
+	const isAuthenticated = await checkAuth();
+	console.log({isAuthenticated});
+	if (isAuthenticated && publicRoutes.has(route))
+		return 'home';
+	else if (!isAuthenticated && !publicRoutes.has(route))
+		return 'login';
+	return route;
 }
 
 export async function navigate(route, ...params)
 {
-    const currentRoute = window.location.pathname.split('/')[1];  // Extract current route from URL
-    
-    // if (currentRoute === route) {
-    //     console.log('Already on the target route:', route);
-    //     return;
-    // }
+	// const currentRoute = window.location.pathname.split('/')[1];  // Extract current route from URL
+	// if (currentRoute === route) {
+		//	 console.log('Already on the target route:', route);
+		//	 return;
+		// }
 
-    console.log('navigating : ', route);
+	console.log('Navigating: ', route);
+		
+	// todo @leontinepaq: a remettre quand auth fonctionne
+	// const newRoute = await authRedirector(route); // todo @leontinepaq en doublon avec main.js processRoute --> cheker avec Sai mais a supp je pense
+	// route = newRoute;
 
-    const newRoute = await authRedirector(route); // todo @leontinepaq en doublon avec main.js processRoute --> cheker avec Sai mais a supp je pense
-    route = newRoute;
-
-    try {
-        const state = { route, params };
-        const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
-        // if (currentRoute == "2fa" || currentRoute == "login")
-        //     history.replaceState(state, title, `/${route}`);
-        // else
-        history.pushState(state, title, `/${route}`);
-        loadView(route);
-    } catch (error) {
-        console.error('Navigation error:', error);
-    }
+	try {
+		const state = { route, params };
+		const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
+		// if (currentRoute == "2fa" || currentRoute == "login")
+		//	 history.replaceState(state, title, `/${route}`);
+		// else
+		history.pushState(state, title, `/${route}`);
+		loadView(route);
+	}
+	catch (error) {
+		console.error('Navigation error:', error);
+	}
 };
 
 export default navigate;

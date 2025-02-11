@@ -3,3 +3,5 @@
 *.venv
 *.sqlite*
 *.pyc
+
+/dir_lele/

@@ -1,38 +1,10 @@
-<!-- <div class="container-fluid d-flex justify-content-center align-items-center vh-100">
-	<div id="login-form" class="login-form">
-		<div class="row">
-			<div class="col-lg-12 col-10">
-				<h1 id="title" class="text-center">Welcome to Home</h1>
-				<div class="mt-3 d-flex justify-content-center ">
-					<button id="play-btn" class="btn w-100">PLAY GAME</button>
-				</div>
-				<div class="mt-3 d-flex justify-content-center ">
-					<button id="tournament-btn" class="btn w-100">TOURNAMENT</button>
-				</div>
-				<div class="mt-3 d-flex justify-content-center ">
-					<button id="stats-btn" class="btn w-100">STATISTIQUES</button>
-				</div>
-				<div class="mt-3 d-flex justify-content-center ">
-					<button id="friends-btn" class="btn w-100">FRIENDS</button>
-				</div>
-				<div class="mt-3 d-flex justify-content-center ">
-					<button id="profile-btn" class="btn w-100">PROFILE</button>
-				</div>
-				<div class="mt-3 d-flex justify-content-center ">
-					<button id="logout-btn" class="btn w-100">LOGOUT</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</div> -->
 <div class="row w-100 justify-content-center mt-4">
 	<div class="col-12 col-md-6 col-lg-4 d-flex flex-column gap-3">
-		<a href="/playerMode" class="btn nav-btn">PLAY GAME</a>
-		<a href="/tournament" class="btn nav-btn">TOURNAMENT</a>
-		<a href="/dashboard" class="btn nav-btn">STATISTICS</a>
-		<a href="/friends" class="btn nav-btn">FRIENDS</a>
-		<a href="/profile" class="btn nav-btn">PROFILE</a>
-		<button type="button" class="btn nav-btn" data-action="logout">LOGOUT</button>  <!-- todo @leontinepaq: voir si on fait un autre bouton pour logout -->
+		<a data-action="navigate" href="playerMode" class="btn nav-btn">PLAY GAME</a>
+		<a data-action="navigate" href="tournament" class="btn nav-btn">TOURNAMENT</a>
+		<a data-action="navigate" href="dashboard" class="btn nav-btn">STATISTICS</a>
+		<a data-action="navigate" href="friends" class="btn nav-btn">FRIENDS</a>
+		<a data-action="navigate" href="profile" class="btn nav-btn">PROFILE</a>
+		<button data-action="logout" type="button" class="btn nav-btn">LOGOUT</button>
 	</div>
 </div>
-

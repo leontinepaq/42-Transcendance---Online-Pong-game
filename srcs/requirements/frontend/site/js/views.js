@@ -1,4 +1,3 @@
-import { renderTest1 } from "./pong.js";
 import { PlanetAnimation } from "./background/PlanetAnimation.js";
 
 async function loadView(view) {
