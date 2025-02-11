@@ -62,7 +62,7 @@ class LoginSuccessSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Password OK")
     two_factor_needed=serializers.BooleanField(default=False)
     qr=serializers.BooleanField(default=False)
-    email=serializers.BooleanField(defaut=False)
+    email=serializers.BooleanField(default=False)
 
 class RegisterErrorSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Username or email already exists")
@@ -73,3 +73,4 @@ class Verify2faErrorSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Invalid or expired code")
     expired=serializers.BooleanField(default=False)
     invalid=serializers.BooleanField(default=False)
+
