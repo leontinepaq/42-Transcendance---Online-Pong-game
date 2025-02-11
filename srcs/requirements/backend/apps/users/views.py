@@ -15,7 +15,6 @@ from django.utils.crypto import get_random_string
 from django.utils.dateparse import parse_datetime
 import string
 from django.utils import timezone
-from datetime import timedelta
 from drf_spectacular.utils import extend_schema
 from .serializers import (GenericResponseSerializer,
                           InputLoginSerializer,
@@ -27,6 +26,12 @@ from .serializers import (GenericResponseSerializer,
                           InputSend2faSerializer,
                           RegisterErrorSerializer,)
 import logging
+from datetime import timedelta, datetime
+from io import BytesIO
+import pyotp
+import qrcode
+import base64
+import time
 
 logger = logging.getLogger(__name__)
 User=get_user_model()
@@ -73,9 +78,10 @@ def login(request):
     user=authenticate(request, username=username, password=password)
     if user is None:
         return LoginErrorSerializer({"message": "Wrong password"}).response(404)
-    if user.is_two_factor_active:
+    if is_two_factor_active or is_two_factor_mail or is_two_factor_auth:
         return LoginSuccessSerializer({"two_factor_needed": True,
-                                       "two_factor_type": user.two_factor_type}).response(200)
+                                       "email": user.is_two_factor_mail,
+                                       "qr": user.is_two_factor_auth}).response(200)
     return refreshToken(user)
     return response
 
@@ -182,3 +188,48 @@ def logout(request):
 def auth_check(request):
     return GenericResponseSerializer({"authenticated": True,
                                       "username": request.user.username}).response()
+
+@api_view(["PUT"])    
+@permission_classes([IsAuthenticated])
+def activate_authenticator(request):
+    user = request.user
+
+    secret = pyotp.random_base32()
+    user.totp_secret = secret
+    user.is_two_factor_mail = False
+    user.is_two_factor_auth = True
+    user.save()
+    
+    totp = pyotp.TOTP(secret)
+    uri = totp.provisioning_uri(name=user.username, issuer_name="Transcendance")
+
+    print(f"Generated secret: {secret}")
+    print(f"Generated URI: {uri}")
+    print(f"Current valid code: {totp.now()}")
+    
+    img = qrcode.make(uri)
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    return Response({"qr_code": f"data:image/png;base64,{qr_base64}"}, status=status.HTTP_200_OK)
+
+@api_view(["POST"])
+def verify_authenticator(request):
+    code = request.data.get('code')
+    username = request.data.get('username')
+
+    if not all([code, username]):
+        return Response({'error': 'missing info'}, status=status.HTTP_400_BAD_REQUEST)
+
+    user = User.objects.get(username=username)
+
+    if not user.totp_secret:
+        return Response({"message": "Authenticator not set up"}, status=status.HTTP_400_BAD_REQUEST)
+
+    totp = pyotp.TOTP(user.totp_secret)
+    
+    if totp.verify(code, valid_window=1):
+        return refreshToken(user)
+
+    return Response({"message": "Invalid code, please try again"}, status=status.HTTP_403_FORBIDDEN)

@@ -45,3 +45,6 @@ txaio==23.1.1
 typing_extensions==4.12.2
 uritemplate==4.1.1
 zope.interface==7.2
+pillow==11.1.0
+pyotp==2.3.0
+pytz==2025.1

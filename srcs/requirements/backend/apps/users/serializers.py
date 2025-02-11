@@ -61,8 +61,8 @@ class LoginErrorSerializer(GenericResponseSerializer):
 class LoginSuccessSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Password OK")
     two_factor_needed=serializers.BooleanField(default=False)
-    two_factor_type=serializers.ChoiceField(["mail", "qr"],
-                                              required=False)
+    qr=serializers.BooleanField(default=False)
+    email=serializers.BooleanField(defaut=False)
 
 class RegisterErrorSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Username or email already exists")

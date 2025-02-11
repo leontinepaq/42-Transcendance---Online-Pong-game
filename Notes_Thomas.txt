@@ -1,5 +1,7 @@
 TODOLIST
 
+IF USER DELETED, CANT CREATE USER WITH SAME USERNAME/EMAIL = GET 404 ON REGISTER. FIX THIS
+
 BACKEND :
 1/ Modify views.py method : Games should not have POST requests as 
 players should not be able to manually create new games. Create def create_game(player1, player2) 
@@ -13,8 +15,6 @@ function to trigger game creation when game is being created
 4/ sanitize ? 
 from django.shortcuts import render
 from django.utils.html import escape
-
-5/ add migrate to dockerfile
 
 def comment_view(request):
     if request.method == "POST":
