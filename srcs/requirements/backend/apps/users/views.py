@@ -124,7 +124,7 @@ def send_2fa(request):
     request=InputVerify2faSerializer,
     responses={
         400:Verify2faErrorSerializer,
-        404:LoginErrorSerializer({"message": "User does not exists"}),
+        404:UserNotFoundErrorSerializer,
         200:GenericResponseSerializer
     }
 )
@@ -189,6 +189,13 @@ def auth_check(request):
     return GenericResponseSerializer({"authenticated": True,
                                       "username": request.user.username}).response()
 
+@extend_schema(
+    summary='Activate authenticator 2fa',
+    description="Generates TOTP secret and provides QR code",
+    responses={
+        200: ActivateAuthenticatorResponseSerializer,
+    }
+)
 @api_view(["PUT"])    
 @permission_classes([IsAuthenticated])
 def activate_authenticator(request):
@@ -203,33 +210,39 @@ def activate_authenticator(request):
     totp = pyotp.TOTP(secret)
     uri = totp.provisioning_uri(name=user.username, issuer_name="Transcendance")
 
-    print(f"Generated secret: {secret}")
-    print(f"Generated URI: {uri}")
-    print(f"Current valid code: {totp.now()}")
     
     img = qrcode.make(uri)
     buffer = BytesIO()
     img.save(buffer, format="PNG")
     qr_base64 = base64.b64encode(buffer.getvalue()).decode()
-
     return Response({"qr_code": f"data:image/png;base64,{qr_base64}"}, status=status.HTTP_200_OK)
-
+    
+@extend_schema(
+    summary="Verify authenticator code",
+    description="Verify a TOTP authenticator code, Expecting JSON",
+    responses={
+        400:VerifyAuthenticatorErrorSerializer,
+        403: GenericResponseSerializer({"message": "Invalid code, please try again"})
+        404:UserNotFoundErrorSerializer,
+        200:GenericResponseSerializer
+    }
+)
 @api_view(["POST"])
 def verify_authenticator(request):
     code = request.data.get('code')
     username = request.data.get('username')
 
     if not all([code, username]):
-        return Response({'error': 'missing info'}, status=status.HTTP_400_BAD_REQUEST)
+        return VerifyAuthenticatorErrorSerializer({"message": "code or username missing"}).response(400)
 
     user = User.objects.get(username=username)
 
     if not user.totp_secret:
-        return Response({"message": "Authenticator not set up"}, status=status.HTTP_400_BAD_REQUEST)
-
+        return VerifyAuthenticatorErrorSerializer({"message": "totp secret missing"}).response(400)
+    
     totp = pyotp.TOTP(user.totp_secret)
     
     if totp.verify(code, valid_window=1):
         return refreshToken(user)
 
-    return Response({"message": "Invalid code, please try again"}, status=status.HTTP_403_FORBIDDEN)
+    return GenericResponseSerializer({"message": "Invalid code, please try again"}).response(403)

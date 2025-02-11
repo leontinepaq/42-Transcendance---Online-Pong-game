@@ -69,3 +69,4 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
