@@ -16,85 +16,87 @@ from django.utils.dateparse import parse_datetime
 import string
 from django.utils import timezone
 from datetime import timedelta
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
+from drf_spectacular.utils import extend_schema
+from .serializers import (GenericResponseSerializer,
+                          InputLoginSerializer,
+                          InputRegisterSerializer,
+                          InputVerify2faSerializer,
+                          LoginErrorSerializer,
+                          LoginSuccessSerializer,
+                          Verify2faErrorSerializer,
+                          InputSend2faSerializer,
+                          RegisterErrorSerializer,)
+import logging
 
-User = get_user_model()
+logger = logging.getLogger(__name__)
+User=get_user_model()
 
+@extend_schema(
+    summary="Register",
+    description="Expecting JSON",
+    request=InputRegisterSerializer,
+    responses={400: RegisterErrorSerializer,
+               201: GenericResponseSerializer}
+)
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def register(request):
-    email = request.data.get("email")
-    username = request.data.get("username")
-    password = request.data.get("password")
+    email=request.data.get("email")
+    username=request.data.get("username")
+    password=request.data.get("password")
+    username_exists=User.objects.filter(username=username).exists()
+    email_exists=User.objects.filter(email=email).exists()
     
-    if User.objects.filter(email=email).exists():
-        return Response({"error": "Email already registered."},
-                        status=status.HTTP_404_NOT_FOUND)
-    if User.objects.filter(username=username).exists():
-        return Response({"error": "Username already registered."},
-                        status=status.HTTP_404_NOT_FOUND)
+    if username_exists or email_exists:
+        return RegisterErrorSerializer({"email": email_exists,
+                                        "username": username_exists}).response(400)
+    user=User.objects.create_user(email=email,
+                                  username=username,
+                                  password=password)
+    return GenericResponseSerializer({"message": "OK"}).response(201)
 
-    user = User.objects.create_user(email=email,
-                                    username=username,
-                                    password=password)
-    return Response({'message': 'Registration successful.'},
-                    status=status.HTTP_201_CREATED)
-
+@extend_schema(
+    summary="Login",
+    description="Expecting JSON",
+    request=InputLoginSerializer,
+    responses={404: LoginErrorSerializer,
+               200: LoginSuccessSerializer}
+)
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def send_activation_link(request):
-    username = request.data.get("username")
+@permission_classes([AllowAny])
+def login(request):
+    username=request.data.get("username")
+    password=request.data.get("password")
 
-    user = User.objects.filter(username=username).first()
+    if User.objects.filter(username=username).exists() == False:
+        return LoginErrorSerializer({"message": "User does not exist"}).response(404)
+    user=authenticate(request, username=username, password=password)
     if user is None:
-        return Response({'message': 'User does not exists.'},
-                        status=status.HTTP_404_NOT_FOUND)
+        return LoginErrorSerializer({"message": "Wrong password"}).response(404)
+    if user.is_two_factor_active:
+        return LoginSuccessSerializer({"two_factor_needed": True,
+                                       "two_factor_type": user.two_factor_type}).response(200)
+    return refreshToken(user)
+    return response
 
-    # Generate the activation token and email
-    token = default_token_generator.make_token(user)
-    uid = urlsafe_base64_encode(str(user.pk).encode())
- 
-    # Get current site to include in the activation link
-    current_site = get_current_site(request)
-    activation_link = f"{current_site.domain}/activate/{uid}/{token}"
- 
-     # Send email with activation link
-    subject = 'Activate your account'
-    message = render_to_string('activation_email.html', 
-                               {'user': user,
-                                'activation_link': activation_link})
-    send_mail(subject,
-              message,
-              settings.DEFAULT_FROM_EMAIL,
-              [user.email])
-    return Response({'message': 'Mail sent'},
-                    status = status.HTTP_200_OK)
-
+@extend_schema(
+    summary="Ask for 2f mail send",
+    description="Expecting JSON",
+    request=InputSend2faSerializer,
+    responses={200: GenericResponseSerializer({"message": "Sent"}),
+               404: LoginErrorSerializer({"message": "User does not exist"})}
+)
 @api_view(["POST"])
-@permission_classes([IsAuthenticated])
-def	activate(request, uidb64, token):
-    try:
-        uid = urlsafe_base64_decode(uidb64).decode()
-        user = get_user_model().objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-
-    if (user is not None
-        and default_token_generator.check_token(user, token)):
-        user.is_active = True
-        user.save()
-        return Response({"message": "Activated"},
-                        status = status.HTTP_202_ACCEPTED)
-    else:
-        return Response({"message": "Expired link"},
-                        status = status.HTTP_404_NOT_FOUND)
-
-def send_2fa(user):
-    user.two_factor_code = get_random_string(length=6,
+def send_2fa(request):
+    username=request.data.get("username")
+    if User.objects.filter(username=username).exists() == False:
+        return LoginErrorSerializer({"message": "User does not exist"}).response(404)
+    
+    user=User.objects.get(username=username)
+    user.two_factor_code=get_random_string(length=6,
                                              allowed_chars=string.digits)
-    user.two_factor_expiry = timezone.now() + timedelta(minutes=15)
-    user.save()
+    user.two_factor_expiry=timezone.now() + timedelta(minutes=15)
+    user.save()    
 
     try:
         send_mail(
@@ -110,94 +112,73 @@ def send_2fa(user):
         return Response({'error': str(e)},
                         status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+@extend_schema(
+    summary="Verify 2FA code",
+    description="Expecting JSON",
+    request=InputVerify2faSerializer,
+    responses={
+        400:Verify2faErrorSerializer,
+        404:LoginErrorSerializer({"message": "User does not exists"}),
+        200:GenericResponseSerializer
+    }
+)
 @api_view(["POST"])
 def verify_2fa(request):
-    code = request.data.get('code')
-    username = request.data.get('username')
-
-    if not all([code, username]):
-        return Response({'error': 'missing info'},
-                        status=status.HTTP_400_BAD_REQUEST)
-    user = User.objects.get(username=username)
-
-    if user.two_factor_code != code:
-        return Response({"message": "wrong code"},
-                        status = status.HTTP_403_FORBIDDEN)
-    if user.two_factor_expiry < timezone.now():
-        return Response({"message": "expired code"},
-                        status = status.HTTP_403_FORBIDDEN)
-
-    user.two_factor_expiry = None
-    user.two_factor_code = None
-    user.save()    
-    return refreshToken(user)
+    code=request.data.get('code')
+    username=request.data.get('username')
+    user=User.objects.get(username=username)
     
+    if code is None or user.two_factor_code != code:
+        return Verify2faErrorSerializer({"invalid": True}).response(400)
+    if user.two_factor_expiry < timezone.now():
+        return Verify2faErrorSerializer({"expired": True}).response(400)
+    if request.data.get("activate_mail"):
+        user.is_mail_activated=True
+    user.two_factor_expiry=None
+    user.two_factor_code=None
+    user.save()
+    return refreshToken(user)
+
 def refreshToken(user):
-    refresh = RefreshToken.for_user(user)
-    response = Response({"message": "Login successful"})
+    print("TEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    refresh=RefreshToken.for_user(user)
+    response=Response({"message": "Login successful"})
     
     # Set JWT as HttpOnly Cookie
-    response.set_cookie(
-        key="access_token",
-        value=str(refresh.access_token),
-        httponly=True,
-        secure=True,  # Enable this for HTTPS
-        samesite="Strict"
-    )
+    response.set_cookie(key="access_token",
+                        value=str(refresh.access_token),
+                        httponly=True,
+                        secure=True, # Enable this for HTTPS
+                        samesite="Strict")
     
-    response.set_cookie(
-        key="refresh_token",
-        value=str(refresh),
-        httponly=True,
-        secure=True,
-        samesite="Strict"
-    )
+    response.set_cookie(key="refresh_token",
+                        value=str(refresh),
+                        httponly=True,
+                        secure=True,
+                        samesite="Strict")
     return response
-    
-login_request_body = openapi.Schema(
-    type=openapi.TYPE_OBJECT,
-    properties={
-        'username': openapi.Schema(type=openapi.TYPE_STRING,
-                                   description="Username or email of the user"),
-        'password': openapi.Schema(type=openapi.TYPE_STRING,
-                                   description="Password associated with the username/email",
-                                   writeOnly=True),
-    },
-    required=['username',
-              'password']
-)
-@swagger_auto_schema(
-    method="post",
-    request_body=login_request_body,
-    responses={200: "Login successful",
-               400: "Invalid credentials"}
-)
-@api_view(["POST"])
-@permission_classes([AllowAny])
-def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
-    user = authenticate(request, username=username, password=password)
-    if user is None:
-        return Response({"error": "Invalid credentials"},
-                        status=status.HTTP_202_ACCEPTED)
-    # if user.is_mail_activated == False:
-    #     send_mail(request)
-    #     return Response({"is_activated: false"},
-    #                     status=status.HTTP_200_OK)
-    if user.is_two_factor_active:
-        return send_2fa(user)
-    return Response({"message": "Something went wrong"},
-                    status=status.HTTP_404_NOT_FOUND)
 
+@extend_schema(
+    summary="Logout",
+    description="Expecting nothing",
+    responses={200: GenericResponseSerializer}
+)
+@permission_classes([IsAuthenticated])
 @api_view(["POST"])
 def logout(request):
-    response = Response({"message": "Logged out"})
+    response=Response({"message": "Logged out"})
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return response
 
 @api_view(["GET"])
+@extend_schema(
+    summary="Logout",
+    description="Expecting nothing",
+    responses={200: GenericResponseSerializer({"authenticated": True,
+                                               "username": ""})}
+)
 @permission_classes([IsAuthenticated])
 def auth_check(request):
-    return Response({"authenticated": True, "user": request.user.username})
+    return GenericResponseSerializer({"authenticated": True,
+                                      "username": request.user.username}).response()

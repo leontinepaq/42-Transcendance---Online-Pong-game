@@ -35,6 +35,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_mail_activated =     models.BooleanField(default=False)
     is_staff =              models.BooleanField(default=False)
     is_two_factor_active =  models.BooleanField(default=True)
+    two_factor_type =       models.CharField(choices={"qr": "qr", "mail":"mail"}, default="mail")
     two_factor_code =       models.CharField(max_length=6, blank=True, null=True)
     two_factor_expiry =     models.DateTimeField(blank=True, null=True, default=None)
     
@@ -49,6 +50,20 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         return (self.two_factor_code == code 
             and self.two_factor_expiry
             and self.two_factor_expiry > timezone.now())
+        
+    def send_2fa(user):
+        self.two_factor_code = get_random_string(length=6,
+                                                allowed_chars=string.digits)
+        self.two_factor_expiry = timezone.now() + timedelta(minutes=15)
+        self.save()
+
+        send_mail(
+            'Your 2FA Code',
+            f'Your 2FA code is: {user.two_factor_code}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            fail_silently=False,
+        )
 
     def __str__(self):
         return self.username
