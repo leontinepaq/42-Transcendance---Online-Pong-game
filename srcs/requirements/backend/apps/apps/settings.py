@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     
     'users',
+    'dashboards',
 ]
 
 REST_FRAMEWORK = {
@@ -150,3 +151,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Email configuration for development (use an actual SMTP server in production)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # This prints the email to the console
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")

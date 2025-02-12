@@ -58,6 +58,9 @@ class GenericResponseSerializer(serializers.Serializer):
 class LoginErrorSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Something went wrong")
 
+class UserNotFoundErrorSerializer(GenericResponseSerializer):
+    message=serializers.CharField(default="User does not exist")
+
 class LoginSuccessSerializer(GenericResponseSerializer):
     message=serializers.CharField(default="Password OK")
     two_factor_needed=serializers.BooleanField(default=False)
@@ -74,3 +77,12 @@ class Verify2faErrorSerializer(GenericResponseSerializer):
     expired=serializers.BooleanField(default=False)
     invalid=serializers.BooleanField(default=False)
 
+class VerifyAuthenticatorErrorSerializer(GenericResponseSerializer):
+    message=serializers.CharField(default="Missing code, secret or username")
+
+class ActivateAuthenticatorResponseSerializer(serializers.Serializer):
+    message = serializers.CharField(default="Two-factor authentication enabled")
+    qr_code = serializers.CharField(help_text="Base64-encoded QR code image")
+
+class UpdateAvatarResponseSerializer(GenericResponseSerializer):
+    avatar_url = serializers.URLField(required=False)
