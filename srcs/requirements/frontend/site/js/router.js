@@ -1,7 +1,6 @@
 import checkAuth from './api.js';
 import loadView from './views.js';
 
-// todo @leontinepaq / @samihelal: regarder si casert a qqch ???
 window.addEventListener(
 	'popstate', 
 	async (event) => {
@@ -26,6 +25,7 @@ export async function authRedirector(route)
 	return route;
 }
 
+
 export async function navigate(route, ...params)
 {
 	// const currentRoute = window.location.pathname.split('/')[1];  // Extract current route from URL
@@ -47,7 +47,7 @@ export async function navigate(route, ...params)
 		//	 history.replaceState(state, title, `/${route}`);
 		// else
 		history.pushState(state, title, `/${route}`);
-		loadView(route);
+		await loadView(route);
 	}
 	catch (error) {
 		console.error('Navigation error:', error);

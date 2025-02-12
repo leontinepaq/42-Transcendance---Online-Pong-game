@@ -1,5 +1,5 @@
-import api from "./api.js";
-import navigate from "./router.js";
+import api from "../api.js";
+import navigate from "../router.js";
 import observeAndAttachEvent from "./observeAndAttachEvent.js";
 
 observeAndAttachEvent(

@@ -1,5 +1,7 @@
 import { showModal } from "./actions/modals.js";
 import { PlanetAnimation } from "./background/PlanetAnimation.js";
+import onRouteLoad from "./routes.js";
+
 
 async function loadView(view) {
 	const app = document.getElementById("app");
@@ -13,7 +15,8 @@ async function loadView(view) {
 		setTimeout(() => {
 			app.querySelector('.container').innerHTML = html;
 			app.classList.add('active');
-		}, 300); //timeout for transitions, todo @leontinepaq voir si bonne maniere de faire ??
+		}, 0); //timeout for transitions, todo @leontinepaq voir si bonne maniere de faire ??
+		onRouteLoad[view]?.();
 		if (view == 'home' || view == 'login' || view == 'signup')
 			PlanetAnimation.init();
 		else 
