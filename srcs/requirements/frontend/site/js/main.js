@@ -14,9 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-
-
-
 //  @leontinepaq: suppression de authentification comme déjà dans 
 
 // todo @leontinepaq: a supprimer si plus necessaire

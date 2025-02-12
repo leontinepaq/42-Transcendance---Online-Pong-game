@@ -1,5 +1,6 @@
 import logout from "../api.js"
 import navigate from "../router.js"
+import { showModal } from "./modals.js";
 
 export const logoutAction = [
 	{
@@ -16,6 +17,6 @@ async function handleLogout(element, event)
 	}
 	catch (error) {
 		console.error('Logout error:', error);
-		alert('Logout failed. Please try again.');
+		showModal("Logout failed. Please try again");
 	}
 };

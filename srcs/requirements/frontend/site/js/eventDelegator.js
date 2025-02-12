@@ -1,12 +1,16 @@
 import { navigateAction } from "./actions/navigate.js";
 import { logoutAction } from "./actions/logout.js";
 import { loginActions } from "./actions/login.js";
+import { signupActions } from "./actions/signup.js";
+// import { TwofaActions } from "./actions/2fa.js";
 
 // Table des actions à gérer, "..." = concat
 const clickActions = [
 	...logoutAction,
 	...navigateAction,
 	...loginActions,
+	...signupActions,
+	// ...TwofaActions,
 ];
 
 export function initEventDelegation() {
@@ -22,7 +26,6 @@ export function initEventDelegation() {
 		}
 	});
 }
-
 
 /*
  * 🎯 Délégation d'événements pour une application SPA
@@ -62,7 +65,6 @@ export function initEventDelegation() {
  * Page de login :
  *  - login.html avec boutons et lien avec data-action 
  *  - actions/login.js avec les deux actions a faire sur cette page: signin ou forgot-pwd
-
 
 */
 

@@ -1,6 +1,7 @@
 import api from "./api.js"
 import navigate from "./router.js"
 import observeAndAttachEvent from './observeAndAttachEvent.js'
+import { showModal } from "./actions/modals.js";
 
 observeAndAttachEvent(
 	'update-btn',
@@ -11,7 +12,7 @@ observeAndAttachEvent(
 			navigate('updateProfile');
 		} catch (error) {
 			console.error('Profile error:', error);
-			alert('An error occured. Please try again.');
+			showModal("An error occured. Please try again.")
 		}
 	}
 );

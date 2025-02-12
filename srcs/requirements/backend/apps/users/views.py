@@ -78,11 +78,11 @@ def login(request):
     user=authenticate(request, username=username, password=password)
     if user is None:
         return LoginErrorSerializer({"message": "Wrong password"}).response(404)
-    if is_two_factor_active or is_two_factor_mail or is_two_factor_auth:
+    if user.is_two_factor_active or user.is_two_factor_mail or user.is_two_factor_auth:
         return LoginSuccessSerializer({"two_factor_needed": True,
                                        "email": user.is_two_factor_mail,
                                        "qr": user.is_two_factor_auth}).response(200)
-    return refreshToken(user)
+    return refreshToken(user) 
     return response
 
 @extend_schema(

@@ -1,5 +1,6 @@
 // ADD /api/ for login signup and logout
 import navigate from "./router.js"
+import { showModal } from "./actions/modals.js";
 
 export async function checkAuth()
 {
@@ -65,43 +66,43 @@ export async function authFetch(url, options = {})
     return response;
 }
 
-export async function signup(username, email, password)
-{
-    try {
-        const response = await fetch('/api/user/register/', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username, email, password }),
-        });
-        const data = await response.json();
-        return {
-            ok: response.ok,
-            ...data
-        };
-    } catch (error) {
-        console.error('Signup failed:', error);
-        throw error;
-    }
-}
+// export async function signup(username, email, password)
+// {
+//     try {
+//         const response = await fetch('/api/user/register/', {
+//             method: 'POST',
+//             credentials: 'include',
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ username, email, password }),
+//         });
+//         const data = await response.json();
+//         return {
+//             ok: response.ok,
+//             ...data
+//         };
+//     } catch (error) {
+//         console.error('Signup failed:', error);
+//         throw error;
+//     }
+// }
 
-export async function verify2FA(code, username)
-{
-    try {
-        const response = await fetch('/api/user/verify_2fa/', {
-            method: 'POST',
-            headers: { "Content-Type": "application/json" },
-            credentials: 'include',
-            body: JSON.stringify({ code, username }),
-        });
+// export async function verify2FA(code, username)
+// {
+//     try {
+//         const response = await fetch('/api/user/verify_2fa/', {
+//             method: 'POST',
+//             headers: { "Content-Type": "application/json" },
+//             credentials: 'include',
+//             body: JSON.stringify({ code, username }),
+//         });
         
-        const data = await response.json();
-        return { ok: response.ok, ...data };
-    } catch (error) {
-        console.error('2FA verification error:', error);
-        throw error;
-    }
-}
+//         const data = await response.json();
+//         return { ok: response.ok, ...data };
+//     } catch (error) {
+//         console.error('2FA verification error:', error);
+//         throw error;
+//     }
+// }
 
 export async function logout()
 {
@@ -163,7 +164,7 @@ export async function activateAuthenticator() {
         }
     } catch (error) {
         console.error("Error activating authenticator:", error);
-        alert("Failed to activate 2FA. Please try again.");
+        showModal("Failed to activate 2FA. Please try again.");
     }
 }
 
