@@ -11,6 +11,3 @@ down:
 
 stop:
 			docker compose -f ./srcs/docker-compose.yml stop
-
-rm-volumes:
-			rm -drf $(HOME)/data/**/**

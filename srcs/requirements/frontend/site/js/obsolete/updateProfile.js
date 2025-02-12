@@ -1,7 +1,7 @@
-import api from "./api.js"
-import navigate from "./router.js"
+import api from "../api.js"
+import navigate from "../router.js"
 import observeAndAttachEvent from './observeAndAttachEvent.js'
-import { showModal } from "./actions/modals.js";
+import { showModal } from "../actions/modals.js";
 
 observeAndAttachEvent(
 	'activ-auth',
