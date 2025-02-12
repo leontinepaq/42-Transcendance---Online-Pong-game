@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework import status
+from rest_framework.response import Response
 from .models import Game, UserStatistics
 from users.models import UserProfile
 
@@ -38,3 +40,9 @@ class UserStatisticsSerializer(serializers.ModelSerializer):
 
         user_statistics.games.set(games)
         return user_statistics
+
+class GenericResponseSerializer(serializers.Serializer):
+    message=serializers.CharField(default="OK")
+
+    def response(self, _status=200):
+        return Response(self.data, status=_status)
