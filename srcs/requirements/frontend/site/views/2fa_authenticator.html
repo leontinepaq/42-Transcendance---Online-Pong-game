@@ -1,0 +1,25 @@
+<div class="container"></div>
+	<h1>Two-Factor Authentication - Authenticator</h1>
+	<form id="authenticator-form">
+		<div class="form-group">
+			<label for="verification-code">Enter Authenticator Code</label>
+			<input type="text" id="verification-code" name="verification-code" required>
+		</div>
+		<button type="submit">Verify</button>
+	</form>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="false">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+		</div>
+	  </div>
+	</div>
+</div>

@@ -52,7 +52,14 @@ async function handleSignin(element, event)
 		const data = await login(username, password);
 		sessionStorage.setItem("username", username);
 		if (data.ok)
-			navigate('2fa');
+		{
+			if (data.redirect_url)
+				navigate('2fa_authenticator')
+			else if (data.message === "2FA code sent")
+				navigate('2fa_mail')
+			else
+				navigate('home')
+		}
 		else
 			showModal("Login failed");
 	}
