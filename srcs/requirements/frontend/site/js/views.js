@@ -12,10 +12,8 @@ async function loadView(view) {
 		if (!response.ok)
 			throw new Error("View not found");
 		const html = await response.text();
-		setTimeout(() => {
-			app.querySelector('.container').innerHTML = html;
-			app.classList.add('active');
-		}, 0); //timeout for transitions, todo @leontinepaq voir si bonne maniere de faire ??
+		app.querySelector('.container').innerHTML = html;
+		app.classList.add('active');
 		onRouteLoad[view]?.();
 		if (view == 'home' || view == 'login' || view == 'signup')
 			PlanetAnimation.init();

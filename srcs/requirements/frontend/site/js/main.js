@@ -12,6 +12,3 @@ document.addEventListener('DOMContentLoaded', () => {
 	navigate(cleanedPath);
 })
 
-
-
-//  @leontinepaq: suppression de authentification comme déjà dans 

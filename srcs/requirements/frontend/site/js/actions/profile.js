@@ -1,5 +1,6 @@
 import { navigate	} from "../router.js"
-import { showModal } from "./modals.js";
+import { showModal } from "./modals.js"
+import { getUserProfile } from "../api.js"
 
 export const profileActions = [
 	{
@@ -8,10 +9,6 @@ export const profileActions = [
 	}
 	
 ];
-const response = await fetch("/api/user/auth_check/", {
-	method: "GET",
-	credentials: "include",
-});
 
 // todo @leontine: a voir avec thomas comment ca marche
 export async function loadUserProfile() {
