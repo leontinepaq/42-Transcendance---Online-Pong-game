@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .models import Game, UserStatistics
 from users.models import UserProfile
 
+
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model=Game
@@ -16,12 +17,12 @@ class GameSerializer(serializers.ModelSerializer):
             'score_player2',
             'longest_exchange',
             'created_at',
-            'duration',
-            'tournament']
+            'duration']
         read_only_fields=['created_at', 'id']
 
     def create(self, validated_data):
         return Game.objects.create(**validated_data)
+
 
 class UserStatisticsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,6 +35,7 @@ class UserStatisticsSerializer(serializers.ModelSerializer):
             'games',
             'tournaments']
         read_only_fields=['user']
+
     
     def create(self, validated_data):
         #all of this because games is many to many field and we cant set it with create

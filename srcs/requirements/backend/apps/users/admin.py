@@ -4,7 +4,7 @@ from .models import UserProfile
 
 class CustomUserAdmin(UserAdmin):
     model = UserProfile
-    list_display = ("username", "email", "is_active", "is_staff", "is_superuser", "is_two_factor_active", "theme")
+    list_display = ("username", "email", "is_active", "is_staff", "is_superuser", "is_two_factor_mail", "is_two_factor_auth", "theme")
     list_filter = ("is_staff", "is_active", "is_superuser")
     search_fields = ("username", "email")
     ordering = ("email",)
@@ -12,8 +12,8 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         ("Personal Info", {"fields": ("email", "avatar_url")}),
-        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
-        ("Security", {"fields": ("is_two_factor_active", "two_factor_code", "two_factor_expiry")}),
+        ("Permissions", {"fields": ("is_active", "is_staff", "is_superuser")}),
+        ("Security", {"fields": ("is_two_factor_mail", "two_factor_code", "two_factor_expiry", "is_two_factor_auth")}),
         ("Preferences", {"fields": ("theme",)}),
     )
 
