@@ -1,3 +1,4 @@
+import { showModal } from "./actions/modals.js";
 import { PlanetAnimation } from "./background/PlanetAnimation.js";
 
 async function loadView(view) {
