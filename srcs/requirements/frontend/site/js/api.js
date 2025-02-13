@@ -1,4 +1,3 @@
-// ADD /api/ for login signup and logout
 import navigate from "./router.js"
 import { showModal } from "./actions/modals.js";
 
@@ -50,7 +49,7 @@ export async function authFetch(url, options = {})
 
     // If unauthorized, try refreshing token (maybe add 403 ?)
     if (response.status === 401) {
-        const refreshSuccess = await this.refreshToken();
+        const refreshSuccess = await refreshToken();
         if (refreshSuccess) {
             // Retry original request with new access token
             return fetch(url, {
