@@ -32,7 +32,10 @@ class RequestLoginSerializer(serializers.Serializer):
     two_factor_mail = serializers.CharField(default = "123456")
 
 ## REGISTER  
-class RequestRegisterSerializer(RequestLoginSerializer):
+class RequestRegisterSerializer(serializers.Serializer):
+    username=serializers.CharField(required=True)
+    password=serializers.CharField(required=True, 
+                                   write_only=True)
     email=serializers.EmailField(required=True)
 
 class ResponseRegisterErrorSerializer(GenericResponseSerializer):

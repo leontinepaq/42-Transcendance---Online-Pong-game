@@ -10,6 +10,7 @@ from drf_spectacular.utils import extend_schema
 from ..serializers.auth import *
 from io import BytesIO
 import qrcode
+import pyotp
 import base64
 from rest_framework import serializers
 
