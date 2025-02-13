@@ -35,3 +35,4 @@ class Tournament(models.Model):
     winner =                models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="winner_of_tournament")
     games =                 models.ManyToManyField(Game, related_name="tournaments")
     created_at =            models.DateTimeField(auto_now_add=True)
+

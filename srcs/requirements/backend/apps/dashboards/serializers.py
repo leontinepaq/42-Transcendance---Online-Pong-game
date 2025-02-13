@@ -16,8 +16,7 @@ class GameSerializer(serializers.ModelSerializer):
             'score_player2',
             'longest_exchange',
             'created_at',
-            'duration',
-            'tournament']
+            'duration']
         read_only_fields=['created_at', 'id']
 
     def create(self, validated_data):
