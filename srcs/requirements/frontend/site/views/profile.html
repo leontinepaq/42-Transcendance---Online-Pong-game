@@ -1,46 +1,52 @@
-<h1 class="text-center mb-4">Edit my profile</h1>
-  
-  <div class="row w-100">
+<h1 class="text-center mb-5">Edit my profile</h1>
+<div class="row w-100">
 	<!-- Colonne gauche : Avatar -->
-	<div class="col-12 col-md-4 d-flex flex-column align-items-center mb-4 mb-md-0">
-	  <!-- Avatar (placeholder ou URL dynamique) -->
-	  <img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 100px;">
-	  <button data-action="edit-avatar" class="btn btn-outline-primary">Edit Avatar</button>
+	<div class="col-12 col-md-6 d-flex flex-column align-items-center mb-4 mb-md-0">
+		<!-- Avatar (placeholder ou URL dynamique) -->
+		<img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 100px;">
+		<button data-action="edit-avatar" class="btn btn-outline-primary">Edit Avatar</button>
 	</div>
 	
 	<!-- Colonne droite : Informations du profil -->
-	<div class="col-12 col-md-8">
-	  <!-- Section Username -->
-	  <div class="mb-4">
-		<label class="form-label">Username</label>
-		<div class="mb-2">
-		  <span id="display-username" class="fs-5"></span>
-		  <input type="text" id="edit-username" class="form-control d-none" />
+	<div class="d-flex flex-column col-12 col-md-6 gap-5	 text-md-start justify-content-center" >
+		<!-- Section Username -->
+		<div>
+			<label class="form-label">Username</label>
+			<div class="mb-2">
+				<span id="display-username" class="fs-5"></span>
+				<input type="text" id="edit-username" class="form-control d-none" />
+			</div>
+			<button data-action="toggle-edit" data-field="username" class="btn btn-outline-secondary">EDIT</button>
 		</div>
-		<button data-action="toggle-edit" data-field="username" class="btn btn-outline-secondary">EDIT</button>
-	  </div>
-	  
-	  <!-- Section Email -->
-	  <div class="mb-4">
-		<label class="form-label">Email</label>
-		<div class="mb-2">
-		  <span id="display-email" class="fs-5"></span>
-		  <input type="email" id="edit-email" class="form-control d-none" />
+		
+		<!-- Section Email -->
+		<div>
+			<label class="form-label">Email</label>
+			<div class="mb-2">
+				<span id="display-email" class="fs-5"></span>
+				<input type="email" id="edit-email" class="form-control d-none" />
+			</div>
+			<button data-action="toggle-email-edit" class="btn btn-outline-secondary">EDIT</button>
 		</div>
-		<button data-action="toggle-email-edit" class="btn btn-outline-secondary">EDIT</button>
-	  </div>
-	  
-	  <!-- Section Password -->
-	  <div class="mb-4">
-		<label class="form-label">Password</label>
-		<div><button data-action="change-password" class="btn btn-outline-secondary">CHANGE PASSWORD</button></div>
-	  </div>
+		
+		<!-- Section Password -->
+		<div>
+			<label class="form-label">Password</label>
+			<div><button data-action="change-password" class="btn btn-outline-secondary">CHANGE PASSWORD</button></div>
+		</div>
+
+		<!-- Section 2FA -->
+		<div>
+			<label class="form-label">Two-Factor authentification</label>
+			<div><button data-action="toggle-2fa" class="btn btn-outline-secondary">ENABLE</button></div>
+			</div>
+		</div>
 	</div>
-  </div>
 </div>
 
 
-  <!-- <div class="container">
+
+	<!-- <div class="container">
 	<h1>Two-factor authentification</h1>
 	<button id="toggle-2fa-enable" data-action="toggle-2fa" type="button" class="btn action-btn ">
 		ENABLE 2FA
