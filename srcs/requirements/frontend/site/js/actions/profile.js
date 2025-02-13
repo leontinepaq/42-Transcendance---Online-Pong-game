@@ -8,28 +8,30 @@ export const profileActions = [
 	}
 	
 ];
+const response = await fetch("/api/user/auth_check/", {
+	method: "GET",
+	credentials: "include",
+});
 
 // todo @leontine: a voir avec thomas comment ca marche
 export async function loadUserProfile() {
+	const usernameElem = document.getElementById('display-username');
+	const emailElem = document.getElementById('display-email');
+	if (!usernameElem || !emailElem) {
+		console.error("Elements absent from DOM"); // todo @leontinepaq: utile ??
+		return;
+	}
+	usernameElem.textContent = "**error charging username**"; //todo @leontinepaq a changer
+	emailElem.textContent = "**error charging email**";
 	try {
-		const response = await fetch('/api/user/profile', { credentials: 'include' });
-		const user = await response.json();
+		const user = getUserProfile();
 		document.getElementById('display-username').textContent = user.username;
 		document.getElementById('display-email').textContent = user.email;
 		if (user.avatarUrl)
 			document.getElementById('profile-avatar').src = user.avatarUrl;
 	}
 	catch (error) {
-			const usernameElem = document.getElementById('display-username');
-			const emailElem = document.getElementById('display-email');
-			// if (usernameElem) usernameElem.textContent = "**error charging username**"; //todo @leontinepaq a changer
-			// if (emailElem) emailElem.textContent = "**error charging email**";
-			if (usernameElem) usernameElem.textContent = "Lele";
-			if (emailElem) emailElem.textContent = "lele@gmail.com";
-			if (!usernameElem || !emailElem) {
-				console.error("Elements absent from DOM");
-				return;
-			}
+		console.error("Error loading profile: ", error)
 	}
 };
 
