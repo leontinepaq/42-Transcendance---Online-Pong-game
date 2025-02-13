@@ -160,6 +160,15 @@ form
 
 }
 
+/* GAME */
+
+	
+#myCanvas{
+	width: 100%;   /* Le canvas occupe toute la largeur de son conteneur */
+	height: 100%;  /* La hauteur s'ajuste pour garder l'aspect ratio */
+	position: relative;
+	border-radius: 16px;
+}
 
 
 
