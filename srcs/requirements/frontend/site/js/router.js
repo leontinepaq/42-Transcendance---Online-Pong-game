@@ -37,7 +37,7 @@ export async function navigate(route, ...params)
 	console.log('Navigating: ', route);
 		
 	// todo @leontinepaq: a remettre quand auth fonctionne
-	// const newRoute = await authRedirector(route); // todo @leontinepaq en doublon avec main.js processRoute --> cheker avec Sai mais a supp je pense
+	// const newRoute = await authRedirector(route);
 	// route = newRoute;
 
 	try {

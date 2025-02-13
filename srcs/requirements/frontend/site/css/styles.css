@@ -176,4 +176,8 @@ form
 }
 
 
-
+/* todo @leontinepaq a changef */
+.modal
+{
+	color: var(--color-dark);
+}
