@@ -4,7 +4,7 @@ import { showModal } from "./actions/modals.js";
 export async function checkAuth()
 {
     try {
-        const response = await fetch("/api/user/auth_check/", {
+        const response = await fetch("/api/user/check_auth/", {
             method: "GET",
             credentials: "include",
         });

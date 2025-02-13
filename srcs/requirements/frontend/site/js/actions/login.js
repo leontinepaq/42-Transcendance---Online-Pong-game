@@ -7,19 +7,77 @@ export const loginActions = [
 		handler: handleSignin
 	},
 	{
+		selector: '[data-action="submit-auth"]',
+		handler: handleAuth
+	},
+	{
 		selector: '[data-action="forgot-pwd"]',
 		handler: handleForgotPwd
 	}
 ];
 
-async function login(username, password)
+
+async function displayAuthSection(response, username) {
+	const data = await response.json();
+	document.getElementById("page-title").textContent = "Nice to see you again " + username + " !";
+	if (data.two_factor_mail == true)
+	{
+		document.getElementById("auth-label").textContent = "2FA code received by mail";
+		document.getElementById("auth-input").type = "text";
+		document.getElementById("auth-input").classList.remove("d-none");
+	}
+	if (data.two_factor_auth == true)
+	{
+		document.getElementById("auth-label").textContent = "2FA code from authentificator app";
+		document.getElementById("auth-input").type = "text";
+		document.getElementById("auth-input").classList.remove("d-none");
+	}
+	document.getElementById("auth-step").classList.remove("d-none");
+	document.getElementById("pre-login").classList.add("d-none");
+}
+
+async function handleSignin(element, event)
+{
+	console.log("{login.js} sign-in button clicked", element);
+
+	const form = element.closest("form");
+	if (!form.checkValidity()) {
+		form.reportValidity();
+		return;
+	}
+
+	const username = document.getElementById('username').value;
+	try {
+		const response = await fetch('/api/user/pre_login/', {
+			method: 'POST',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({username}),
+		});
+		if (response.ok)
+			displayAuthSection(response, username);
+		else
+		{
+			console.error("Signin error");
+			showModal("An error occured. Please try again.")
+		}
+	}
+	catch (error) {
+		console.error('Signin error:', error);
+		showModal("An error occured. Please try again."); //todo @leontinepaq a checker
+	}
+}
+
+
+
+async function login(username, password, two_factor_auth, two_factor_mail)
 {
 	try {
 		const response = await fetch('/api/user/login/', {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username, password }),
+			body: JSON.stringify({ username, password, two_factor_auth, two_factor_mail}),
 		});
 		const data = await response.json();
 		console.log(data.message);
@@ -35,9 +93,9 @@ async function login(username, password)
 	}
 }
 
-async function handleSignin(element, event)
+async function handleAuth(element, event)
 {
-	console.log("{login.js} sign-in button clicked", element);
+	console.log("{login.js} log in button clicked", element);
 
 	const form = element.closest("form");
 	if (!form.checkValidity()) {
@@ -46,22 +104,18 @@ async function handleSignin(element, event)
 	}
 
 	const username = document.getElementById('username').value;
-	const password = document.getElementById('password').value;
+	const password = document.getElementById('pwd-input').value;
+	const two_factor_auth = document.getElementById('pwd-input').value;
+	const two_factor_mail = document.getElementById('pwd-input').value;
+	// todo @leontinepaq voir avec JA si utile d'en envoyer 2 ?
 
 	try {
-		const data = await login(username, password);
+		const data = await login(username, password, two_factor_auth, two_factor_mail);
 		sessionStorage.setItem("username", username);
 		if (data.ok)
-		{
-			if (data.redirect_url)
-				navigate('2fa_authenticator')
-			else if (data.message === "2FA code sent")
-				navigate('2fa_mail')
-			else
-				navigate('home')
-		}
+			navigate('home')
 		else
-			showModal("Login failed");
+			showModal("Login failed: " + data.message);
 	}
 	catch (error) {
 		console.error('Login error:', error);
