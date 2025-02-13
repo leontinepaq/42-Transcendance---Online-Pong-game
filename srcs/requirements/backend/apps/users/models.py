@@ -1,5 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.utils.crypto import get_random_string
+import string
+from django.utils import timezone
+from datetime import timedelta, datetime
+from django.core.mail import send_mail
+from django.conf import settings
+import pyotp
 
 class UserProfileManager(BaseUserManager):
     def create_user(self, username, email, password=None, **extra_fields):
@@ -34,8 +41,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_active =             models.BooleanField(default=True)
     is_mail_activated =     models.BooleanField(default=False)
     is_staff =              models.BooleanField(default=False)
-    is_two_factor_active =  models.BooleanField(default=True)
-    is_two_factor_mail =    models.BooleanField(default=True)
+    is_two_factor_mail =    models.BooleanField(default=False)
     is_two_factor_auth =    models.BooleanField(default=False)
     two_factor_code =       models.CharField(max_length=6, blank=True, null=True)
     two_factor_expiry =     models.DateTimeField(blank=True, null=True, default=None)
@@ -48,22 +54,31 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         default="light",
     )
 
-    def is_2fa_valid(self, code):
-        return (self.two_factor_code == code 
+    def is_mail_code_valid(self, code):
+        return (self.two_factor_code == code
             and self.two_factor_expiry
             and self.two_factor_expiry > timezone.now())
+    
+    def is_auth_code_valid(self, code):
+        return pyotp.TOTP(self.totp_secret).verify(code, valid_window = 1)
         
-    def send_2fa(user):
+    def reset_2fa_code(self):
+        self.two_factor_code = None
+        self.two_factor_expiry = None
+        self.save()
+        
+    def send_2fa_mail(self):
+        if not self.is_two_factor_mail:
+            return
         self.two_factor_code = get_random_string(length=6,
-                                                allowed_chars=string.digits)
+                                                 allowed_chars=string.digits)
         self.two_factor_expiry = timezone.now() + timedelta(minutes=15)
         self.save()
-
         send_mail(
             'Your 2FA Code',
-            f'Your 2FA code is: {user.two_factor_code}',
+            f'Your 2FA code is: {self.two_factor_code}',
             settings.DEFAULT_FROM_EMAIL,
-            [user.email],
+            [self.email],
             fail_silently=False,
         )
 
