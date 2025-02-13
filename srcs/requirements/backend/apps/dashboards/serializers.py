@@ -16,7 +16,8 @@ class GameSerializer(serializers.ModelSerializer):
             'score_player2',
             'longest_exchange',
             'created_at',
-            'duration']
+            'duration',
+            'tournament']
         read_only_fields=['created_at', 'id']
 
     def create(self, validated_data):
@@ -30,7 +31,8 @@ class UserStatisticsSerializer(serializers.ModelSerializer):
             'total_games_played',
             'wins',
             'losses',
-            'games']
+            'games',
+            'tournaments']
         read_only_fields=['user']
     
     def create(self, validated_data):

@@ -3,7 +3,7 @@ from .models import UserProfile
 from rest_framework import status
 from rest_framework.response import Response
 
-
+#updated at read only ???
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model=UserProfile
@@ -83,6 +83,3 @@ class VerifyAuthenticatorErrorSerializer(GenericResponseSerializer):
 class ActivateAuthenticatorResponseSerializer(serializers.Serializer):
     message = serializers.CharField(default="Two-factor authentication enabled")
     qr_code = serializers.CharField(help_text="Base64-encoded QR code image")
-
-class UpdateAvatarResponseSerializer(GenericResponseSerializer):
-    avatar_url = serializers.URLField(required=False)
