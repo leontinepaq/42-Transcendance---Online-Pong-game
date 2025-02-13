@@ -20,16 +20,16 @@ export async function loadUserProfile() {
 			document.getElementById('profile-avatar').src = user.avatarUrl;
 	}
 	catch (error) {
-		requestAnimationFrame(() => {
 			const usernameElem = document.getElementById('display-username');
 			const emailElem = document.getElementById('display-email');
-			if (usernameElem) usernameElem.textContent = "**error charging username**";
-			if (emailElem) emailElem.textContent = "**error charging email**";
+			// if (usernameElem) usernameElem.textContent = "**error charging username**"; //todo @leontinepaq a changer
+			// if (emailElem) emailElem.textContent = "**error charging email**";
+			if (usernameElem) usernameElem.textContent = "Lele";
+			if (emailElem) emailElem.textContent = "lele@gmail.com";
 			if (!usernameElem || !emailElem) {
 				console.error("Elements absent from DOM");
 				return;
 			}
-		  });
 	}
 };
 
@@ -74,7 +74,7 @@ function toggleEdit(element, event) {
 	 * @returns {Promise<Object>} Réponse de l'API.
 	 */
 	function updateProfileField(field, value) {
-	return fetch('/api/user/update', {
+	return fetch('/api/user/', {
 		method: "POST",
 		credentials: "include",
 		headers: {
