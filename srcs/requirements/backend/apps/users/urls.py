@@ -1,13 +1,13 @@
 from django.urls import path
-from .views.auth import (register,
-                         pre_login,
-                         login,
-                         logout,
-                         auth_check,
-                         send_2fa_mail_activation,
-                         verify_2fa_mail,
-                         get_2fa_qr_activation,
-                         verify_2fa_qr,)
+from .views import (register,
+                   pre_login,
+                   login,
+                   logout,
+                   auth_check,
+                   send_2fa_mail_activation,
+                   verify_2fa_mail,
+                   get_2fa_qr_activation,
+                   verify_2fa_qr,)
 from django.conf import settings
 from django.conf.urls.static import static
 
