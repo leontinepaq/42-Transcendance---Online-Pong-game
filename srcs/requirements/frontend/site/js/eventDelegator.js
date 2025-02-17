@@ -3,6 +3,7 @@ import { logoutAction } from "./actions/logout.js";
 import { loginActions } from "./actions/login.js";
 import { signupActions } from "./actions/signup.js";
 import { pongActions } from "./actions/pong.js";
+import { friendsActions } from "./actions/friends.js";
 // import { TwofaActions } from "./actions/2fa.js";
 
 // Table des actions à gérer, "..." = concat
@@ -12,6 +13,7 @@ const clickActions = [
 	...loginActions,
 	...signupActions,
 	...pongActions,
+	...friendsActions,
 	// ...TwofaActions,
 ];
 
