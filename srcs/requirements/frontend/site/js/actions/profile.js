@@ -1,6 +1,7 @@
 import { navigate	} from "../router.js"
 import { showModal } from "./modals.js"
-import { getUserProfile } from "../api.js"
+// import { getUserProfile } from "../api.js"
+import { authFetch } from "../api.js"
 
 export const profileActions = [
 	{
@@ -10,7 +11,16 @@ export const profileActions = [
 	
 ];
 
-// todo @leontine: a voir avec thomas comment ca marche
+async function getUserProfile()
+{
+	const response = await authFetch('api/userprofile/', {method: 'GET'
+	});
+	if (!response.ok) {
+		throw new Error('Failed to fetch profile')
+	}
+	return await response.json();
+}
+
 export async function loadUserProfile() {
 	const usernameElem = document.getElementById('display-username');
 	const emailElem = document.getElementById('display-email');
@@ -21,7 +31,7 @@ export async function loadUserProfile() {
 	usernameElem.textContent = "**error charging username**"; //todo @leontinepaq a changer
 	emailElem.textContent = "**error charging email**";
 	try {
-		const user = getUserProfile();
+		const user = await getUserProfile();
 		document.getElementById('display-username').textContent = user.username;
 		document.getElementById('display-email').textContent = user.email;
 		if (user.avatarUrl)
@@ -37,7 +47,7 @@ function toggleEdit(element, event) {
 	const displayElem = document.getElementById(`display-${field}`);
 	const inputElem = document.getElementById(`edit-${field}`);
 	const btn = element;
-
+	
 	// Si le bouton affiche "EDIT", on passe en mode édition
 	if (btn.textContent.trim().toUpperCase() === "EDIT") {
 		// Préremplir l'input avec la valeur affichée
@@ -50,15 +60,17 @@ function toggleEdit(element, event) {
 		const newValue = inputElem.value.trim();
 		// Optionnel : validation de newValue
 		updateProfileField(field, newValue).then(response => {
-		if (response.ok) {
-			// Mise à jour de l'affichage et retour au mode lecture
-			displayElem.textContent = newValue;
-			inputElem.classList.add("d-none");
-			displayElem.classList.remove("d-none");
-			btn.textContent = "EDIT";
-		} else {
-			alert(response.message || "Mise à jour échouée");
-		}
+			console.log("Réponse API :", response); // Debugging
+		
+			if (response.ok) {
+				console.log("TEST"); // Devrait s'afficher
+				displayElem.textContent = newValue;
+				inputElem.classList.add("d-none");
+				displayElem.classList.remove("d-none");
+				btn.textContent = "EDIT";
+			} else {
+				alert(response.message || "Mise à jour échouée");
+			}
 		}).catch(error => {
 		console.error(`Erreur lors de la mise à jour de ${field} :`, error);
 		alert("Une erreur est survenue. Veuillez réessayer.");
@@ -66,21 +78,36 @@ function toggleEdit(element, event) {
 	}
 	}
 	
-	/**
-	 * Envoie une requête API pour mettre à jour un champ du profil.
-	 * @param {string} field - "username" ou "email"
-	 * @param {string} value - Nouvelle valeur pour le champ
-	 * @returns {Promise<Object>} Réponse de l'API.
-	 */
 	function updateProfileField(field, value) {
-	return fetch('/api/user/', {
-		method: "POST",
-		credentials: "include",
-		headers: {
-		"Content-Type": "application/json"
-		},
-		body: JSON.stringify({ field, value })
-	}).then(res => res.json());
+		if (field == "username"){
+			const new_username = value;
+			return fetch('api/userprofile/update-username/', {
+				method: "PUT",
+				credentials: "include",
+				headers: {
+				"Content-Type": "application/json"
+				},
+				body: JSON.stringify({new_username})
+			}).then(res => res.json().then(data => ({
+			ok: res.ok, // Ajoute la clé `ok` manuellement
+			...data})));
+		}
+		if (field == "email") {
+			const new_email = value;
+			return fetch('api/userprofile/update-email/', {
+				method: "PUT",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({ new_email })  
+			}).then(res => res.json().then(data => ({
+    ok: res.ok, // Ajoute la clé `ok` manuellement
+    ...data})));
+		}
+
+
+		
 	}
 	
 

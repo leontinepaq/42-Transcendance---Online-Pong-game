@@ -1,5 +1,6 @@
 import { navigate  } from "../router.js"
 import { showModal } from "./modals.js";
+import { authFetch } from "../api.js";
 
 export const loginActions = [
 	{
@@ -48,9 +49,8 @@ async function handleSignin(element, event)
 
 	const username = document.getElementById('username').value;
 	try {
-		const response = await fetch('/api/user/pre_login/', {
+		const response = await authFetch('/api/user/pre_login/', {
 			method: 'POST',
-			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({username}),
 		});
@@ -73,9 +73,8 @@ async function handleSignin(element, event)
 async function login(username, password, two_factor_auth, two_factor_mail)
 {
 	try {
-		const response = await fetch('/api/user/login/', {
+		const response = await authFetch('/api/user/login/', {
 			method: 'POST',
-			credentials: 'include',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ username, password, two_factor_auth, two_factor_mail}),
 		});
