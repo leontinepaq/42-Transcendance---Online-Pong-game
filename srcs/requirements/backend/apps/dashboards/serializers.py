@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Game, UserStatistics
+from .models import Game, UserStatistics, Tournament
 from users.models import UserProfile
 
 class GameSerializer(serializers.ModelSerializer):
@@ -42,8 +42,26 @@ class UserStatisticsSerializer(serializers.ModelSerializer):
         user_statistics.games.set(games)
         return user_statistics
 
-class GenericResponseSerializer(serializers.Serializer):
-    message=serializers.CharField(default="OK")
+class TournamentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Tournament
+        fields=[
+            'id',
+            'name',
+            'players',
+            'winner',
+            'games',
+            'created_at'
+        ]
+        read_only_fields=['created_at', 'id']
 
-    def response(self, _status=200):
-        return Response(self.data, status=_status)
+        def create(self, validated_data):
+            players = validated_data.pop('players', [])
+            games = validated_data.pop('games', [])
+
+            tournament = Tournament.objects.create(**validated_data)
+            tournament.players.set(players)
+            tournament.games.set(games)
+
+            return tournament
+            

@@ -13,5 +13,6 @@ urlpatterns = [
     path('token/refresh', TokenRefreshView.as_view()),
     
     path('user/', include("users.urls")),
-    path('userprofile/', include("userprofile.urls"))
+    path('userprofile/', include("userprofile.urls")),
+    path('dashboard/', include("dashboards.urls"))
 ]
