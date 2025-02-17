@@ -14,8 +14,8 @@ export async function checkAuth()
         }
 
         const data = await response.json();
-        console.log("Authenticated user:", data.user);
-        return data.authenticated;
+        console.log("Authenticated user:", data.username);
+        return true;
     } catch (error) {
         console.log("User is not authenticated");
         return false;
@@ -58,7 +58,7 @@ export async function authFetch(url, options = {})
             });
         } else {
             // Redirect to login if refresh fails
-            window.location.href = '/login';
+            // window.location.href = '/login';
             throw new Error('Authentication failed');
         }
     }
@@ -121,20 +121,6 @@ export async function logout()
     }
 }
 
-export async function getUserProfile()
-{
-    try {
-        const response = await this.authFetch('/profile/', { method: 'GET' });
-        if (!response.ok) {
-            throw new Error('Failed to fetch profile')
-        }
-        return await response.json();
-
-    } catch (error) {
-        console.error('Profile fetch error:', error);
-        throw error;
-    }
-}
 
 export async function activateAuthenticator() {
     try {
