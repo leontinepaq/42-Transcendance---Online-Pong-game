@@ -1,0 +1,14 @@
+Here you may find examples of requests to use dashboard views
+
+create_game : 
+{
+  "player1": 1,
+  "player2": 13,
+  "winner": 1,
+  "score_player1": 5,
+  "score_player2": 4,
+  "longest_exchange": 30,
+  "duration": "2 05:30:15.123456"  
+}
+
+create_tournament:

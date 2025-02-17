@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import (register,
+from .views.auth import (register,
                    pre_login,
                    login,
                    logout,
