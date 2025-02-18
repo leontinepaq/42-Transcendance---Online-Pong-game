@@ -12,15 +12,13 @@ class Game(models.Model):
     longest_exchange =    models.IntegerField(default=0)
     created_at =          models.DateTimeField(auto_now_add=True)
     duration =            models.DurationField()
-    tournament =          models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE, related_name="games_in_tournament")
+    tournament =          models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE, related_name="games")
 
 class UserStatistics(models.Model):
     user =                  models.OneToOneField(UserProfile, on_delete=models.CASCADE)
     total_games_played =    models.IntegerField(default=0)
     wins =                  models.IntegerField(default=0)
     losses =                models.IntegerField(default=0)
-    games =                 models.ManyToManyField(Game, blank=True)
-    tournaments =           models.ManyToManyField("Tournament", blank=True)
 
     @property
     def winrate(self):
@@ -33,6 +31,5 @@ class Tournament(models.Model):
     name =                  models.CharField(max_length=50)
     players =               models.ManyToManyField(UserProfile)
     winner =                models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="winner_of_tournament")
-    games =                 models.ManyToManyField(Game, related_name="tournaments")
     created_at =            models.DateTimeField(auto_now_add=True)
 
