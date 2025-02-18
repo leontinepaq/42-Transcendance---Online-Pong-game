@@ -18,8 +18,7 @@ export const loginActions = [
 ];
 
 
-async function displayAuthSection(response, username) {
-	const data = await response.json();
+async function displayAuthSection(data, username) {
 	document.getElementById("page-title").textContent = "Nice to see you again " + username + " !";
 	if (data.two_factor_mail == true)
 	{
@@ -49,17 +48,18 @@ async function handleSignin(element, event)
 
 	const username = document.getElementById('username').value;
 	try {
-		const response = await authFetch('/api/user/pre_login/', {
+		const response = await fetch('/api/user/pre_login/', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({username}),
 		});
+		const data = await response.json();
 		if (response.ok)
-			displayAuthSection(response, username);
+			displayAuthSection(data, username);
 		else
 		{
-			console.error("Signin error");
-			showModal("An error occured. Please try again.")
+			console.error("Signin error: " + data.message);
+			showModal("Signin failed: " + data.message);
 		}
 	}
 	catch (error) {
