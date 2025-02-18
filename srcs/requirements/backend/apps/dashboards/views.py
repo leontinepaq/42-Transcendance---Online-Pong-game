@@ -1,14 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.response import Response
+from users.models import UserProfile
 from .models import Game, UserStatistics, Tournament
 from .serializers import UserStatisticsSerializer, GameSerializer, TournamentSerializer
 from users.serializers.auth import GenericResponseSerializer
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
-#works
 @extend_schema(
     summary="creates game",
     description="After game ends, creates game and adds it to both players's UserStatistics",
@@ -37,9 +37,6 @@ def create_game(request):
             player2_stats.wins += 1
             player1_stats.losses += 1
 
-        player1_stats.games.add(game)
-        player2_stats.games.add(game)
-
         player1_stats.save()
         player2_stats.save()
 
@@ -59,30 +56,23 @@ def create_game(request):
 @api_view(["POST"])
 def create_tournament(request):
     serializer = TournamentSerializer(data=request.data)
-
     if not serializer.is_valid():
         return Response({"message": "An error has occurred", "errors": serializer.errors}, status=400)
 
+    game_ids = request.data.get('games', [])
+    if not game_ids:
+        return GenericResponseSerializer({"message": "At least one game is required for a tournament"}, status=400)
+
+    games = Game.objects.filter(id__in=game_ids).select_related('player1', 'player2')
+    if len(games) != len(game_ids):
+        return GenericResponseSerializer({"message": "One ore more game IDs are invalid"}, status=400)
+
     tournament = serializer.save()
-    games = request.data.get('games', [])
-
-    for game_data in games:
-        game_request = {
-            'player1': game_data['player1'],
-            'player2': game_data['player2'],
-            'winner': game_data['winner'],
-            'score_player1': game_data['score_player1'],
-            'score_player2': game_data['score_player2'],
-            'longest_exchange': game_data['longest_exchange'],
-            'duration': game_data['duration'],
-            'tournament': tournament.id
-        }
-
-        game_request =  request._replace(data=game_request)
-        create_game(game_request)
+    games.update(tournament=tournament)
+    players = set(player for game in games.values_list("player1", "player2") for player in game)
+    tournament.players.add(*players)
 
     return Response(TournamentSerializer(tournament).data, status=201)
-
 
 @extend_schema(
     summary="Fetch user statistics",
@@ -90,14 +80,23 @@ def create_tournament(request):
     responses={
         404: GenericResponseSerializer,
         200: UserStatisticsSerializer
-    }
+    },
+    parameters=[
+        OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)
+    ],
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def userStatisticsView(request):
-    user = request.user
+    user_id = request.query_params.get("user_id")
+
+    if not user_id or not user_id.isdigit():
+        return GenericResponseSerializer({"message": "invalid or missing user id"}, status=400)
+
+    user = get_object_or_404(UserProfile, id=int(user_id))
+
     try:
-        user_stats = UserStatistics.objects.get(user=user)
+        user_stats = UserStatistics.objects.select_related('user').get(user=user)
     except UserStatistics.DoesNotExist:
         return GenericResponseSerializer({"message": "User Statistics not found"}).response(404)
 
@@ -109,7 +108,10 @@ def userStatisticsView(request):
     responses={
         404: GenericResponseSerializer,
         200: GameSerializer
-    }
+    },
+    parameters=[
+        OpenApiParameter(name="game_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)
+    ],
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -118,9 +120,8 @@ def gameInfoView(request):
     if not game_id:
         return GenericResponseSerializer({"message": "Game ID is required"}).response(400)
 
-    game = get_object_or_404(Game, id=game_id)
+    game = get_object_or_404(Game.objects.select_related('player1', 'player2', 'winner', 'tournament'), id=game_id)
     return Response(GameSerializer(game).data, status=200)
-
 
 @extend_schema(
     summary="Fetch tournament info",
@@ -128,7 +129,10 @@ def gameInfoView(request):
     responses={
         404: GenericResponseSerializer,
         200: TournamentSerializer
-    }
+    },
+    parameters=[
+        OpenApiParameter(name="tournament_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)
+    ]
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -137,7 +141,7 @@ def tournamentInfoView(request):
     if not tournament_id:
         return GenericResponseSerializer({"message": "Tournament ID is required"}).response(400)
 
-    tournament = get_object_or_404_or_404(Tournament, id=tournament_id)
+    tournament = get_object_or_404(Tournament.objects.prefetch_related('games', 'players'), id=tournament_id)
     return Response(TournamentSerializer(tournament).data, status=200)
 
 

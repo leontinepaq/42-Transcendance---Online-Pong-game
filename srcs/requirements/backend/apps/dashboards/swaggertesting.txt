@@ -12,3 +12,9 @@ create_game :
 }
 
 create_tournament:
+{
+    "name": "Summer Championship",
+    "players" : [1, 13],
+    "winner": 1,
+    "games": [1, 2, 3, 4]
+}
