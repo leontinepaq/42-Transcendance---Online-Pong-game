@@ -36,6 +36,7 @@ class RequestRegisterSerializer(serializers.Serializer):
     username=serializers.CharField(required=True)
     password=serializers.CharField(required=True, 
                                    write_only=True)
+    confirm_password=serializers.CharField(required=True, write_only=True)
     email=serializers.EmailField(required=True)
 
 class ResponseRegisterErrorSerializer(GenericResponseSerializer):

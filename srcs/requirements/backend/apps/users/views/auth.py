@@ -30,6 +30,13 @@ def register(request):
     email=request.data.get("email")
     username=request.data.get("username")
     password=request.data.get("password")
+    confirm_password=request.data.get("confirm_password")
+
+    if not password or not confirm_password:
+        return GenericResponseSerializer({"message": "Both fields required"}).response(400)
+    if password != confirm_password:
+        return GenericResponseSerializer({"message": "Passwords do not match"}).response(400)
+
     username_exists=User.objects.filter(username=username).exists()
     email_exists=User.objects.filter(email=email).exists()
     
