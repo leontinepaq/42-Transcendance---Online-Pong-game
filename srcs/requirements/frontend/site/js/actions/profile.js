@@ -105,14 +105,6 @@ async function switchToSaveMode(button, valueDisplay, input, confirmInput)
 	button.textContent = "EDIT";
 }
 
-function checkInput(input)
-{
-	if (input.checkValidity())
-		return true;
-	input.reportValidity();
-	return false;
-}
-
 async function toggleEdit(element, event) {
 	const field = element.getAttribute("data-field");
 	const valueDisplay = document.getElementById(`display-${field}`);
@@ -124,8 +116,6 @@ async function toggleEdit(element, event) {
 		switchToEditMode(button, valueDisplay, input, confirmInput);
 	else if (button.textContent === "SAVE")
 	{
-		if (!checkInput(input)) // todo @leontinepaq a garder ? voir avec le back..?
-			return;
 		button.disabled = true;
 		const response = await updateProfileField(field, input, confirmInput);
 		if (response.ok)

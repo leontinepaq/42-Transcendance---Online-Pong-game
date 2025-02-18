@@ -8,14 +8,14 @@ export const signupActions = [
 	},
 ];
 
-async function signup(username, email, password)
+async function signup(username, email, password, confirm_password)
 {
 	try {
 		const response = await fetch('/api/user/register/', {
 			method: 'POST',
 			// credentials: 'include',
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ username, email, password }),
+			body: JSON.stringify({ username, email, password, confirm_password }),
 		});
 		
 		const data = await response.json();
@@ -33,12 +33,12 @@ async function handleSignup(element, event)
 {
 	console.log("{signup.js} sign-up button clicked", element);
 
-	const form = element.closest("form");
-	if (!form.checkValidity())
-	{
-		form.reportValidity();
-		return;
-	}
+	// const form = element.closest("form"); //todo @leontinepaq a supp si sur que inutile -> si utile ajouter dans login x2 et dans profile
+	// if (!form.checkValidity())
+	// {
+	// 	form.reportValidity();
+	// 	return;
+	// }
 
 	const username = document.getElementById('new-username').value;
 	const password = document.getElementById('new-password').value;
@@ -50,11 +50,11 @@ async function handleSignup(element, event)
 		return;
 	}
 	try {
-		const data = await signup(username, email, password);
+		const data = await signup(username, email, password, confirmPassword);
 		if (data.ok)
 		{
 			showModal("Account created successfully");
-			navigate('login');
+			navigate('home');
 		}
 		else
 			showModal("Signup failed: " + data.message);

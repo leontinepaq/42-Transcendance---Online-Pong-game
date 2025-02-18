@@ -40,12 +40,6 @@ async function handleSignin(element, event)
 {
 	console.log("{login.js} sign-in button clicked", element);
 
-	const form = element.closest("form");
-	if (!form.checkValidity()) {
-		form.reportValidity();
-		return;
-	}
-
 	const username = document.getElementById('username').value;
 	try {
 		const response = await fetch('/api/user/pre_login/', {
@@ -95,12 +89,6 @@ async function login(username, password, two_factor_auth, two_factor_mail)
 async function handleAuth(element, event)
 {
 	console.log("{login.js} log in button clicked", element);
-
-	const form = element.closest("form");
-	if (!form.checkValidity()) {
-		form.reportValidity();
-		return;
-	}
 
 	const username = document.getElementById('username').value;
 	const password = document.getElementById('pwd-input').value;
