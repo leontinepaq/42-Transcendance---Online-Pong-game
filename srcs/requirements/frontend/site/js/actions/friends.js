@@ -18,24 +18,21 @@ function initFriends()
 
 const userData = 
 [
-    { "id": 1, "name": "Alice", "avatar": "https://i.pravatar.cc/80?img=1" },
-    { "id": 2, "name": "Bob", "avatar": "https://i.pravatar.cc/80?img=2" },
-    { "id": 3, "name": "Charlie", "avatar": "https://i.pravatar.cc/80?img=3"},
-    { "id": 4, "name": "Alice", "avatar": "https://i.pravatar.cc/80?img=1" },
-    { "id": 5, "name": "Bob", "avatar": "https://i.pravatar.cc/80?img=2" },
-    { "id": 6, "name": "Charlie", "avatar": "https://i.pravatar.cc/80?img=3"},
-    { "id": 1, "name": "Alice", "avatar": "https://i.pravatar.cc/80?img=1" },
-    { "id": 2, "name": "Bob", "avatar": "https://i.pravatar.cc/80?img=2" },
-    { "id": 3, "name": "Charlie", "avatar": "https://i.pravatar.cc/80?img=3"},
-    { "id": 4, "name": "Alice", "avatar": "https://i.pravatar.cc/80?img=1" },
-    { "id": 5, "name": "Bob", "avatar": "https://i.pravatar.cc/80?img=2" },
-    { "id": 6, "name": "Charlie", "avatar": "https://i.pravatar.cc/80?img=3"},
+    { "id": 1, "name": "Alice", "avatar": "https://i.pravatar.cc/80?img=1", "friend": 0},
+    { "id": 2, "name": "Bob", "avatar": "https://i.pravatar.cc/80?img=2" , "friend": 1},
+    { "id": 3, "name": "Charlie", "avatar": "https://i.pravatar.cc/80?img=3", "friend": 1},
 ]
 
 function handleFriends()
 {
     const userlist = document.getElementById('user-container');
     const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+
+    userlist.innerHTML = `
+    <div class="container mt-5">
+            <button class="btn btn-primary see-friend" id="userFiltre">FRIEND</button>
+    </div>  
+    `
 
     userData.forEach(user => {
 
@@ -46,20 +43,41 @@ function handleFriends()
             <div class="card user-card text-center p-3">
                 <img src="${user.avatar}" alt="Avatar de ${user.name}" class="user-avatar mx-auto">
                 <h5 class="mt-2">${user.name}</h5>
-                <button class="btn btn-primary add-friend" data-id="${user.id}">Ajouter</button>
+                <button class="btn btn-primary add-friend" data-id="${user.id}">ADD</button>
                 <button class="btn btn-primary view-profile" data-action="userModal" data-id="${user.id}">Profile</button>
             </div>
         `;
-
         userlist.appendChild(userCard);
+    })
+
+    const friendBox = document.getElementById('userFiltre')
+    friendBox.addEventListener("click", (e) => {
+        if (e.target.innerText == "FRIEND")
+        {
+            userlist.innerHTML = ``;
+            userlist.innerHTML = `
+            <div class="container mt-5">
+                    <button class="btn btn-primary see-friend" id="userFiltre">USER</button>
+            </div>  
+            `
+        }
+        else
+        {
+            userlist.innerHTML = ``;
+            userlist.innerHTML = `
+            <div class="container mt-5">
+                    <button class="btn btn-primary see-friend" id="userFiltre">FRIEND</button>
+            </div>  
+            `
+        }
     })
 
     document.querySelectorAll(".add-friend").forEach(button => {
         button.addEventListener("click", (e) => {
-            e.target.innerText = "Demande envoyée";
+            e.target.innerText = "Remove";
             e.target.classList.remove("btn-primary");
-            e.target.classList.add("btn-secondary");
-            e.target.disabled = true;
+            e.target.classList.add("btn-success");
+            e.target.disabled = true; // desactive lutilisation du boutton 
         });
     });
 
@@ -84,4 +102,5 @@ function handleFriends()
     - remplacer par lappel api quand userlist sera implementer dans le back
     - si user est un ami -> on peut voir son status online/offline
     - ajout comme ami != envoyer une demande dami (cf le sujet)
+    - besoin du back pour check si user is a friend ou non 
 */
