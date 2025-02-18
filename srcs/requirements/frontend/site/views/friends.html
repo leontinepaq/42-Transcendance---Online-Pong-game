@@ -1,55 +1,23 @@
-<div class="input-group mb-3">
-    <input type="text" class="form-control" placeholder="Rechercher un ami..." id="search-input">
-    <button class="btn btn-primary" id="search-button">🔍</button>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Add Users</h2>
+    <div id="user-container" class="row g-3"></div>
 </div>
-
-    <ul class="list-unstyled" id="friends-container">
-        <!-- <li>
-            John Doe
-            <select>
-            <option value="message">Envoyer un message</option>
-            <option value="block">Bloquer</option>
-            <option value="remove">Supprimer</option>
-            </select>
-        </li> -->
-    </ul>
-<!-- <table>
-    <thead>
-        <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Status</th>      
-        </tr>
-    </thead>
-    <tbody id="friends-container">
-    </tbody>
-</table> -->
-
-
-  <!-- <div class="card mb-4">
-    <div class="card-header">Mes Amis</div>
-    <ul class="list-group list-group-flush" id="friends-container">
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>Player1</span>
-        <span class="badge bg-success">🟢 En ligne</span>
-        <button class="btn btn-sm btn-outline-primary">🎮 Jouer</button>
-      </li>
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>Player2</span>
-        <span class="badge bg-secondary">🔴 Hors ligne</span>
-        <button class="btn btn-sm btn-outline-primary" disabled>🎮 Jouer</button>
-      </li>
-    </ul>
-  </div> -->
-
-  <!-- <div class="card">
-    <div class="card-header">Invitations</div>
-    <ul class="list-group list-group-flush" id="invitations-container">
-      <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>Player3 ta invité à jouer</span>
-        <div>
-          <button class="btn btn-sm btn-success">✅ Accepter</button>
-          <button class="btn btn-sm btn-danger">❌ Refuser</button>
-        </div>
-      </li>
-    </ul>
-  </div> -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="ProfileModalLabel" aria-hidden="true" data-bs-backdrop="false">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Profile</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body text-center">
+      <img id="profile-avatar" src="" class="rounded-circle mb-3" width="100" height="100">
+      <h4 id="profile-name"></h4>
+      <p id="profile-email"></p>
+      <p id="profile-bio"></p>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+		</div>
+	  </div>
+	</div>
+</div>
