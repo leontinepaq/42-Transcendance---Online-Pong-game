@@ -1,4 +1,6 @@
 from django.contrib.auth import get_user_model, authenticate
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes, parser_classes
@@ -31,6 +33,11 @@ def register(request):
     username=request.data.get("username")
     password=request.data.get("password")
     confirm_password=request.data.get("confirm_password")
+
+    try:
+        validate_email(email)
+    except ValidationError:
+        return GenericResponseSerializer({"message": "Invalid email format"}).response(400)
 
     if not password or not confirm_password:
         return GenericResponseSerializer({"message": "Both fields required"}).response(400)
