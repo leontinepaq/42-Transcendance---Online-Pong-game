@@ -83,5 +83,5 @@ function handleFriends()
 /*
     - remplacer par lappel api quand userlist sera implementer dans le back
     - si user est un ami -> on peut voir son status online/offline
-    - ajouter un modal pour mieux voir le profile du user
+    - ajout comme ami != envoyer une demande dami (cf le sujet)
 */
