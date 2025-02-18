@@ -26,13 +26,17 @@
 				<span id="display-email" class="fs-5"></span>
 				<input type="email" id="edit-email" class="form-control d-none" />
 			</div>
-			<button data-action="toggle-email-edit" class="btn btn-outline-secondary">EDIT</button>
+			<button data-action="toggle-edit" data-field="email" class="btn btn-outline-secondary">EDIT</button>
 		</div>
 		
 		<!-- Section Password -->
 		<div>
 			<label class="form-label">Password</label>
-			<div><button data-action="change-password" class="btn btn-outline-secondary">CHANGE PASSWORD</button></div>
+			<div class="mb-2">
+				<input type="password" id="edit-password" class="form-control d-none" placeholder="New password">
+				<input type="password" id="confirm-password" class="form-control d-none mt-2" placeholder="Confirm password">
+			</div>
+			<div><button data-action="toggle-edit" data-field="password" class="btn btn-outline-secondary">EDIT</button></div>
 		</div>
 
 		<!-- Section 2FA -->
@@ -44,7 +48,21 @@
 	</div>
 </div>
 
-
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="false">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+		</div>
+	  </div>
+	</div>
+</div>
 
 	<!-- <div class="container">
 	<h1>Two-factor authentification</h1>
