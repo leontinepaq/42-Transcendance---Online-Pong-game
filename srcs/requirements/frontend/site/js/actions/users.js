@@ -46,7 +46,7 @@ function handleUsers()
 
     userlist.innerHTML = `
     <div class="container mt-5">
-            <button data-action="friends" class="btn btn-primary see-friend">USER</button>
+            <button data-action="friends" class="btn btn-primary see-friend">FRIENDS</button>
     </div>  
     `
 
@@ -54,29 +54,28 @@ function handleUsers()
             appendUser(user, userlist);
     })
 
+    document.querySelectorAll(".add-friend").forEach(button => {
+        button.addEventListener("click", (e) => {
+            e.target.innerText = "Remove";
+            e.target.classList.remove("btn-primary");
+            e.target.classList.add("btn-success");
+            e.target.disabled = true; // desactive lutilisation du boutton 
+        });
+    });
     
-    // document.querySelectorAll(".add-friend").forEach(button => {
-    //     button.addEventListener("click", (e) => {
-    //         e.target.innerText = "Remove";
-    //         e.target.classList.remove("btn-primary");
-    //         e.target.classList.add("btn-success");
-    //         e.target.disabled = true; // desactive lutilisation du boutton 
-    //     });
-    // });
+    document.querySelectorAll(".view-profile").forEach(button => {
+        button.addEventListener("click", (e) => {
+            const userId = parseInt(e.target.getAttribute("data-id"));
     
-    // document.querySelectorAll(".view-profile").forEach(button => {
-    //     button.addEventListener("click", (e) => {
-    //         const userId = parseInt(e.target.getAttribute("data-id"));
+            const user = userData.find(u => u.id === userId);
     
-    //         const user = userData.find(u => u.id === userId);
+            document.getElementById("profile-avatar").src = user.avatar;
+            document.getElementById("profile-name").innerText = user.name;
+            document.getElementById("profile-email").innerText = `Email: ${user.email}`;
+            document.getElementById("profile-bio").innerText = user.bio || "Pas de bio disponible.";
     
-    //         document.getElementById("profile-avatar").src = user.avatar;
-    //         document.getElementById("profile-name").innerText = user.name;
-    //         document.getElementById("profile-email").innerText = `Email: ${user.email}`;
-    //         document.getElementById("profile-bio").innerText = user.bio || "Pas de bio disponible.";
-    
-    //         profileModal.show();
-    //     });
-    // });
+            profileModal.show();
+        });
+    });
 }
 
