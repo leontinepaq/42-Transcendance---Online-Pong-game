@@ -57,10 +57,19 @@ function handleUsers()
 
     document.querySelectorAll(".add-friend").forEach(button => {
         button.addEventListener("click", (e) => {
-            e.target.innerText = "Remove";
-            e.target.classList.remove("btn-primary");
-            e.target.classList.add("btn-success");
-            e.target.disabled = true; // desactive lutilisation du boutton 
+            if (e.target.innerText == "ADD")
+            {    
+                e.target.innerText = "REMOVE";
+                e.target.classList.remove("btn-primary");
+                e.target.classList.add("btn-success");
+                // e.target.disabled = true; // desactive lutilisation du boutton 
+            }
+            else
+            {
+                e.target.innerText = "ADD";
+                e.target.classList.add("btn-success");
+                e.target.classList.remove("btn-primary");
+            }
         });
     });
     
