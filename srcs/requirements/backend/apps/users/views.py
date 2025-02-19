@@ -95,12 +95,12 @@ def login(request):
     response.set_cookie(key="access_token",
                         value=str(refresh.access_token),
                         httponly=True,
-                        secure=True, # Enable this for HTTPS
-                        samesite="Strict")    
+                        # secure=True, # Enable this for HTTPS
+                        samesite="Strict")
     response.set_cookie(key="refresh_token",
                         value=str(refresh),
                         httponly=True,
-                        secure=True,
+                        # secure=True,
                         samesite="Strict")
     return response
 
