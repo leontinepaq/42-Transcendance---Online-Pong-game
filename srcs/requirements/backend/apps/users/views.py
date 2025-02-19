@@ -1,12 +1,10 @@
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
-from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
+from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework import status
 from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
 from .serializers import *
