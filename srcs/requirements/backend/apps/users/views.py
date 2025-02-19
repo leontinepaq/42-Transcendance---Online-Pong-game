@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework import status
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
 from .serializers import *
 from io import BytesIO
 from rest_framework import serializers
@@ -127,7 +127,7 @@ def login(request):
 @extend_schema(
     summary="Ask for 2 factor authentication activation mail to be sent",
     description="Expecting nothing",
-    responses={200: GenericResponseSerializer({"message": "Sent"})}
+    responses={200: inline_serializer("Mail sent", fields={"message": serializers.CharField(default="Mail sent")})}
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -140,8 +140,10 @@ def send_2fa_mail_activation(request):
     description="Expecting JSON",
     request=RequestVerify2faSerializer,
     responses={
-        400:GenericResponseSerializer,
-        200:GenericResponseSerializer
+        400:inline_serializer("Wrong code",
+                              fields = {"message": serializers.CharField(default="Wrong or expired code")}),
+        200:inline_serializer("Activated",
+                              fields = {"message": serializers.CharField(default="Activated")}),
     }
 )
 @api_view(["POST"])
@@ -211,8 +213,10 @@ def get_2fa_qr_activation(request):
     description="Verify a TOTP authenticator code, Expecting JSON",
     request=RequestVerify2faSerializer,
     responses={
-        400:GenericResponseSerializer({"message": "Wrong code"}),
-        200:GenericResponseSerializer({"message": "OK"})
+        400:inline_serializer("Wrong code",
+                              fields = {"message": serializers.CharField(default="Wrong or expired code")}),
+        200:inline_serializer("Activated",
+                              fields = {"message": serializers.CharField(default="Activated")}),
     }
 )
 @api_view(["POST"])
@@ -225,7 +229,7 @@ def verify_2fa_qr(request):
         user.is_two_factor_mail = False
         user.save()
         return GenericResponseSerializer({"message": "Activated"}).response(200)
-    return GenericResponseSerializer({"message": "Wrong code"}).response(400)
+    return GenericResponseSerializer({"message": "Wrong or expired code"}).response(400)
 
 ## TOKEN REFRESH
 class CookieTokenRefreshView(TokenRefreshView):
