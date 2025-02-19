@@ -12,7 +12,7 @@ window.addEventListener(
 	}
 });
 
-const publicRoutes = new Set(['login', 'signup', '2fa']);
+const publicRoutes = new Set(['login', 'signup']);
 
 export async function authRedirector(route)
 {

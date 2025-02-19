@@ -92,15 +92,18 @@ async function handleAuth(element, event)
 
 	const username = document.getElementById('username').value;
 	const password = document.getElementById('pwd-input').value;
-	const two_factor_auth = document.getElementById('pwd-input').value;
-	const two_factor_mail = document.getElementById('pwd-input').value;
+	const two_factor_auth = document.getElementById('auth-input').value;
+	const two_factor_mail = document.getElementById('auth-input').value;
 	// todo @leontinepaq voir avec JA si utile d'en envoyer 2 ?
 
 	try {
 		const data = await login(username, password, two_factor_auth, two_factor_mail);
 		sessionStorage.setItem("username", username);
 		if (data.ok)
-			navigate('home')
+		{
+			console.log("Login successful");
+			navigate('home');
+		}
 		else
 			showModal("Login failed: " + data.message);
 	}

@@ -1,21 +1,48 @@
 import { showModal } from "./modals.js"
-import { authFetch } from "../api.js"
+import { authFetch } from "../api.js";
+import { update2fa } from "./2fa.js"
 
 export const profileActions = [
 	{
 		selector: '[data-action="toggle-edit"]',
 		handler: toggleEdit
+	},
+	{
+		selector: '[data-action="disable-2fa"]',
+		handler: disable2fa
 	}
 ];
 
+function show(element) { element.classList.remove("d-none"); }
+function hide(element) { element.classList.add("d-none"); }
+
 async function getUserProfile()
 {
-	const response = await authFetch('api/userprofile/', {method: 'GET'
-	});
+	const response = await authFetch('api/userprofile/', {method: 'GET'});
 	if (!response.ok) {
 		throw new Error('Failed to fetch profile')
 	}
 	return await response.json();
+}
+
+function display2fa(user)
+{
+	console.log(user.is_two_factor_auth);//
+
+	if (user.is_two_factor_mail || user.is_two_factor_auth)
+	{
+		hide(document.getElementById('display-enable-2fa'));
+		show(document.getElementById('display-disable-2fa'));
+		if (user.is_two_factor_mail)
+			show(document.getElementById('span-2fa-mail'));
+		else
+			show(document.getElementById('span-2fa-app'));
+	}
+	else
+	{
+		show(document.getElementById('display-enable-2fa'));
+		hide(document.getElementById('display-disable-2fa'));
+	}
 }
 
 export async function loadUserProfile()
@@ -34,6 +61,7 @@ export async function loadUserProfile()
 		document.getElementById('display-email').textContent = user.email;
 		if (user.avatarUrl)
 			document.getElementById('profile-avatar').src = user.avatarUrl;
+		display2fa(user);
 	}
 	catch (error) {
 		console.error("Error loading profile: ", error)
@@ -75,9 +103,6 @@ async function updateProfileField(field, input, confirmInput)
 	}
 
 }
-
-function show(element) { element.classList.remove("d-none"); }
-function hide(element) { element.classList.add("d-none"); }
 
 async function switchToEditMode(button, valueDisplay, input, confirmInput)
 {
@@ -126,32 +151,7 @@ async function toggleEdit(element, event) {
 	}
 }
 
-// async function update2FABtn() {
-//	 try {
-//		 const response = await fetch('/api/user/profile', { credentials: 'include' });
-//		 const user = await response.json();
-		
-//		 const button = document.getElementById("toggle-2fa");
-//		 if (user.twoFAEnabled) {
-//			 button.textContent = "DISABLE 2FA";
-//			 button.classList.remove("d-none");
-//		 } else {
-//			 button.textContent = "ENABLE 2FA";
-//			 button.classList.remove("d-none");
-//		 }
-//	 } catch (error) {
-//		 console.error("Error fetching user profile:", error);
-//	 }
-// }
-
-// Exécuter la mise à jour au chargement de la page
-// document.addEventListener("DOMContentLoaded", update2FABtn);
-
-// async function toggle2FA(element, event) {
-// 	try {
-// 		await api.activateAuthenticator();
-// 		update2FABtn();
-// 	} catch (error) {
-// 		console.error("Error toggling 2FA:", error);
-// 	}
-// }
+async function disable2fa(element, event)
+{
+	return await update2fa({ activate: false });
+}
