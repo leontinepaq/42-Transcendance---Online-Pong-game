@@ -6,6 +6,7 @@ import { pongActions } from "./actions/pong.js";
 import { friendsActions } from "./actions/friends.js";
 import { profileActions } from "./actions/profile.js";
 import { verify2faEmailActions } from "./actions/validate2faEmail.js"
+import { usersActions } from "./actions/users.js";
 
 // Table des actions à gérer, "..." = concat
 const clickActions = [
@@ -15,6 +16,7 @@ const clickActions = [
 	...signupActions,
 	...pongActions,
 	...friendsActions,
+	...usersActions,
 	...profileActions,
 	...verify2faEmailActions
 	// ...TwofaActions,
