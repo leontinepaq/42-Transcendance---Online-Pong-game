@@ -5,10 +5,14 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework import status
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from .serializers import *
 from io import BytesIO
+from rest_framework import serializers
+from django.conf import settings
 import qrcode
 import pyotp
 import base64
@@ -55,9 +59,10 @@ def pre_login(request):
     username=request.data.get("username")
 
     if User.objects.filter(username=username).exists() == False:
-        return GenericResponseSerializer({"message": "User does not exist"}).response(404)
+        return UserNotFoundErrorSerializer.response(404)
     user = User.objects.get(username=username)
-    user.send_2fa_mail()
+    if user.is_two_factor_mail:
+        user.send_2fa_mail()
     return ResponsePreLogin({"two_factor_mail": user.is_two_factor_mail,
                              "two_factor_auth": user.is_two_factor_auth}).response(200)
 
@@ -65,43 +70,44 @@ def pre_login(request):
     summary="Login",
     description="Expecting JSON",
     request=RequestLoginSerializer,
-    responses={404: GenericResponseSerializer,
-               200: GenericResponseSerializer}
+    responses={404: UserNotFoundErrorSerializer,
+               401: ResponseLoginError,
+               200: ResponseLoginSuccess}
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def login(request):
     username = request.data.get("username")
     password = request.data.get("password")
-    two_factor_mail = request.data.get("two_factor_mail")
-    two_factor_auth = request.data.get("two_factor_auth")
+    two_factor_code = request.data.get("two_factor_code")
 
     if User.objects.filter(username=username).exists() == False:
-        return GenericResponseSerializer({"message": "User does not exist"}).response(404)
+        return UserNotFoundErrorSerializer().response(404)
     user=authenticate(request, username=username, password=password)
     if user is None:
-        return GenericResponseSerializer({"message": "Wrong password"}).response(404)
-    if user.is_two_factor_mail and not user.is_mail_code_valid(two_factor_mail):
-        return GenericResponseSerializer({"message": "Wrong code"}).response(404)
+        return ResponseLoginError({"message": "Wrong password"}).response(401)
+    if user.is_two_factor_mail and not user.is_mail_code_valid(two_factor_code):
+        return ResponseLoginError({"message": "Wrong code"}).response(401)
     else:
         user.reset_2fa_code()
-    if user.is_two_factor_auth and not user.is_auth_code_valid(two_factor_auth):
-        return GenericResponseSerializer({"message": "Wrong code"}).response(404)
+    if user.is_two_factor_auth and not user.is_auth_code_valid(two_factor_code):
+        return ResponseLoginError({"message": "Wrong code"}).response(401)
     
     refresh=RefreshToken.for_user(user)
     response=Response({"message": "Login successful"})
-    # Set JWT as HttpOnly Cookie
     print("JWT TOKEN IS \n", str(refresh.access_token))
-    response.set_cookie(key="access_token",
+    response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                         value=str(refresh.access_token),
-                        httponly=True,
-                        # secure=True, # Enable this for HTTPS
-                        samesite="Strict")
-    response.set_cookie(key="refresh_token",
+                        max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+                        httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+                        secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+                        samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"])
+    response.set_cookie(key=settings.SIMPLE_JWT["REFRESH_COOKIE"],
                         value=str(refresh),
-                        httponly=True,
-                        # secure=True,
-                        samesite="Strict")
+                        max_age=settings.SIMPLE_JWT["REFRESH_TOKEN_LIFETIME"],
+                        httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+                        secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+                        samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"])
     return response
 
 ## 2FA MAIL
@@ -117,7 +123,7 @@ def send_2fa_mail_activation(request):
     return GenericResponseSerializer({"message": "Sent"}).response(200)
 
 @extend_schema(
-    summary="Activate 2 factor authentication via mail",
+    summary="Activate 2 factor authentication via mail. To be used after calling send_2fa_mail_activation",
     description="Expecting JSON",
     request=RequestVerify2faSerializer,
     responses={
@@ -142,12 +148,12 @@ def verify_2fa_mail(request):
 @extend_schema(
     summary="Logout/Deleting JWT Token",
     description="Expecting nothing",
-    responses={200: GenericResponseSerializer}
+    responses={200: ResponseLogout}
 )
 @permission_classes([IsAuthenticated])
 @api_view(["POST"])
 def logout(request):    
-    response=Response({"message": "Logged out"})
+    response=Response(ResponseLogout().data)
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
     return response
@@ -188,7 +194,7 @@ def get_2fa_qr_activation(request):
                     status=status.HTTP_200_OK)
 
 @extend_schema(
-    summary="Verify authenticator code",
+    summary="Activates 2FA via authenticator. To be used after calling get_2fa_qr_activation",
     description="Verify a TOTP authenticator code, Expecting JSON",
     request=RequestVerify2faSerializer,
     responses={
@@ -207,3 +213,47 @@ def verify_2fa_qr(request):
         user.save()
         return GenericResponseSerializer({"message": "Activated"}).response(200)
     return GenericResponseSerializer({"message": "Wrong code"}).response(400)
+
+## TOKEN REFRESH
+class CookieTokenRefreshView(TokenRefreshView):
+    @extend_schema(
+        summary="Refresh JWT Token",
+        description="Refreshes the access token using the refresh token stored in cookies.",
+        parameters=[
+            OpenApiParameter(
+                name="refresh_token",
+                type=str,
+                location=OpenApiParameter.COOKIE,
+                required=True,
+                description="Refresh token stored in cookies"
+            )
+        ],
+        responses={200: ResponseRefreshToken,
+                   400: ResponseRefreshTokenErrorInvalid,
+                   401: ResponseRefreshTokenErrorMissing}
+    )
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get(settings.SIMPLE_JWT["REFRESH_COOKIE"])
+
+        if not refresh_token:
+            return Response(ResponseRefreshTokenErrorMissing,
+                            status=status.HTTP_401_UNAUTHORIZED)
+        
+        serializer = self.get_serializer(data={"refresh": refresh_token})
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except TokenError as e:
+            return Response(ResponseRefreshTokenErrorInvalid,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        access_token = serializer.validated_data.get("access")
+        print("JWT TOKEN IS \n", access_token)
+        response = Response({"message": "Token refreshed successfully"})
+        response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
+                            value=access_token,
+                            max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
+                            httponly=settings.SIMPLE_JWT["AUTH_COOKIE_HTTP_ONLY"],
+                            secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
+                            samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"])
+        return response

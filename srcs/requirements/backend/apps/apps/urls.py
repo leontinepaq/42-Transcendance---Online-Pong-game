@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from users.views import CookieTokenRefreshView
 
 urlpatterns = [
     path('schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -10,7 +10,7 @@ urlpatterns = [
     
     path('admin/', admin.site.urls),
     
-    path('token/refresh', TokenRefreshView.as_view()),
+    path('token/refresh/', CookieTokenRefreshView.as_view()),
     
     path('user/', include("users.urls")),
     path('userprofile/', include("userprofile.urls")),
