@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from .models import Game, UserStatistics, Tournament
 from users.models import UserProfile
+from drf_spectacular.utils import extend_schema_field
 
 class GameSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,12 +61,14 @@ class UserStatisticsSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['user', 'winrate']
     
+    @extend_schema_field(GameSerializer(many=True))
     def get_games(self, obj):
         games = Game.objects.filter(
             Q(player1=obj.user) | Q(player2=obj.user)
         ).select_related('player1', 'player2', 'winner', 'tournament')
         return GameSerializer(games, many=True).data
-    
+
+    @extend_schema_field(TournamentSerializer(many=True))
     def get_tournaments(self, obj):
         tournaments = Tournament.objects.filter(
             players=obj.user

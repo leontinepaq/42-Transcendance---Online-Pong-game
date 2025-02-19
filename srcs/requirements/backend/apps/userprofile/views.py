@@ -36,6 +36,7 @@
 import os
 import logging
 from django.conf import settings
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth import get_user_model
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -44,7 +45,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema, OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiTypes, OpenApiParameter
 from users.models import UserProfile
 from users.serializers import UserProfileSerializer
 from .serializers import (
@@ -56,28 +57,47 @@ from .serializers import (
 )
 from users.serializers import GenericResponseSerializer, UserNotFoundErrorSerializer
 
-
-
 logger = logging.getLogger(__name__)
 User=get_user_model()
 
-
 @extend_schema(
-    summary="display profiles",
-    description="fetches user profile and returns its data",
+    summary="display user's own profile",
+    description="fetches user's own profile and returns its data",
     responses={
         404:UserNotFoundErrorSerializer,
-        200:GenericResponseSerializer
+        200:UserProfileSerializer
     }
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def display_profile(request):
     serializer = UserProfileSerializer(request.user)
-    return Response(serializer.data)
+    return Response(serializer.data, status=200)
 
 @extend_schema(
-    summary="update email",
+    summary="display another user's profile",
+    description="fetches another user's profile based on provided user_id and returns its data",
+    parameters=[OpenApiParameter(name="user_id", type=int, location=OpenApiParameter.QUERY, required=True)],
+    responses={
+        404:UserNotFoundErrorSerializer,
+        200:UserProfileSerializer
+    }
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def display_other_profile(request):
+    user_id = request.query_params.get("user_id")
+
+    if not user_id or not user_id.isdigit():
+        return Response({"message": "invalid or missing user id"}, status=400)
+
+    user = get_object_or_404(UserProfile, id=int(user_id))
+    serializer = UserProfileSerializer(user)
+
+    return Response(serializer.data, status=200)
+
+@extend_schema(
+    summary="updates users's email",
     description="user updates email, checks if email is valid and not already in use",
     responses={
         400:GenericResponseSerializer,
@@ -135,7 +155,7 @@ def update_username(request):
 
 @extend_schema(
     summary="update password",
-    description="user updates password, checks if password is valid",
+    description="user updates password, checks if password is valid and if password and confirm password are the same",
     responses={
         400:GenericResponseSerializer,
         200:GenericResponseSerializer
@@ -160,34 +180,21 @@ def update_password(request):
     return GenericResponseSerializer({"message": "OK"}).response(200)
 
 @extend_schema(
-    summary="update 2fa",
-    description="user activates or deactivates 2fa, then choose method if he activates it",
+    summary="deactivates 2fa",
+    description="No specific parameters needed, the call of this endpoint sets all 2FA users parameters to false",
     responses={
         400:GenericResponseSerializer,
         200:GenericResponseSerializer
     },
-    request=Update2FARequestSerializer
 )
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
-def update_2FA(request):
+def deactivate_2FA(request):
     user = request.user
 
-    new_activate_2fa = request.data.get("new_activate_2fa")
-    new_activate_2fa_mail = request.data.get("new_activate_2fa_mail")
-    new_activate_2fa_auth = request.data.get("new_activate_2fa_auth")
-
-    if new_activate_2fa:
-        if new_activate_2fa_mail and new_activate_2fa_auth:
-            return GenericResponseSerializer({"message": "Choose only one 2FA method"}).response(400)
-
-        user.is_two_factor_active = True
-        user.is_two_factor_mail = bool(new_activate_2fa_mail)
-        user.is_two_factor_auth = bool(new_activate_2fa_auth)
-    else:
-        user.is_two_factor_active = False
-        user.is_two_factor_mail = False
-        user.is_two_factor_auth = False
+    user.is_two_factor_active = False
+    user.is_two_factor_mail = False
+    user.is_two_factor_auth = False
 
     user.save()
     return GenericResponseSerializer({"message": "OK"}).response(200)

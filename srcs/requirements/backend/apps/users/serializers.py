@@ -14,7 +14,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
                   'theme',
                   'is_active',
                   'created_at',
-                  'password']
+                  'password',
+                  'is_two_factor_mail',
+                  'is_two_factor_auth']
         read_only_fields=['created_at',
                             'updated_at',
                             'id']
