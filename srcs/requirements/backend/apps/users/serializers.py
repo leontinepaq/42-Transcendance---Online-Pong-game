@@ -98,3 +98,13 @@ class ResponseRefreshTokenErrorMissing(serializers.Serializer):
     
 class ResponseRefreshTokenErrorInvalid(serializers.Serializer):
     message=serializers.CharField(default="Invalid or expired refresh token")
+
+## REFRESH TOKEN
+class ResponseRefreshToken(serializers.Serializer):
+    message=serializers.CharField(default="Token refreshed successfully")
+    
+class ResponseRefreshTokenErrorMissing(serializers.Serializer):
+    message=serializers.CharField(default="No refresh token provided")
+    
+class ResponseRefreshTokenErrorInvalid(serializers.Serializer):
+    message=serializers.CharField(default="Invalid or expired refresh token")
