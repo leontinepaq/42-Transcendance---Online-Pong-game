@@ -8,7 +8,7 @@ class UpdateAvatarResponseSerializer(GenericResponseSerializer):
     avatar_url = serializers.URLField(required=False)
     
 class UpdateEmailRequestSerializer(serializers.Serializer):
-    new_email = serializers.EmailField()
+    new_email = serializers.EmailField(required=True)
 
 class UpdateUsernameRequestSerializer(serializers.Serializer):
     new_username = serializers.CharField(max_length=30)
