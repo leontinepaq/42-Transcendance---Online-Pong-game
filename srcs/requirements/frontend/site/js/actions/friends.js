@@ -17,9 +17,10 @@ function initFriends()
 
 const userData = 
 [
-    { "id": 1, "name": "Alice", "avatar": "https://i.pravatar.cc/80?img=1", "friend": 0},
-    { "id": 2, "name": "Bob", "avatar": "https://i.pravatar.cc/80?img=2" , "friend": 1},
-    { "id": 3, "name": "Charlie", "avatar": "https://i.pravatar.cc/80?img=3", "friend": 1},
+    { "id": 1, "name": "Alice", "avatar": "https://cdn.intra.42.fr/users/25e67b6dbe3c884da9917b16321f1574/shelal.jpg", "friend": 1, "status": "online 🟢"},
+    { "id": 2, "name": "Bob", "avatar": "https://cdn.intra.42.fr/users/fe62dcf2a389dbfa5070cc1c2fe0bd93/lpaquatt.jpg" , "friend": 1, "status": "offline 🔴"},
+    { "id": 3, "name": "Charlie", "avatar": "https://cdn.intra.42.fr/users/4e1c549d8f89770ae23812a78d09a5e6/tlam.jpg", "friend": 1, "status": "online 🔴"},
+    { "id": 4, "name": "Charlie", "avatar": "https://cdn.intra.42.fr/users/1f066718b7876b71d24f1624e61f66de/jeada-si.jpg", "friend": 1, "status": "online 🟢"},
 ]
 
 function appendUser(user, userlist)
@@ -29,7 +30,7 @@ function appendUser(user, userlist)
 
     userCard.innerHTML = `
         <div class="card user-card text-center p-3">
-            <img src="${user.avatar}" alt="Avatar de ${user.name}" class="user-avatar mx-auto">
+            <img src="${user.avatar}" alt="Avatar de ${user.name}" class="user-avatar mx-auto" width="100" height="100>
             <h5 class="mt-2">${user.name}</h5>
             <button class="btn btn-primary add-friend" data-id="${user.id}">ADD</button>
             <button class="btn btn-primary view-profile" data-action="userModal" data-id="${user.id}">Profile</button>
@@ -71,8 +72,9 @@ function handleFriends()
     
             document.getElementById("profile-avatar").src = user.avatar;
             document.getElementById("profile-name").innerText = user.name;
-            document.getElementById("profile-email").innerText = `Email: ${user.email}`;
-            document.getElementById("profile-bio").innerText = user.bio || "Pas de bio disponible.";
+            // document.getElementById("profile-email").innerText = `Email: ${user.email}`;
+            // document.getElementById("profile-bio").innerText = user.bio || "Pas de bio disponible.";
+            document.getElementById("profile-status").innerText = user.status;
     
             profileModal.show();
         });
