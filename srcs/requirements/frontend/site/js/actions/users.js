@@ -1,17 +1,17 @@
 import { navigate  } from "../router.js"
 
-export const friendsActions = [
+export const usersActions = [
     {
-        selector: '[data-action="friends"]',
-        handler: initFriends
+        selector: '[data-action="Users"]',
+        handler: initUsers
     },
 ];
 
-function initFriends()
+function initUsers()
 {
-    navigate('friends');
+    navigate('users');
     setTimeout(function() {
-        handleFriends();
+        handleUsers();
     }, 50)
 }
 
@@ -38,7 +38,7 @@ function appendUser(user, userlist)
     userlist.appendChild(userCard);
 }
 
-function handleFriends()
+function handleUsers()
 {
     const userlist = document.getElementById('user-container');
 
@@ -46,14 +46,15 @@ function handleFriends()
 
     userlist.innerHTML = `
     <div class="container mt-5">
-            <button data-action="Users" class="btn btn-primary see-friend">FRIEND</button>
+            <button data-action="friends" class="btn btn-primary see-friend">USER</button>
     </div>  
     `
+
     userData.forEach(user => {
-        if(user.friend == 1)
             appendUser(user, userlist);
     })
 
+    
     // document.querySelectorAll(".add-friend").forEach(button => {
     //     button.addEventListener("click", (e) => {
     //         e.target.innerText = "Remove";
@@ -79,6 +80,3 @@ function handleFriends()
     // });
 }
 
-/*
-    - TODO --> REMPLACER PAR APPEL API PAR LA SUITE
-*/
