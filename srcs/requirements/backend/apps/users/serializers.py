@@ -47,18 +47,26 @@ class UserNotFoundErrorSerializer(GenericResponseSerializer):
     
 ## PRE-LOGIN
 class ResponsePreLogin(GenericResponseSerializer):
-    message = None
-    two_factor_mail = serializers.BooleanField(default=False)
-    two_factor_auth = serializers.BooleanField(default=False)
+    message=None
+    two_factor_mail=serializers.BooleanField(default=False)
+    two_factor_auth=serializers.BooleanField(default=False)
  
 ## LOGIN
 class RequestLoginSerializer(serializers.Serializer):
     username=serializers.CharField(required=True)
     password=serializers.CharField(required=True, 
                                    write_only=True)
-    two_factor_auth = serializers.CharField(default = "123456")
-    two_factor_mail = serializers.CharField(default = "123456")
+    two_factor_code=serializers.CharField(default="123456")
+    
+class ResponseLoginError(serializers.Serializer):
+    message=serializers.CharField(default="Wrong code/Wrong password")
+    
+class ResponseLoginSuccess(serializers.Serializer):
+    message=serializers.CharField(default="Login successful")
 
+## LOGOUT
+class ResponseLogout(serializers.Serializer):
+    message=serializers.CharField(default="Logout successful")
 ## REGISTER  
 class RequestRegisterSerializer(serializers.Serializer):
     username=serializers.CharField(required=True)
@@ -78,4 +86,14 @@ class RequestVerify2faSerializer(serializers.Serializer):
 
 ## GET 2FA QR
 class ResponseGet2faQR(serializers.Serializer):
-    qr_code = serializers.CharField(help_text="Base64-encoded QR code image")
+    qr_code=serializers.CharField(help_text="Base64-encoded QR code image")
+
+## REFRESH TOKEN
+class ResponseRefreshToken(serializers.Serializer):
+    message=serializers.CharField(default="Token refreshed successfully")
+    
+class ResponseRefreshTokenErrorMissing(serializers.Serializer):
+    message=serializers.CharField(default="No refresh token provided")
+    
+class ResponseRefreshTokenErrorInvalid(serializers.Serializer):
+    message=serializers.CharField(default="Invalid or expired refresh token")

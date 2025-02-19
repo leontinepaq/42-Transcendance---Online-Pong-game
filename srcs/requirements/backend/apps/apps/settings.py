@@ -49,14 +49,15 @@ REST_FRAMEWORK = {
 
 #TO CHANGE AFTER DEVELOPMENT ACCES TOKEN LIFETIME SHOULD BE MINUTE=15
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_COOKIE": "access_token",  # Name of the cookie
+    "AUTH_COOKIE": "access_token",
+    "REFRESH_COOKIE": "refresh_token",
     "AUTH_COOKIE_HTTP_ONLY": True,  # Prevent XSS attacks
-    "AUTH_COOKIE_SECURE": True,  # Enable for HTTPS
+    "AUTH_COOKIE_SECURE": not DEBUG,  # Enable for HTTPS
     "AUTH_COOKIE_SAMESITE": "Strict",  # CSRF protection
 }
 
