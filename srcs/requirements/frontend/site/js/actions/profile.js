@@ -1,5 +1,4 @@
-import { showModal } from "./modals.js"
-import { authFetch } from "../api.js";
+import { authFetchJson, handleError } from "../api.js";
 import { update2fa } from "./2fa.js"
 
 export const profileActions = [
@@ -16,57 +15,67 @@ export const profileActions = [
 function show(element) { element.classList.remove("d-none"); }
 function hide(element) { element.classList.add("d-none"); }
 
-async function getUserProfile()
-{
-	const response = await authFetch('api/userprofile/', {method: 'GET'});
-	if (!response.ok) {
-		throw new Error('Failed to fetch profile')
-	}
-	return await response.json();
-}
-
 function display2fa(user)
 {
-	console.log(user.is_two_factor_auth);//
-
-	if (user.is_two_factor_mail || user.is_two_factor_auth)
-	{
-		hide(document.getElementById('display-enable-2fa'));
-		show(document.getElementById('display-disable-2fa'));
-		if (user.is_two_factor_mail)
-			show(document.getElementById('span-2fa-mail'));
-		else
-			show(document.getElementById('span-2fa-app'));
-	}
-	else
+	if (!user.is_two_factor_mail && !user.is_two_factor_auth)
 	{
 		show(document.getElementById('display-enable-2fa'));
 		hide(document.getElementById('display-disable-2fa'));
+		return ;
 	}
+	hide(document.getElementById('display-enable-2fa'));
+	show(document.getElementById('display-disable-2fa'));
+	if (user.is_two_factor_mail)
+		show(document.getElementById('span-2fa-mail'));
+	else
+		show(document.getElementById('span-2fa-app'));
 }
 
 export async function loadUserProfile()
 {
 	const usernameElem = document.getElementById('display-username');
 	const emailElem = document.getElementById('display-email');
-	if (!usernameElem || !emailElem) {
-		console.error("Elements absent from DOM"); // todo @leontinepaq: utile ??
-		return;
-	}
-	usernameElem.textContent = "**error charging username**"; //todo @leontinepaq a changer
-	emailElem.textContent = "**error charging email**";
+
+	usernameElem.textContent = "**charging username**"; //todo @leontinepaq a changer ?
+	emailElem.textContent = "**charging email**";
 	try {
-		const user = await getUserProfile();
-		document.getElementById('display-username').textContent = user.username;
-		document.getElementById('display-email').textContent = user.email;
+		const user = await authFetchJson('api/userprofile/', {method: 'GET'});
+		usernameElem.textContent = user.username;
+		emailElem.textContent = user.email;
 		if (user.avatarUrl)
 			document.getElementById('profile-avatar').src = user.avatarUrl;
 		display2fa(user);
 	}
 	catch (error) {
-		console.error("Error loading profile: ", error)
+		handleError(error, "Load user profile error");
 	}
 };
+
+async function switchToEditMode(button, valueDisplay, input, confirmInput)
+{
+	if (valueDisplay)
+	{
+		input.value = valueDisplay.textContent;
+		hide(valueDisplay);
+	}
+	show(input);
+	if (confirmInput)
+		show(confirmInput);
+	button.textContent = "SAVE";
+}
+
+async function switchToDisplayMode(button, valueDisplay, input, confirmInput)
+{
+	if (valueDisplay)
+	{
+		valueDisplay.textContent = input.value;
+		show(valueDisplay);
+	}
+	hide(input);
+	if (confirmInput)
+		hide(confirmInput);
+	button.textContent = "EDIT";
+}
 
 const PROFILE_FIELDS = {
 	username:	{ endpoint: "api/userprofile/update-username/",	key: "new_username" },
@@ -86,48 +95,21 @@ async function updateProfileField(field, input, confirmInput)
 
 	try 
 	{
-		const response = await authFetch(fieldConfig.endpoint, {
+		const response = await authFetchJson(fieldConfig.endpoint, {
 			method: "PUT",
 			credentials: "include",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(body)
 		});
-		const data = await response.json();
-		console.log("Update profile: " + data.message);
-		return { ok: response.ok, message: data.message };
+		console.log("Update profile: " + response.message);
+		return true;
 	}
 	catch (error)
 	{
-		console.error('Update error:', error);
-		return { ok: false, message: "An error occurred while updating the profile" };
+		handleError(error, "Update profile error");
+		return false;
 	}
 
-}
-
-async function switchToEditMode(button, valueDisplay, input, confirmInput)
-{
-	if (valueDisplay)
-	{
-		input.value = valueDisplay.textContent;
-		hide(valueDisplay);
-	}
-	show(input);
-	if (confirmInput)
-		show(confirmInput);
-	button.textContent = "SAVE";
-}
-
-async function switchToSaveMode(button, valueDisplay, input, confirmInput)
-{
-	if (valueDisplay)
-	{
-		valueDisplay.textContent = input.value;
-		show(valueDisplay);
-	}
-	hide(input);
-	if (confirmInput)
-		hide(confirmInput);
-	button.textContent = "EDIT";
 }
 
 async function toggleEdit(element, event) {
@@ -142,11 +124,8 @@ async function toggleEdit(element, event) {
 	else if (button.textContent === "SAVE")
 	{
 		button.disabled = true;
-		const response = await updateProfileField(field, input, confirmInput);
-		if (response.ok)
-			switchToSaveMode(button, valueDisplay, input, confirmInput)
-		else
-			showModal("Edit profile failed: " + response.message);
+		if (await updateProfileField(field, input, confirmInput))
+			switchToDisplayMode(button, valueDisplay, input, confirmInput)
 		button.disabled = false;
 	}
 }

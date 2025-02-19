@@ -28,12 +28,6 @@ export async function authRedirector(route)
 
 export async function navigate(route, ...params)
 {
-	// const currentRoute = window.location.pathname.split('/')[1];  // Extract current route from URL
-	// if (currentRoute === route) {
-		//	 console.log('Already on the target route:', route);
-		//	 return;
-		// }
-
 	console.log('Navigating: ', route);
 		
 	// todo @leontinepaq: a remettre quand auth fonctionne

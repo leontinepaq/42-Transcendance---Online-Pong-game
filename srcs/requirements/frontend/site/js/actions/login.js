@@ -1,6 +1,5 @@
 import { navigate  } from "../router.js"
-import { showModal } from "./modals.js";
-import { authFetch } from "../api.js";
+import { authFetchJson, handleError } from "../api.js";
 
 export const loginActions = [
 	{
@@ -17,99 +16,65 @@ export const loginActions = [
 	}
 ];
 
+//todo @leontinepaq: en doublon avec profile.js > mettre dans un utils ?
+function show(element) { element.classList.remove("d-none"); }
+function hide(element) { element.classList.add("d-none"); }
 
 async function displayAuthSection(data, username) {
 	document.getElementById("page-title").textContent = "Nice to see you again " + username + " !";
 	if (data.two_factor_mail == true)
 	{
 		document.getElementById("auth-label").textContent = "2FA code received by mail";
-		document.getElementById("auth-input").type = "text";
-		document.getElementById("auth-input").classList.remove("d-none");
+		show(document.getElementById("auth-input"));
 	}
 	if (data.two_factor_auth == true)
 	{
 		document.getElementById("auth-label").textContent = "2FA code from authentificator app";
-		document.getElementById("auth-input").type = "text";
-		document.getElementById("auth-input").classList.remove("d-none");
+		show(document.getElementById("auth-input"));
 	}
-	document.getElementById("auth-step").classList.remove("d-none");
-	document.getElementById("pre-login").classList.add("d-none");
+	show(document.getElementById("auth-step"));
+	hide(document.getElementById("pre-login"));
 }
 
 async function handleSignin(element, event)
 {
-	console.log("{login.js} sign-in button clicked", element);
-
 	const username = document.getElementById('username').value;
 	try {
-		const response = await fetch('/api/user/pre_login/', {
+		const data = await authFetchJson('/api/user/pre_login/', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({username}),
 		});
-		const data = await response.json();
-		if (response.ok)
-			displayAuthSection(data, username);
-		else
-		{
-			console.error("Signin error: " + data.message);
-			showModal("Signin failed: " + data.message);
-		}
+		displayAuthSection(data, username);
 	}
-	catch (error) {
-		console.error('Signin error:', error);
-		showModal("An error occured. Please try again."); //todo @leontinepaq a checker
-	}
-}
-
-
-
-async function login(username, password, two_factor_auth, two_factor_mail)
-{
-	try {
-		const response = await authFetch('/api/user/login/', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username, password, two_factor_auth, two_factor_mail}),
-		});
-		const data = await response.json();
-		console.log(data.message);
-		return {
-			ok: response.ok,
-			message: data.message,
-			...data
-		};
-	}
-	catch (error) {
-		console.error('Login error:', error);
-		throw error;
+	catch (error)
+	{
+		handleError(error, "Handle signin error");
 	}
 }
 
 async function handleAuth(element, event)
 {
-	console.log("{login.js} log in button clicked", element);
-
 	const username = document.getElementById('username').value;
 	const password = document.getElementById('pwd-input').value;
 	const two_factor_auth = document.getElementById('auth-input').value;
 	const two_factor_mail = document.getElementById('auth-input').value;
 	// todo @leontinepaq voir avec JA si utile d'en envoyer 2 ?
 
-	try {
-		const data = await login(username, password, two_factor_auth, two_factor_mail);
-		sessionStorage.setItem("username", username);
-		if (data.ok)
-		{
-			console.log("Login successful");
-			navigate('home');
-		}
-		else
-			showModal("Login failed: " + data.message);
+	try 
+	{
+		await authFetchJson('/api/user/login/', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, password, two_factor_auth, two_factor_mail}),
+		});
+		sessionStorage.setItem("username", username);//todo @leontinepaq checker si utile / si ok qd change username
+		console.log("Login successful");
+		navigate('home');
 	}
-	catch (error) {
-		console.error('Login error:', error);
-		showModal("An error occured. Please try again.");
+	catch (error) 
+	{
+		handleError(error, "Handle authentification error");
 	}
 }
 
