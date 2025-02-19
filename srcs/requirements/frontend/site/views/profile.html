@@ -42,27 +42,26 @@
 		<!-- Section 2FA -->
 		<div>
 			<label class="form-label">Two-Factor authentification</label>
-			<div><button data-action="toggle-2fa" class="btn btn-outline-secondary">ENABLE</button></div>
+			<div class="mb-2 d-none" id="display-disable-2fa">
+				<span id="span-2fa-mail" class="fs-5 d-none">Two-factor authentification by mail is required</span>
+				<span id="span-2fa-app" class="fs-5 d-none">Two-factor authentification by app is required</span>
+				<div><button data-action="disable-2fa" class="btn btn-outline-secondary">DISABLE</button></div>
+			</div>
+			<div class="mb-2 d-none" id="display-enable-2fa">
+				<div>
+					<span class="fs-5">Two-factor authentification by mail</span>
+					<div><a data-action="navigate" href="validation2faEmail" class="btn btn-outline-secondary">ENABLE</a></div>
+				</div>
+				<div>
+					<span class="fs-5">Two-factor authentification by app</span>
+					<div><a data-action="navigate" href="2fa_app" class="btn btn-outline-secondary">ENABLE</a></div>
+				</div>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="false">
-	<div class="modal-dialog">
-	  <div class="modal-content">
-		<div class="modal-header">
-		  <h5 class="modal-title" id="exampleModalLabel">Error</h5>
-		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-		</div>
-		<div class="modal-body">
-		</div>
-		<div class="modal-footer">
-		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
-		</div>
-	  </div>
-	</div>
-</div>
+
 
 	<!-- <div class="container">
 	<h1>Two-factor authentification</h1>
