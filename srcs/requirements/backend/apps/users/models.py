@@ -68,8 +68,8 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         self.save()
         
     def send_2fa_mail(self):
-        if not self.is_two_factor_mail:
-            return
+        # if not self.is_two_factor_mail:
+        #     return
         self.two_factor_code = get_random_string(length=6,
                                                  allowed_chars=string.digits)
         self.two_factor_expiry = timezone.now() + timedelta(minutes=15)

@@ -74,6 +74,11 @@ h1
 	font-family: "Jersey 15", serif;
 }
 
+label
+{
+	font-size: 2rem;
+}
+
 /* FORM */
 form
 {
@@ -171,4 +176,8 @@ form
 }
 
 
-
+/* todo @leontinepaq a changef */
+.modal
+{
+	color: var(--color-dark);
+}

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from users.models import UserProfile
 from .models import Game, UserStatistics, Tournament
 from .serializers import UserStatisticsSerializer, GameSerializer, TournamentSerializer
-from users.serializers.auth import GenericResponseSerializer
+from users.serializers import GenericResponseSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 @extend_schema(

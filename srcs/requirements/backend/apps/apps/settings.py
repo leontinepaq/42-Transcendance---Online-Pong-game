@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,8 +13,12 @@ SECRET_KEY = 'django-insecure-o4r1!m^8xhfg1f*x)v1ts_pf5i97#x486ty6a!m9bnp%7&uygw
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "bess-f3r1s9"]
-# CSRF_TRUSTED_ORIGINS = ["http://localhost:9999"]
+ALLOWED_HOSTS = ["0.0.0.0",
+                 "127.0.0.1",
+                 "localhost",
+                 "bess-f3r1s9"]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -46,18 +52,27 @@ REST_FRAMEWORK = {
 
 #TO CHANGE AFTER DEVELOPMENT ACCES TOKEN LIFETIME SHOULD BE MINUTE=15
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(hours=7),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
-    "AUTH_COOKIE": "access_token",  # Name of the cookie
+    "AUTH_COOKIE": "access_token",
+    "REFRESH_COOKIE": "refresh_token",
     "AUTH_COOKIE_HTTP_ONLY": True,  # Prevent XSS attacks
-    "AUTH_COOKIE_SECURE": True,  # Enable for HTTPS
+    "AUTH_COOKIE_SECURE": not DEBUG,  # Enable for HTTPS
     "AUTH_COOKIE_SAMESITE": "Strict",  # CSRF protection
 }
 
-
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = ['https://localhost:8888',
+                         'http://localhost:9999']
+CORS_ALLOWED_ORIGINS = ["https://localhost:8888",
+                        "http://localhost:9999"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost:8888",
+                        "http://localhost:9999"]
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -90,7 +105,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'apps.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -104,7 +118,6 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-
 
 AUTH_USER_MODEL = 'users.UserProfile'
 
@@ -136,8 +149,6 @@ TIME_ZONE = 'UTC'
 USE_TZ = True
 
 USE_I18N = True
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

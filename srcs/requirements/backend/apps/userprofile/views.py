@@ -46,7 +46,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from drf_spectacular.utils import extend_schema, OpenApiTypes
 from users.models import UserProfile
-from users.serializers.users import UserProfileSerializer
+from users.serializers import UserProfileSerializer
 from .serializers import (
     UpdateAvatarResponseSerializer,
     UpdateUsernameRequestSerializer,
@@ -54,7 +54,7 @@ from .serializers import (
     UpdateEmailRequestSerializer,
     UpdatePasswordRequestSerializer,
 )
-from users.serializers.auth import GenericResponseSerializer, UserNotFoundErrorSerializer
+from users.serializers import GenericResponseSerializer, UserNotFoundErrorSerializer
 
 
 

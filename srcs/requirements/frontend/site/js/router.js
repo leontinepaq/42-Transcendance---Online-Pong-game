@@ -1,7 +1,6 @@
 import checkAuth from './api.js';
 import loadView from './views.js';
 
-// todo @leontinepaq / @samihelal: regarder si casert a qqch ???
 window.addEventListener(
 	'popstate', 
 	async (event) => {
@@ -13,7 +12,7 @@ window.addEventListener(
 	}
 });
 
-const publicRoutes = new Set(['login', 'signup', '2fa']);
+const publicRoutes = new Set(['login', 'signup']);
 
 export async function authRedirector(route)
 {
@@ -26,18 +25,13 @@ export async function authRedirector(route)
 	return route;
 }
 
+
 export async function navigate(route, ...params)
 {
-	// const currentRoute = window.location.pathname.split('/')[1];  // Extract current route from URL
-	// if (currentRoute === route) {
-		//	 console.log('Already on the target route:', route);
-		//	 return;
-		// }
-
 	console.log('Navigating: ', route);
 		
 	// todo @leontinepaq: a remettre quand auth fonctionne
-	// const newRoute = await authRedirector(route); // todo @leontinepaq en doublon avec main.js processRoute --> cheker avec Sai mais a supp je pense
+	// const newRoute = await authRedirector(route);
 	// route = newRoute;
 
 	try {
@@ -47,7 +41,7 @@ export async function navigate(route, ...params)
 		//	 history.replaceState(state, title, `/${route}`);
 		// else
 		history.pushState(state, title, `/${route}`);
-		loadView(route);
+		await loadView(route);
 	}
 	catch (error) {
 		console.error('Navigation error:', error);

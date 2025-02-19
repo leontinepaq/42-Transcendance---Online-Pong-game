@@ -1,5 +1,5 @@
 import { navigate  } from "../router.js"
-import { showModal } from "./modals.js";
+import { authFetchJson, handleError } from "../api.js";
 
 export const loginActions = [
 	{
@@ -7,65 +7,74 @@ export const loginActions = [
 		handler: handleSignin
 	},
 	{
+		selector: '[data-action="submit-auth"]',
+		handler: handleAuth
+	},
+	{
 		selector: '[data-action="forgot-pwd"]',
 		handler: handleForgotPwd
 	}
 ];
 
-async function login(username, password)
-{
-	try {
-		const response = await fetch('/api/user/login/', {
-			method: 'POST',
-			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username, password }),
-		});
-		const data = await response.json();
-		console.log(data.message);
-		return {
-			ok: response.ok,
-			message: data.message,
-			...data
-		};
+//todo @leontinepaq: en doublon avec profile.js > mettre dans un utils ?
+function show(element) { element.classList.remove("d-none"); }
+function hide(element) { element.classList.add("d-none"); }
+
+async function displayAuthSection(data, username) {
+	document.getElementById("page-title").textContent = "Nice to see you again " + username + " !";
+	if (data.two_factor_mail == true)
+	{
+		document.getElementById("auth-label").textContent = "2FA code received by mail";
+		show(document.getElementById("auth-input"));
 	}
-	catch (error) {
-		console.error('Login error:', error);
-		throw error;
+	if (data.two_factor_auth == true)
+	{
+		document.getElementById("auth-label").textContent = "2FA code from authentificator app";
+		show(document.getElementById("auth-input"));
 	}
+	show(document.getElementById("auth-step"));
+	hide(document.getElementById("pre-login"));
 }
 
 async function handleSignin(element, event)
 {
-	console.log("{login.js} sign-in button clicked", element);
-
-	const form = element.closest("form");
-	if (!form.checkValidity()) {
-		form.reportValidity();
-		return;
-	}
-
 	const username = document.getElementById('username').value;
-	const password = document.getElementById('password').value;
-
 	try {
-		const data = await login(username, password);
-		sessionStorage.setItem("username", username);
-		if (data.ok)
-		{
-			if (data.redirect_url)
-				navigate('2fa_authenticator')
-			else if (data.message === "2FA code sent")
-				navigate('2fa_mail')
-			else
-				navigate('home')
-		}
-		else
-			showModal("Login failed");
+		const data = await authFetchJson('/api/user/pre_login/', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({username}),
+		});
+		displayAuthSection(data, username);
 	}
-	catch (error) {
-		console.error('Login error:', error);
-		showModal("An error occured. Please try again.");
+	catch (error)
+	{
+		handleError(error, "Handle signin error");
+	}
+}
+
+async function handleAuth(element, event)
+{
+	const username = document.getElementById('username').value;
+	const password = document.getElementById('pwd-input').value;
+	const two_factor_auth = document.getElementById('auth-input').value;
+	const two_factor_mail = document.getElementById('auth-input').value;
+	// todo @leontinepaq voir avec JA si utile d'en envoyer 2 ?
+
+	try 
+	{
+		await authFetchJson('/api/user/login/', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ username, password, two_factor_auth, two_factor_mail}),
+		});
+		sessionStorage.setItem("username", username);//todo @leontinepaq checker si utile / si ok qd change username
+		console.log("Login successful");
+		navigate('home');
+	}
+	catch (error) 
+	{
+		handleError(error, "Handle authentification error");
 	}
 }
 

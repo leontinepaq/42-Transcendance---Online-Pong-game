@@ -1,6 +1,5 @@
-import logout from "../api.js"
 import navigate from "../router.js"
-import { showModal } from "./modals.js";
+import { authFetchJson, handleError } from "../api.js";
 
 export const logoutAction = [
 	{
@@ -11,12 +10,13 @@ export const logoutAction = [
 
 async function handleLogout(element, event)
 {
-	try {
-		await logout();
+	try
+	{
+		await authFetchJson('/api/user/logout/', { method: 'POST' });
 		navigate('login');
 	}
-	catch (error) {
-		console.error('Logout error:', error);
-		showModal("Logout failed. Please try again");
+	catch (error)
+	{
+		handleError(error, "Logout error");
 	}
 };
