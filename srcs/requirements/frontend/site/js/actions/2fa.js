@@ -1,7 +1,5 @@
 import navigate from "../router.js"
-import { showModal } from "./modals.js";
-import { authFetch } from "../api.js";
-// import observeAndAttachEvent from './observeAndAttachEvent.js'
+import { authFetchJson, handleError } from "../api.js";
 
 export async function update2fa({ activate, mail = false, app = false })
 {
@@ -12,25 +10,17 @@ export async function update2fa({ activate, mail = false, app = false })
 	};
 	try 
 	{
-		const response = await authFetch("/api/userprofile/update-2fa/", {
+		const response = await authFetchJson("/api/userprofile/update-2fa/", {
 			method: "PUT",
 			credentials: "include",
 			headers: {"Content-Type": "application/json"},
 			body: JSON.stringify(body)
 		});
-		if (!response.ok)
-		{
-			const data = await response.json();
-			console.error("Disable 2fa: " + data.message);
-			showModal("An error occured. Please try again.");
-			return ;
-		}
-		console.log(`2FA update successful: activate=${activate}, mail=${mail}, app=${app}`);
+		console.log(`Update 2fa successful: activate=${activate}, mail=${mail}, app=${app}`);
 		navigate("profile");
 	}
 	catch (error)
 	{
-		console.error('2FA update error:', error);
-		showModal("An error occured. Please try again.");
+		handleError(error, "Update 2fa error");
 	}
 }
