@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -12,7 +14,8 @@ SECRET_KEY = 'django-insecure-o4r1!m^8xhfg1f*x)v1ts_pf5i97#x486ty6a!m9bnp%7&uygw
 DEBUG = True
 
 ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1", "localhost", "bess-f3r1s9"]
-# CSRF_TRUSTED_ORIGINS = ["http://localhost:9999"]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Application definition
 
@@ -57,7 +60,15 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_SAMESITE": "Strict",  # CSRF protection
 }
 
-
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = ['https://localhost:8888',
+                         'http://localhost:9999']
+CORS_ALLOWED_ORIGINS = ["https://localhost:8888",
+                        "http://localhost:9999"]
+CSRF_TRUSTED_ORIGINS = ["https://localhost:8888",
+                        "http://localhost:9999"]
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -90,7 +101,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'apps.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -104,7 +114,6 @@ DATABASES = {
         'PORT': 5432,
     }
 }
-
 
 AUTH_USER_MODEL = 'users.UserProfile'
 
@@ -136,8 +145,6 @@ TIME_ZONE = 'UTC'
 USE_TZ = True
 
 USE_I18N = True
-
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
