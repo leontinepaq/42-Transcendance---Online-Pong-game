@@ -1,5 +1,5 @@
 import { navigate  } from "../router.js"
-import { authFetchJson, handleError } from "../api.js";
+import { authFetchJson, fetchJson, handleError } from "../api.js";
 
 export const loginActions = [
 	{
@@ -57,16 +57,14 @@ async function handleAuth(element, event)
 {
 	const username = document.getElementById('username').value;
 	const password = document.getElementById('pwd-input').value;
-	const two_factor_auth = document.getElementById('auth-input').value;
-	const two_factor_mail = document.getElementById('auth-input').value;
-	// todo @leontinepaq voir avec JA si utile d'en envoyer 2 ?
+	const two_factor_code = document.getElementById('auth-input').value;
 
 	try 
 	{
-		await authFetchJson('/api/user/login/', {
+		await fetchJson('/api/user/login/', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username, password, two_factor_auth, two_factor_mail}),
+			body: JSON.stringify({ username, password, two_factor_code}),
 		});
 		sessionStorage.setItem("username", username);//todo @leontinepaq checker si utile / si ok qd change username
 		console.log("Login successful");

@@ -1,5 +1,5 @@
 import { authFetchJson, handleError } from "../api.js";
-import { update2fa } from "./2fa.js"
+import { navigate  } from "../router.js"
 
 export const profileActions = [
 	{
@@ -132,5 +132,17 @@ async function toggleEdit(element, event) {
 
 async function disable2fa(element, event)
 {
-	return await update2fa({ activate: false });
+	try 
+	{
+		const response = await authFetchJson("/api/userprofile/deactivate-2fa/", {
+			method: "PUT",
+			headers: {"Content-Type": "application/json"},
+		});
+		console.log("Disable 2fa successful");
+		navigate("profile");
+	}
+	catch (error)
+	{
+		handleError(error, "Disable 2fa error");
+	}
 }

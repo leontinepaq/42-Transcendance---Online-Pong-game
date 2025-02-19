@@ -68,6 +68,13 @@ export async function authFetchJson(url, options = {}) {
 	return parseJsonResponse(response);
 }
 
+export async function fetchJson(url, options = {}) {
+	let response = await fetch(url, {
+		...options
+	});
+	return parseJsonResponse(response);
+}
+
 async function parseJsonResponse(response) {
 	if (!response.ok) {
 		let message = "Unknown error";
@@ -86,36 +93,36 @@ async function parseJsonResponse(response) {
 
 
 
-// export async function activateAuthenticator() {
-// 	try {
-// 		console.log('clicked');
-// 		const response = await fetch("/api/user/activate_authenticator/", {
-// 			method: "PUT",
-// 			credentials: 'include',
-// 		});
+export async function activateAuthenticator() {
+	try {
+		console.log('clicked');
+		const response = await fetch("/api/user/activate_authenticator/", {
+			method: "PUT",
+			credentials: 'include',
+		});
 
-// 		if (!response.ok) {
-// 			throw new Error("Failed to activate authenticatooor");
-// 		}
+		if (!response.ok) {
+			throw new Error("Failed to activate authenticatooor");
+		}
 
-// 		const data = await response.json();
+		const data = await response.json();
 
-// 		if (data.qr_code) {
-// 			const qrCodeImg = document.getElementById("qrCodeImg");
-// 			const qrContainer = document.getElementById("qrContainer");
-// 			const verifyContainer = document.getElementById("verifyContainer");
+		if (data.qr_code) {
+			const qrCodeImg = document.getElementById("qrCodeImg");
+			const qrContainer = document.getElementById("qrContainer");
+			const verifyContainer = document.getElementById("verifyContainer");
 
-// 			qrCodeImg.src = data.qr_code;
-// 			qrContainer.style.display = "block";
-// 			verifyContainer.style.display = "block";
-// 		} else {
-// 			throw new Error("QR code not received");
-// 		}
-// 	} catch (error) {
-// 		console.error("Error activating authenticator:", error);
-// 		showModal("Failed to activate 2FA. Please try again.");
-// 	}
-// }
+			qrCodeImg.src = data.qr_code;
+			qrContainer.style.display = "block";
+			verifyContainer.style.display = "block";
+		} else {
+			throw new Error("QR code not received");
+		}
+	} catch (error) {
+		console.error("Error activating authenticator:", error);
+		showModal("Failed to activate 2FA. Please try again.");
+	}
+}
 
 // export async function verifyAuthenticator(code, username) {
 // 	try {

@@ -1,0 +1,20 @@
+<h1 id="page-title">Email verification required</h1>
+<div class="row w-100 justify-content-center mt-4">
+	<div class="col-12 col-md-8 col-lg-6 d-flex flex-column gap-3">
+		<h3>You chose two factor authentification by app</h3>
+		<div>
+			<h4>Scan the QR code with your authenticator app:</h4>
+			<img id="qrCodeImg" src="" alt="charging QR Code" class="img-fluid mx-auto d-block w-50" />
+		</div>	
+		<div class="d-flex flex-column gap-3">
+			<h4>Enter the code from your authenticator app:</h4>
+			<input type="text" class="form-control" id="verification-code" placeholder="Verification code" required />
+			<button data-action="verify-2fa-app" type="submit" class="btn w-100">VERIFY</button>
+		</div>
+		<div class="d-flex justify-content-between gap-3 mt-2">
+			<button data-action="disable-2fa" type="submit" class="btn action-btn w-100">DISABLE 2FA</button>
+			<button data-action="logout" type="button" class="btn action-btn w-100">LOGOUT</button>
+		</div>
+	</div>
+</div>
+

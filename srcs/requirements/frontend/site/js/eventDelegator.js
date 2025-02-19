@@ -1,12 +1,13 @@
-import { navigateAction } from "./actions/navigate.js";
-import { logoutAction } from "./actions/logout.js";
-import { loginActions } from "./actions/login.js";
-import { signupActions } from "./actions/signup.js";
-import { pongActions } from "./actions/pong.js";
-import { friendsActions } from "./actions/friends.js";
-import { profileActions } from "./actions/profile.js";
-import { verify2faEmailActions } from "./actions/validate2faEmail.js"
-import { usersActions } from "./actions/users.js";
+import { navigateAction }			from "./actions/navigate.js";
+import { logoutAction }				from "./actions/logout.js";
+import { loginActions }				from "./actions/login.js";
+import { signupActions }			from "./actions/signup.js";
+import { pongActions }				from "./actions/pong.js";
+import { friendsActions }			from "./actions/friends.js";
+import { profileActions }			from "./actions/profile.js";
+import { verify2faEmailActions }	from "./actions/validate2faEmail.js"
+import { verify2faAppActions }		from "./actions/validate2faApp.js"
+import { usersActions } 			from "./actions/users.js";
 
 // Table des actions à gérer, "..." = concat
 const clickActions = [
@@ -18,7 +19,9 @@ const clickActions = [
 	...friendsActions,
 	...usersActions,
 	...profileActions,
-	...verify2faEmailActions
+	...verify2faEmailActions,
+	...verify2faAppActions
+
 	// ...TwofaActions,
 ];
 

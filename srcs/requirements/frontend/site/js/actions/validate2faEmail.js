@@ -1,5 +1,5 @@
 import { authFetchJson, handleError } from "../api.js";
-import { update2fa } from "./2fa.js"
+import { navigate  } from "../router.js"
 
 export const verify2faEmailActions = [
 	{
@@ -7,7 +7,7 @@ export const verify2faEmailActions = [
 		handler: send2faEmail
 	},
 	{
-		selector: '[data-action="verify-code"]',
+		selector: '[data-action="verify-2fa-mail"]',
 		handler: verifyCode
 	}
 ];
@@ -35,11 +35,11 @@ async function verifyCode(element, event)
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({code}),
 		});
-		await update2fa({ activate: true, mail: true });
+		console.log("Verification successful - 2FA by mail enabled");
+		navigate("profile");
 	}
 	catch (error)
 	{
-		await update2fa({ activate: true, mail: true }); //todo @leontinepaq a supprimer si envoi/verif fonctionne
 		handleError(error, "Verify code error");
 	}
 }
