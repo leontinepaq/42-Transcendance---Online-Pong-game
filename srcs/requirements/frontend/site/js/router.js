@@ -31,8 +31,8 @@ export async function navigate(route, ...params)
 	console.log('Navigating: ', route);
 		
 	// todo @leontinepaq: a remettre quand auth fonctionne
-	// const newRoute = await authRedirector(route);
-	// route = newRoute;
+	const newRoute = await authRedirector(route);
+	route = newRoute;
 
 	try {
 		const state = { route, params };
