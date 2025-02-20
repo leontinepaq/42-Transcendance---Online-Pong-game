@@ -181,3 +181,9 @@ form
 {
 	color: var(--color-dark);
 }
+
+.card
+{
+	background-color: var(--color-light);
+	color:#000;
+}
