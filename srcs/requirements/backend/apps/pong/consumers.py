@@ -1,58 +1,69 @@
 import json
-from channels.generic.websocket import WebsocketConsumer
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from rest_framework.serializers import Serializer, CharField
-from drf_spectacular_websocket.decorators import extend_ws_schema
-from asgiref.sync import async_to_sync
+import asyncio
+from channels.generic.websocket import AsyncWebsocketConsumer
+from .pong import Pong  # Import Pong class
 
-class SomeMethodInputSerializer(Serializer):
-    message = CharField()
+class PongGameConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_name = "pingpong_game"
+        self.room_group_name = f"game_{self.room_name}"
 
-class SomeMethodOutputSerializer(Serializer):
-    message = CharField()
+        await self.accept()
 
-class SendMessageOutputSerializer(Serializer):
-    message = CharField()
+        self.game = Pong(use_ai=True)
+        await self.start_game_loop()
+        # self.room_name = "pingpong"
+        # await self.channel_layer.group_add(self.room_name, self.channel_name)
+        # await self.accept()
 
-class ChatConsumer(WebsocketConsumer):
-    def connect(self):
-        # self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = "chat"
+        # Track players
+        # self.player_side = None  # Will be "left" or "right"
+        # self.game = None
 
-        # Join room group
-        async_to_sync(self.channel_layer.group_add)(
-            self.room_group_name, self.channel_name
-        )
-
-        self.accept()
-
-    def disconnect(self, close_code):
-        # Leave room group
-        async_to_sync(self.channel_layer.group_discard)(
-            self.room_group_name, self.channel_name
-        )
-
-    @extend_ws_schema(
-        type='send',
-        summary='some_method_summary',
-        description='some_method_description',
-        request=SomeMethodInputSerializer,
-        responses=SomeMethodOutputSerializer,
-    )
-    # Receive message from WebSocket
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
-
-        # Send message to room group
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "chat.message",
-                                   "message": message}
-        )
+        # Assign player side
+        # if not hasattr(self.channel_layer, "players"):
+        #     self.channel_layer.players = []
         
-    # Receive message from room group
-    def chat_message(self, event):
-        message = event["message"]
+        # if len(self.channel_layer.players) == 0:
+        #     self.channel_layer.players.append(self.channel_name)
+        #     self.player_side = "left"
+        #     self.game = Pong(use_ai=True)  # Start with AI
+        # elif len(self.channel_layer.players) == 1:
+        #     self.channel_layer.players.append(self.channel_name)
+        #     self.player_side = "right"
+        #     self.game.use_ai = False  # Now it's 1v1 mode
 
-        # Send message to WebSocket
-        self.send(text_data=json.dumps({"message": message}))
+        # self.channel_layer.players.append(self.channel_name)
+        # self.player_side = "left"
+        # self.game = Pong(use_ai=True)
+        # Start the game loop only if it's the first player
+        # if self.player_side == "left":
+        #     print("starting")
+            # await self.start_game_loop()
+
+    async def disconnect(self, close_code):
+        # self.channel_layer.players.remove(self.channel_name)
+        # if len(self.channel_layer.players) == 0:
+            # del self.channel_layer.players
+
+        # await self.channel_layer.group_discard(self.room_name, self.channel_name)
+        pass
+
+    async def receive(self, text_data):
+        """Handle paddle movement from players."""
+        print("Received message")
+        data = json.loads(text_data)
+
+        if "paddle_y" in data and self.player_side:
+            self.game.move_paddle(self.player_side, data["paddle_y"])
+
+    async def start_game_loop(self):
+        """Main game loop that updates and broadcasts state."""
+        while True:
+            self.game.update()
+            self.send(text_data = json.dumps(self.game.get_state()))
+            await asyncio.sleep(0.05)  # 20 FPS game loop
+
+    async def send_update(self, event):
+        """Send updated game state to frontend."""
+        await self.send(text_data=json.dumps(event["state"]))

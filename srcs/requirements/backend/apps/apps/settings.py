@@ -23,6 +23,9 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
+    'channels',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,7 +40,21 @@ INSTALLED_APPS = [
     
     'users',
     'dashboards',
+    'pong'
 ]
+
+# Use Daphne as the ASGI application
+ASGI_APPLICATION = "apps.asgi.application"
+
+# Define channel layers (using in-memory for now, use Redis for production)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
+        },
+    },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
