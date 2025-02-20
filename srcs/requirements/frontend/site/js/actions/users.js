@@ -1,17 +1,17 @@
 import { navigate  } from "../router.js"
 
-export const friendsActions = [
+export const usersActions = [
     {
-        selector: '[data-action="friends"]',
-        handler: initFriends
+        selector: '[data-action="Users"]',
+        handler: initUsers
     },
 ];
 
-function initFriends()
+function initUsers()
 {
-    navigate('friends');
+    navigate('users');
     setTimeout(function() {
-        handleFriends();
+        handleUsers();
     }, 50)
 }
 
@@ -39,7 +39,7 @@ function appendUser(user, userlist)
     userlist.appendChild(userCard);
 }
 
-function handleFriends()
+function handleUsers()
 {
     const userlist = document.getElementById('user-container');
 
@@ -47,20 +47,29 @@ function handleFriends()
 
     userlist.innerHTML = `
     <div class="container mt-5">
-            <button data-action="Users" class="btn btn-primary see-friend">USERS</button>
+            <button data-action="friends" class="btn btn-primary see-friend">FRIENDS</button>
     </div>  
     `
+
     userData.forEach(user => {
-        if(user.friend == 1)
             appendUser(user, userlist);
     })
 
     document.querySelectorAll(".add-friend").forEach(button => {
         button.addEventListener("click", (e) => {
-            e.target.innerText = "Remove";
-            e.target.classList.remove("btn-primary");
-            e.target.classList.add("btn-success");
-            e.target.disabled = true; // desactive lutilisation du boutton 
+            if (e.target.innerText == "ADD")
+            {    
+                e.target.innerText = "REMOVE";
+                e.target.classList.remove("btn-primary");
+                e.target.classList.add("btn-success");
+                // e.target.disabled = true; // desactive lutilisation du boutton 
+            }
+            else
+            {
+                e.target.innerText = "ADD";
+                e.target.classList.add("btn-success");
+                e.target.classList.remove("btn-primary");
+            }
         });
     });
     
@@ -74,12 +83,12 @@ function handleFriends()
             document.getElementById("profile-name").innerText = user.name;
             // document.getElementById("profile-email").innerText = `Email: ${user.email}`;
             // document.getElementById("profile-bio").innerText = user.bio || "Pas de bio disponible.";
-            document.getElementById("profile-status").innerText = user.status;
-    
+   
             profileModal.show();
         });
     });
 }
+
 
 /*
     - TODO --> REMPLACER PAR APPEL API PAR LA SUITE
