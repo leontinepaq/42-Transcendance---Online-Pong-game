@@ -72,7 +72,7 @@ def pre_login(request):
     username=request.data.get("username")
 
     if User.objects.filter(username=username).exists() == False:
-        return UserNotFoundErrorSerializer.response(404)
+        return UserNotFoundErrorSerializer({}).response(404)
     user = User.objects.get(username=username)
     if user.is_two_factor_mail:
         user.send_2fa_mail()
@@ -95,7 +95,7 @@ def login(request):
     two_factor_code = request.data.get("two_factor_code")
 
     if User.objects.filter(username=username).exists() == False:
-        return UserNotFoundErrorSerializer().response(404)
+        return UserNotFoundErrorSerializer({}).response(404)
     user=authenticate(request, username=username, password=password)
     if user is None:
         return ResponseLoginError({"message": "Wrong password"}).response(401)
