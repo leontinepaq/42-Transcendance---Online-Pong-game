@@ -60,10 +60,10 @@ class RequestLoginSerializer(serializers.Serializer):
                                    write_only=True)
     two_factor_code=serializers.CharField(default="123456")
     
-class ResponseLoginError(serializers.Serializer):
+class ResponseLoginError(GenericResponseSerializer):
     message=serializers.CharField(default="Wrong code/Wrong password")
     
-class ResponseLoginSuccess(serializers.Serializer):
+class ResponseLoginSuccess(GenericResponseSerializer):
     message=serializers.CharField(default="Login successful")
 
 ## LOGOUT
