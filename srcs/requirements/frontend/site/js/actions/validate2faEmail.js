@@ -1,5 +1,5 @@
-import { authFetchJson, handleError } from "../api.js";
-import { navigate  } from "../router.js"
+import { authFetchJson, handleError }	from "../api.js";
+import { navigate }						from "../router.js"
 
 export const verify2faEmailActions = [
 	{

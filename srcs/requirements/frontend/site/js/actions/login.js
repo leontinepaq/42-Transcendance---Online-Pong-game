@@ -1,5 +1,6 @@
-import { navigate  } from "../router.js"
-import { authFetchJson, fetchJson, handleError } from "../api.js";
+import { navigate  }								from "../router.js"
+import { authFetchJson, fetchJson, handleError }	from "../api.js";
+import { show, hide }								from "../utils.js"
 
 export const loginActions = [
 	{
@@ -15,10 +16,6 @@ export const loginActions = [
 		handler: handleForgotPwd
 	}
 ];
-
-//todo @leontinepaq: en doublon avec profile.js > mettre dans un utils ?
-function show(element) { element.classList.remove("d-none"); }
-function hide(element) { element.classList.add("d-none"); }
 
 async function displayAuthSection(data, username) {
 	document.getElementById("page-title").textContent = "Nice to see you again " + username + " !";

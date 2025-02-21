@@ -1,0 +1,12 @@
+  /* Bloc global du dashboard */
+.dashboard-block {
+    /* padding: 2rem; Padding global à l'intérieur du dashboard */
+    background-color: var(--color-dark-transparent);
+  }
+  
+  /* Éléments internes avec padding homogène */
+  .custom-border {
+    border: 0.2rem solid var(--color-light);
+    border-radius: 0.2rem;
+  }
+  

@@ -1,0 +1,65 @@
+<a data-action="navigate" href="dashboard" class="btn action-btn w-100 text-center">REFRESH</a>
+<p></p>
+
+
+
+ 
+<div class="container">
+    <!-- Bloc global avec marges et padding homogène -->
+    <div class="dashboard-block custom-border p-4 g-4">
+    
+      <!-- ROW 1: Trois éléments de même largeur -->
+      <div class="row m-0 gy-4">
+        <div class="col-md-4 d-flex justify-content-center align-items-center">
+          <div id="lottie-animation" class="w-100 h-100">
+            <dotlottie-wc src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie" autoplay loop></dotlottie-wc>
+          </div>
+        </div>
+        
+        <div class="col-md-4 p-0">
+          <div class="d-flex flex-column justify-content-between h-100">
+            <div class="custom-border p-2 d-flex align-items-center">
+              <i class="bi bi-trophy me-2"></i>
+              <div><strong>Matches Won</strong><br><span id="matches-won">0</span></div>
+            </div>
+            <div class="custom-border p-2 d-flex align-items-center">
+              <i class="bi bi-fire me-2"></i>
+              <div><strong>Win Streak</strong><br><span id="win-streak">0</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-4 custom-border d-flex justify-content-center align-items-center">
+          <canvas id="victory-rate-chart" width="150" height="150"></canvas>
+        </div>
+      </div>
+  
+      <!-- ROW 2: Deux éléments de même largeur -->
+      <div class="row m-0 gy-4">
+        <div class="col-md-6 custom-border d-flex flex-column ">
+          <canvas id="game-mode-chart" width="200" height="200"></canvas>
+        </div>
+        
+        <div class="col-md-6 custom-border d-flex flex-column justify-content-between">
+          <div class="custom-border p-2 text-center">
+            <h5>Total Time Played</h5>
+            <p id="total-time">0h 0m</p>
+          </div>
+          <div class="custom-border p-2 text-center">
+            <h5>Online Opponents Played</h5>
+            <p id="online-opponents">0</p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- ROW 3: Un élément large -->
+      <div class="row m-0 gy-4">
+        <div class="col-12 custom-border p-2">
+          <h5 class="text-center">Match Results (Last 7 Days)</h5>
+          <canvas id="match-results-chart" class="w-100 h-100"></canvas>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+  

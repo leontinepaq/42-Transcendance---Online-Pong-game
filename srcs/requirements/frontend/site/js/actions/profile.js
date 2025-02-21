@@ -1,5 +1,6 @@
-import { authFetchJson, handleError } from "../api.js";
-import { navigate  } from "../router.js"
+import { authFetchJson, handleError }	from "../api.js";
+import { show, hide }					from "../utils.js"
+import { navigate  }					from "../router.js"
 
 export const profileActions = [
 	{
@@ -11,9 +12,6 @@ export const profileActions = [
 		handler: disable2fa
 	}
 ];
-
-function show(element) { element.classList.remove("d-none"); }
-function hide(element) { element.classList.add("d-none"); }
 
 function display2fa(user)
 {
