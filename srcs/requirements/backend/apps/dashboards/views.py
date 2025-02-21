@@ -4,118 +4,154 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.response import Response
 from users.models import UserProfile
-from .models import Game, UserStatistics, Tournament
-from .serializers import UserStatisticsSerializer, GameSerializer, TournamentSerializer
+from .models import Game, Tournament, Participant
+from .serializers import (GameSerializer, TournamentSerializer, 
+    UserStatisticsSerializer, ParticipantSerializer, RequestCreateGameSerializer, RequestCreateTournamentSerializer)
 from users.serializers import GenericResponseSerializer
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
+#Display user stats by ID
 @extend_schema(
-    summary="creates game",
-    description="After game ends, creates game and adds it to both players's UserStatistics",
-    request=GameSerializer,
-    responses={
-        201: GameSerializer,
-        400: GenericResponseSerializer
-    }
-)
-@api_view(["POST"])
-def create_game(request):
-    serializer = GameSerializer(data=request.data)
-    if serializer.is_valid():
-        game = serializer.save()
-
-        player1_stats, _ = UserStatistics.objects.get_or_create(user=game.player1)
-        player2_stats, _ = UserStatistics.objects.get_or_create(user=game.player2)
-
-        player1_stats.total_games_played += 1
-        player2_stats.total_games_played += 1
-
-        if game.winner == game.player1:
-            player1_stats.wins += 1
-            player2_stats.losses += 1
-        elif game.winner == game.player2:
-            player2_stats.wins += 1
-            player1_stats.losses += 1
-
-        player1_stats.save()
-        player2_stats.save()
-
-        return Response(GameSerializer(game).data, status=201)
-
-    return Response({"message": "An error has occurred", "errors": serializer.errors}, status=400)
-
-@extend_schema(
-    summary="Creates tournament to database",
-    description="Creates tournament and adds all useful stats to players to database",
-    request=TournamentSerializer,
-    responses={
-        201: TournamentSerializer,
-        400: GenericResponseSerializer
-    }
-)
-@api_view(["POST"])
-def create_tournament(request):
-    serializer = TournamentSerializer(data=request.data)
-    if not serializer.is_valid():
-        return Response({"message": "An error has occurred", "errors": serializer.errors}, status=400)
-
-    game_ids = request.data.get('games', [])
-    if not game_ids:
-        return GenericResponseSerializer({"message": "At least one game is required for a tournament"}, status=400)
-
-    games = Game.objects.filter(id__in=game_ids).select_related('player1', 'player2')
-    if len(games) != len(game_ids):
-        return GenericResponseSerializer({"message": "One ore more game IDs are invalid"}, status=400)
-
-    tournament = serializer.save()
-    games.update(tournament=tournament)
-    players = set(player for game in games.values_list("player1", "player2") for player in game)
-    tournament.players.add(*players)
-
-    return Response(TournamentSerializer(tournament).data, status=201)
-
-@extend_schema(
-    summary="Fetch user statistics",
-    description="Fetch user stats to display on frontend",
+    summary="Fetch user's stats identified by ID.",
+    description="Fetch all user's gaming stats. User is identified by ID. If no ID provided, returns current user's stats",
     responses={
         404: GenericResponseSerializer,
         200: UserStatisticsSerializer
     },
-    parameters=[
-        OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)
-    ],
+    parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def userStatisticsView(request):
+def display_user_stats(request):
     user_id = request.query_params.get("user_id")
+    if not user_id:
+        user_profile = request.user
+    else:
+        user_profile = get_object_or_404(UserProfile, id=user_id)
 
-    if not user_id or not user_id.isdigit():
-        return GenericResponseSerializer({"message": "invalid or missing user id"}, status=400)
+    if not user_profile:
+        return Response({"message": "User not found"}, status=404)
 
-    user = get_object_or_404(UserProfile, id=int(user_id))
+    participant = get_object_or_404(Participant, user=user_profile)
 
-    try:
-        user_stats = UserStatistics.objects.select_related('user').get(user=user)
-    except UserStatistics.DoesNotExist:
-        return GenericResponseSerializer({"message": "User Statistics not found"}).response(404)
+    games = Game.objects.filter(Q(player1=participant) | Q(player2=participant))
+    total_games_played = games.count()
+    wins = games.filter(winner=participant).count()
+    losses = total_games_played - wins
+    winrate = (wins / total_games_played) * 100 if total_games_played > 0 else 0
+    total_time_played = sum(game.duration for game in games)
 
-    return Response(UserStatisticsSerializer(user_stats).data)
+    solo_games = 0
+    multiplayer_games = 0
+    online_games = 0
+    for game in games:
+        if game.player2.is_ai:
+            solo_games += 1
+        elif game.player2.user is None:
+            multiplayer_games += 1
+        else:
+            online_games += 1
 
+    winstreak = 0
+    for game in reversed(games):
+        if game.winner and game.winner.user == user_profile:
+            winstreak += 1
+        else:
+            break
+
+    unique_opponents = set()
+    for game in games:
+        opponent = game.player2 if game.player1.user == user_profile else game.player1
+        if opponent.user != None:
+            unique_opponents.add(opponent.user)
+    unique_opponents_count = len(unique_opponents)
+
+    tournaments = Tournament.objects.filter(players=participant)
+    data = {
+        "user": user_profile.username,
+        "total_games_played": total_games_played,
+        "wins": wins,
+        "losses": losses,
+        "winrate": round(winrate, 2),
+        "winstreak": winstreak,
+        "total_time_played": total_time_played,
+        "solo_games": solo_games,
+        "multiplayer_games": multiplayer_games,
+        "online_games": online_games,
+        "unique_opponents_count": unique_opponents_count,
+        "games": games,
+        "tournaments": tournaments,
+    }
+
+    return Response(UserStatisticsSerializer(data).data, status=200)
+
+#Display all user games
 @extend_schema(
-    summary="Fetch game info",
-    description="Fetch game info to display on frontend",
+    summary="View all played games by user identified by ID",
+    description="Fetch all games played by user identified by ID. If no ID in request, sends all games played by current user",
     responses={
         404: GenericResponseSerializer,
-        200: GameSerializer
+        200: GameSerializer(many=True),
     },
-    parameters=[
-        OpenApiParameter(name="game_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)
-    ],
+    parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def gameInfoView(request):
+def display_user_games(request):
+    user_id = request.query_params.get("user_id")
+    if not user_id:
+        user = request.user
+    else:
+        user = get_object_or_404(UserProfile, id=user_id)
+
+    if not user:
+        return Response({"message": "User not found"}, status=404)
+
+    participant = get_object_or_404(Participant, user=user)
+
+    games = Game.objects.filter(Q(player1=participant) | Q(player2=participant)).select_related("player1", "player2", "winner")
+    return Response(GameSerializer(games, many=True).data, status=200)
+
+#Display all user tournaments
+@extend_schema(
+    summary="View all tournament played by user identified by ID",
+    description="Fetch all tournaments played by user identified by ID. If no ID in request, sends all tournaments played by current user",
+    responses={
+        404: GenericResponseSerializer,
+        200: TournamentSerializer(many=True),
+    },
+    parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def display_user_tournaments(request):
+    user_id = request.query_params.get("user_id")
+    if not user_id:
+        user = request.user
+    else:
+        user = get_object_or_404(UserProfile, id=user_id)
+
+    if not user:
+        return Response({"message": "User not found"}, status=404)
+
+    participant = get_object_or_404(Participant, user=user)
+
+    tournaments = Tournament.objects.filter(players=participant).prefetch_related("players", "games", "winner")
+    return Response(TournamentSerializer(tournaments, many=True).data, status=200)
+
+#Display one specific game by ID
+@extend_schema(
+    summary="Fetch one game info identified by ID",
+    description="Fetch game info to display on frontend. Must provide game ID",
+    responses={
+        404: GenericResponseSerializer,
+        200: GameSerializer,
+    },
+    parameters=[OpenApiParameter(name="game_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def display_game(request):
     game_id = request.query_params.get("game_id")
     if not game_id:
         return GenericResponseSerializer({"message": "Game ID is required"}).response(400)
@@ -123,20 +159,19 @@ def gameInfoView(request):
     game = get_object_or_404(Game.objects.select_related('player1', 'player2', 'winner', 'tournament'), id=game_id)
     return Response(GameSerializer(game).data, status=200)
 
+#Display one specific tournament by ID
 @extend_schema(
-    summary="Fetch tournament info",
-    description="Fetch info stats to display on frontend",
+    summary="Fetch one tournament info identified by ID",
+    description="Fetch info stats to display on frontend. Must provide tournament ID",
     responses={
         404: GenericResponseSerializer,
         200: TournamentSerializer
     },
-    parameters=[
-        OpenApiParameter(name="tournament_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)
-    ]
+    parameters=[OpenApiParameter(name="tournament_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)]
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def tournamentInfoView(request):
+def display_tournament(request):
     tournament_id = request.query_params.get("tournament_id")
     if not tournament_id:
         return GenericResponseSerializer({"message": "Tournament ID is required"}).response(400)
@@ -144,4 +179,112 @@ def tournamentInfoView(request):
     tournament = get_object_or_404(Tournament.objects.prefetch_related('games', 'players'), id=tournament_id)
     return Response(TournamentSerializer(tournament).data, status=200)
 
+#Create game
+@extend_schema(
+    summary="Create a game",
+    description="Creates a game, saves its participants and ID and returns it. Needs player1_type (= ai, guest or user), player1_id if player1 is a user, player1_name if player1 is not AI. Same for player2.",
+    responses={
+        201: GenericResponseSerializer,
+        400: GenericResponseSerializer,
+        404: GenericResponseSerializer,
+    },
+    request=RequestCreateGameSerializer,
+)
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_game(request):
+    user = request.user
 
+    player1 = create_participant(request.data.get("player1_type"), request.data.get("player1_id"), request.data.get("player1_name"))
+    if isinstance(player1, Response): #If create_participant fails, player1 is an error response. We return this response.
+        return player1
+
+    player2 = create_participant(request.data.get("player2_type"), request.data.get("player2_id"), request.data.get("player2_name"))
+    if isinstance(player2, Response):
+        return player2
+
+    tournament_id = request.data.get("tournament_id")
+    if tournament_id:
+        try:
+            tournament = Tournament.objects.get(id=tournament_id)
+        except Tournament.DoesNotExist:
+            return Response({"error": "Invalid tournament_id"}, status=404)
+
+    game = Game.objects.create(player1=player1, player2=player2, tournament=tournament)
+
+    return Response(GameSerializer(game.data), status=201)
+
+#Create tournament
+@extend_schema(
+    summary="Creates a tournament",
+    description="Creates a tournament, saves its participants, creator and ID and returns it. Needs player1_type (= ai, guest or user), player1_id if player1 is a user, player1_name if player1 is not AI. Same for all players.",
+    responses={
+        201: TournamentSerializer
+    },
+    request=RequestCreateTournamentSerializer
+)
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_tournament(request):
+    user = request.user
+
+    player1 = create_participant("user", player_id=user.id)
+    if isinstance(player1, Response):
+        return player2
+
+    player2 = create_participant(request.data.get("player2_type"), request.data.get("player2_id"), request.data.get("player2_name"))
+    if isinstance(player2, Response):
+        return player2
+
+    player3 = create_participant(request.data.get("player3_type"), request.data.get("player3_id"), request.data.get("player3_name"))
+    if isinstance(player3, Response):
+        return player3
+
+    player4 = create_participant(request.data.get("player4_type"), request.data.get("player4_id"), request.data.get("player4_name"))
+    if isinstance(player4, Response):
+        return player4
+
+    name = request.data.get("name")
+    if not name:
+        return Response({"error": "Tournament name is required"}, status=400)
+
+    tournament = Tournament.objects.create(name=name, creator=user)
+    tournament.players.add(player1, player2, player3, player4)
+
+    return Response(TournamentSerializer(tournament.data), status=201)
+
+#utils to create participants
+def create_participant(player_type, player_id=None, player_name=None):
+    """
+    Creates or retrieves a Participant based on its type.
+    
+    - **user**: Uses an existing UserProfile.
+    - **guest**: Creates a guest participant by name.
+    - **ai**: Uses a predefined AI participant.
+    
+    Returns:
+    - `Participant` object if successful.
+    - `Response` (error) if invalid data is provided.
+    """
+
+    if player_type == "user":
+        if not player_id:
+            return Response({"error": f"player_id is required for user type"}, status=400)
+        try:
+            user_profile = UserProfile.objects.get(id=player_id)
+            participant, _ = Participant.objects.get_or_create(user=user_profile, defaults={"name": user_profile.username, "is_ai": False})
+        except UserProfile.DoesNotExist:
+            return Response({"error": f"Invalid user ID {player_id}"}, status=400)
+
+    elif player_type == "guest":
+        if not player_name:
+            return Response({"error": "Guest player must have a name"}, status=400)
+        participant, _ = Participant.objects.get_or_create(name=player_name, is_ai=False)
+
+    elif player_type == "ai":
+        participant, _ = Participant.objects.get_or_create(name="CPU", is_ai=True)
+
+    else:
+        return Response({"error": f"Invalid player type '{player_type}'"}, status=400)
+
+    return participant

@@ -14,7 +14,23 @@ create_game :
 create_tournament:
 {
     "name": "Summer Championship",
-    "players" : [1, 13],
-    "winner": 1,
+    "players" : [1, 13,],
+    "winner": 13,
     "games": [1, 2, 3, 4]
 }
+
+-------------------------------- NOTES ----------------------------------------
+
+1/ Create game with empty fields
+2/ Create tournament with empty fields
+3/ delete updating stats in tournament and games
+4/ supprimer UserStatistics
+
+
+
+
+1/User connecte cree game ou tournoi
+2/Guest ou IA ou utilisateur connecte
+2a/ if Guest ou IA : on s'en fout de leur nom
+2b/ If utilisateur connecte : on prend son profil
+
