@@ -75,14 +75,14 @@ class UserStatisticsSerializer(serializers.Serializer):
     multiplayer_games = serializers.IntegerField()
     online_games = serializers.IntegerField()
     unique_opponents_count = serializers.IntegerField()
-    games = serializers.SerializerMethodField()
-    tournaments = serializers.SerializerMethodField()
+    games = GameSerializer(many=True)
+    tournaments = TournamentSerializer(many=True)
 
-    def get_games(self, obj):
-        return GameSerializer(obj["games"], many=True).data
+    # def get_games(self, obj):
+    #     return GameSerializer(obj["games"], many=True).data
 
-    def get_tournaments(self, obj):
-        return TournamentSerializer(obj["tournaments"], many=True).data
+    # def get_tournaments(self, obj):
+    #     return TournamentSerializer(obj["tournaments"], many=True).data
     
     @extend_schema_field(GameSerializer(many=True))
     def get_games(self, obj):

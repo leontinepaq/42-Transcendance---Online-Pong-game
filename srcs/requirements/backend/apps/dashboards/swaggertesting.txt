@@ -1,22 +1,29 @@
 Here you may find examples of requests to use dashboard views
 
-create_game : 
+CreateGame
 {
-  "player1": 1,
-  "player2": 13,
-  "winner": 1,
-  "score_player1": 5,
-  "score_player2": 4,
-  "longest_exchange": 30,
-  "duration": "2 05:30:15.123456"  
+  "player1_type": "user",
+  "player1_id": 1,
+  "player1_name": "string",
+  "player2_type": "user",
+  "player2_id": 2,
+  "player2_name": "test"
+  "tournament_id": 3
 }
+TOURNAMENT ID EST OPTIONNEL
 
-create_tournament:
+CreateTournament
 {
-    "name": "Summer Championship",
-    "players" : [1, 13,],
-    "winner": 13,
-    "games": [1, 2, 3, 4]
+  "name": "string",
+  "player2_type": "user",
+  "player2_id": 2,
+  "player2_name": "test",
+  "player3_type": "user",
+  "player3_id": 3,
+  "player3_name": "test2",
+  "player4_type": "user",
+  "player4_id": 4,
+  "player4_name": "test3"
 }
 
 -------------------------------- NOTES ----------------------------------------

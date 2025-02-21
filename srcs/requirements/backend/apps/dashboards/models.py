@@ -16,15 +16,15 @@ class Game(models.Model):
     score_player2 =       models.IntegerField(default=0)
     longest_exchange =    models.IntegerField(default=0)
     created_at =          models.DateTimeField(auto_now_add=True)
-    duration =            models.DurationField()
+    duration =            models.DurationField(null=True, blank=True)
     tournament =          models.ForeignKey("Tournament", null=True, blank=True, on_delete=models.CASCADE, related_name="games")
     finished =            models.BooleanField(default=False)
 
 class Tournament(models.Model):
     id =                    models.AutoField(primary_key=True)
     name =                  models.CharField(max_length=50)
-    creator =               models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="tournaments_created")
+    creator =               models.ForeignKey(UserProfile, null=True, on_delete=models.CASCADE, related_name="tournaments_created")
     players =               models.ManyToManyField(Participant)
-    winner =                models.ForeignKey(Participant, on_delete=models.CASCADE, related_name="winner_of_tournament")
+    winner =                models.ForeignKey(Participant, null=True, blank=True, on_delete=models.CASCADE, related_name="winner_of_tournament")
     created_at =            models.DateTimeField(auto_now_add=True)
     finished =              models.BooleanField(default=False)

@@ -1,4 +1,6 @@
 from django.shortcuts import render, get_object_or_404
+from datetime import timedelta
+from django.db.models import Q
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, parser_classes
@@ -39,7 +41,7 @@ def display_user_stats(request):
     wins = games.filter(winner=participant).count()
     losses = total_games_played - wins
     winrate = (wins / total_games_played) * 100 if total_games_played > 0 else 0
-    total_time_played = sum(game.duration for game in games)
+    total_time_played = sum((game.duration for game in games if game.duration is not None), timedelta())
 
     solo_games = 0
     multiplayer_games = 0
@@ -203,16 +205,23 @@ def create_game(request):
     if isinstance(player2, Response):
         return player2
 
+    if player2.is_ai == False and player1.is_ai == False and player2.name == player1.name:
+        return Response({"error": "Player names must be different"}, status=400)
+
     tournament_id = request.data.get("tournament_id")
+    tournament = None
     if tournament_id:
         try:
             tournament = Tournament.objects.get(id=tournament_id)
         except Tournament.DoesNotExist:
             return Response({"error": "Invalid tournament_id"}, status=404)
 
-    game = Game.objects.create(player1=player1, player2=player2, tournament=tournament)
+    if tournament != None:
+        game = Game.objects.create(player1=player1, player2=player2, tournament=tournament)
+    else:
+        game = Game.objects.create(player1=player1, player2=player2)
 
-    return Response(GameSerializer(game.data), status=201)
+    return Response(GameSerializer(game).data, status=201)
 
 #Create tournament
 @extend_schema(
@@ -248,10 +257,25 @@ def create_tournament(request):
     if not name:
         return Response({"error": "Tournament name is required"}, status=400)
 
+    players = [
+        (player1, "user"),
+        (player2, request.data.get("player2_type")),
+        (player3, request.data.get("player3_type")),
+        (player4, request.data.get("player4_type"))
+    ]
+
+    human_players = [player for player, player_type in players if player_type in ["user", "guest"]]
+    human_player_names = [player.name for player in human_players]
+    duplicate_names = [name for name in human_player_names if human_player_names.count(name) > 1]
+    
+    if duplicate_names:
+        return Response({"error": f"Duplicate player names found: {', '.join(set(duplicate_names))}"}, status=400)
+
+
     tournament = Tournament.objects.create(name=name, creator=user)
     tournament.players.add(player1, player2, player3, player4)
 
-    return Response(TournamentSerializer(tournament.data), status=201)
+    return Response(TournamentSerializer(tournament).data, status=201)
 
 #utils to create participants
 def create_participant(player_type, player_id=None, player_name=None):
@@ -280,6 +304,9 @@ def create_participant(player_type, player_id=None, player_name=None):
         if not player_name:
             return Response({"error": "Guest player must have a name"}, status=400)
         participant, _ = Participant.objects.get_or_create(name=player_name, is_ai=False)
+
+        if UserProfile.objects.filter(username=player_name).exists():
+            return Response({"error": f"Username '{player_name}' is already taken by another user."}, status=400)
 
     elif player_type == "ai":
         participant, _ = Participant.objects.get_or_create(name="CPU", is_ai=True)
