@@ -1,67 +1,155 @@
 import random
+import math
+
+TOLERANCE = 0.5
+
+
+class Paddle:
+    height = 15
+    width = 2
+
+    def __init__(self, right=False):
+        self.right = right
+        self.x = 0
+        self.y = 0
+        self.reset()
+
+    def reset(self):
+        self.x = self.width / 2
+        self.y = 50
+        if self.right:
+            self.x = 100 - self.width / 2
+
+    def move(self, delta):
+        self.y += delta
+        if self.y < self.height / 2:
+            self.y = self.height / 2
+        elif self.y + self.height / 2 > 100:
+            self.y = 100 - self.height / 2
+
+    def get_state(self):
+        return {
+            "top_left_corner": {
+                "x": self.x - self.width / 2,
+                "y": self.y - self.height / 2
+            },
+            "center": {
+                "x": self.x,
+                "y": self.y
+            },
+            "height": self.height,
+            "width": self.width
+        }
+
+
+class Ball:
+    radius = 1
+    speed = 2
+
+    def reset(self):
+        self.x = 50
+        self.y = 50
+        angle = random.uniform(-math.pi / 4, math.pi / 4)
+        direction = random.choice([-1, 1])
+
+        # Normalize velocity components
+        self.velocity_x = direction * self.speed * math.cos(angle)
+        self.velocity_y = self.speed * math.sin(angle)
+
+    def update(self):
+        self.x += self.velocity_x
+        self.y += self.velocity_y
+
+    def bounce_top_bottom(self):
+        if self.y <= 0 or self.y >= 100:
+            self.velocity_y *= -1
+            return True
+        return False
+
+    def bounce_paddle(self, paddle: Paddle):
+        if abs(self.x - paddle.x) <= (paddle.width / 2 + self.radius) \
+                and abs(self.y - paddle.y) <= (paddle.height / 2):
+            self.velocity_x *= -1
+            hit_position = (self.y - paddle.y) / paddle.height - 0.5
+            self.velocity_y = hit_position * 1.5
+            return True
+        return False
+
+    def is_out(self):
+        return self.x < 0 or self.x > 100
+
+    def get_state(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "r": self.radius
+        }
+
 
 class Pong:
     def __init__(self, use_ai=True):
-        """Initialize game with AI or two-player mode."""
+        self.ball = Ball()
+        self.left = Paddle()
+        self.right = Paddle(right=True)
+        self.score = [0, 0]
         self.use_ai = use_ai
-        self.reset_game()
+        self.paused = False
+        self.reset()
 
-    def reset_game(self):
-        """Reset game state at the start or after scoring."""
-        self.ball_x, self.ball_y = 50, 50
-        self.velocity_x = random.choice([-5, 5])
-        self.velocity_y = random.choice([-3, 3])
-        self.paddle_left = 50
-        self.paddle_right = 50
-        self.ai_speed = 4  # AI movement speed
+    def reset(self):
+        self.left.reset()
+        self.right.reset()
+        self.ball.reset()
+        self.ai_speed = 2
 
-    def move_paddle(self, side, new_y):
-        """Move paddle within bounds."""
+    def move_paddle(self, side, delta):
         if side == "left":
-            self.paddle_left = max(0, min(100, new_y))
+            self.left.move(delta)
         elif side == "right":
-            self.paddle_right = max(0, min(100, new_y))
+            self.right.move(delta)
 
     def update_ai_paddle(self):
-        """Move AI paddle toward the ball with some delay."""
-        if self.use_ai and self.ball_x > 50:  # AI moves only when ball is on its side
-            if self.paddle_right < self.ball_y:
-                self.paddle_right += self.ai_speed
-            elif self.paddle_right > self.ball_y:
-                self.paddle_right -= self.ai_speed
+        if self.use_ai and self.ball.x > 50:  # AI moves only when the ball is on its side
+            reaction_chance = 0.7  # 80% chance to react to ball movement
+            if random.random() < reaction_chance:
+                target_y = self.ball.y + random.uniform(-7, 7)  # AI aims slightly off
+                move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
+                if move_amount < 2:
+                    return 
+                if self.right.y < target_y:
+                    self.right.move(move_amount)
+                elif self.right.y > target_y:
+                    self.right.move(-move_amount)
 
     def update_ball(self):
-        """Move the ball and check for collisions."""
-        self.ball_x += self.velocity_x
-        self.ball_y += self.velocity_y
-
-        # Ball bounces off top/bottom walls
-        if self.ball_y <= 0 or self.ball_y >= 100:
-            self.velocity_y *= -1
-
-        # Ball hits left paddle
-        if self.ball_x <= 5 and abs(self.ball_y - self.paddle_left) < 10:
-            self.velocity_x *= -1
-
-        # Ball hits right paddle
-        if self.ball_x >= 95 and abs(self.ball_y - self.paddle_right) < 10:
-            self.velocity_x *= -1
-
-        # Ball goes out of bounds (scoring)
-        if self.ball_x < 0 or self.ball_x > 100:
-            self.reset_game()
+        self.ball.update()
+        self.ball.bounce_top_bottom()
+        self.ball.bounce_paddle(self.left)
+        self.ball.bounce_paddle(self.right)
+        if self.ball.is_out():
+            if self.ball.x < 0:
+                self.score[0] += 1
+            else:
+                self.score[1] += 1
+            self.reset()
 
     def get_state(self):
-        """Return the current game state."""
         return {
-            "ball_x": self.ball_x,
-            "ball_y": self.ball_y,
-            "paddle_left": self.paddle_left,
-            "paddle_right": self.paddle_right,
+            "left": self.left.get_state(),
+            "right": self.right.get_state(),
+            "ball": self.ball.get_state(),
+            "paused": self.paused
         }
+        
+    def toogle_pause(self):
+        self.paused = not self.paused
+        
+    def is_paused(self):
+        return self.paused
 
     def update(self):
-        """Main game update function (called every frame)."""
+        if self.paused:
+            return
         self.update_ball()
         if self.use_ai:
             self.update_ai_paddle()

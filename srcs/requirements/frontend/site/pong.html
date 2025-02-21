@@ -58,7 +58,6 @@
 
         socket.onmessage = function(event) {
             const state = JSON.parse(event.data);
-            console.log(state);
         
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -94,22 +93,15 @@
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowUp") {
                 event.preventDefault();
-                socket.send(JSON.stringify({
-                    toogle_pause: false,
-                    paddle_y: -5}));
+                socket.send(JSON.stringify({ paddle_y: -5 }));
             }
             else if (event.key === "ArrowDown") {
                 event.preventDefault();
-                socket.send(JSON.stringify({
-                    toogle_pause: false,
-                    paddle_y: 5}));
+                socket.send(JSON.stringify({ paddle_y: paddle_y }));
             }
-			else if (event.key === " ") {
+			else if (event.key === "Escape") {
 				event.preventDefault();
-				socket.send(JSON.stringify({
-                    toogle_pause: true,
-                    paddle_y: 0
-                }));
+				socket.send(JSON.stringify({ pause: true}));
 			}
         });
     </script>
