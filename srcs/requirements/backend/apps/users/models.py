@@ -46,6 +46,8 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     two_factor_code =       models.CharField(max_length=6, blank=True, null=True)
     two_factor_expiry =     models.DateTimeField(blank=True, null=True, default=None)
     totp_secret =           models.CharField(max_length=32, blank=True, null=True)
+    friends =               models.ManyToManyField("self", blank=True)
+    blocked =               models.ManyToManyField("self", blank=True, symmetrical=False)
     
     objects = UserProfileManager()
     theme = models.CharField(

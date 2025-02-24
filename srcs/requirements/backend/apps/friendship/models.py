@@ -1,11 +1,11 @@
 from django.db import models
 from users.models import UserProfile
 
-class Friendship(models.Model):
-    status =    models.CharField(
-        max_length=11,
-        choices=[("not_friends", "Not Friends"), ("pending", "Pending"), ("accepted", "Accepted"),]
-        default="not_friends",
-        )
-    friend1 =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="friend of")
-    friend2 =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="friend of")
+#add ID ? 
+class FriendRequest(models.Model):
+    sender =     models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="sent_friend_request")
+    receiver =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="received_friend_request")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("sender", "receiver")
