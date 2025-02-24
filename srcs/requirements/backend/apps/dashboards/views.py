@@ -20,7 +20,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
         404: GenericResponseSerializer,
         200: UserStatisticsSerializer
     },
-    parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
+    parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY)],
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -31,10 +31,33 @@ def display_user_stats(request):
     else:
         user_profile = get_object_or_404(UserProfile, id=user_id)
 
-    if not user_profile:
+    stats = get_user_stats(user_profile)
+    if stats is None:
         return Response({"message": "User not found"}, status=404)
 
+    return Response(UserStatisticsSerializer(stats).data, status=200)
+
+#Display all users stats
+@extend_schema(
+    summary="Displays all users statistics",
+    description="Go fetch all users in the database and returns their gaming statistics",
+    responses={
+        404: GenericResponseSerializer,
+        200: UserStatisticsSerializer(many=True)
+    },
+)
+@api_view(["GET"])
+def display_all_users_stats(request):
+    all_users = UserProfile.objects.all()
+    stats_list = [get_user_stats(user) for user in all_users if get_user_stats(user) is not None]
+
+    return Response(UserStatisticsSerializer(stats_list, many=True).data, status=200)
+
+#helper function to fetch user statistics
+def get_user_stats(user_profile):
     participant = get_object_or_404(Participant, user=user_profile)
+    if not participant:
+        return None
 
     games = Game.objects.filter(Q(player1=participant) | Q(player2=participant))
     total_games_played = games.count()
@@ -69,7 +92,7 @@ def display_user_stats(request):
     unique_opponents_count = len(unique_opponents)
 
     tournaments = Tournament.objects.filter(players=participant)
-    data = {
+    return {
         "user": user_profile.username,
         "total_games_played": total_games_played,
         "wins": wins,
@@ -84,8 +107,6 @@ def display_user_stats(request):
         "games": games,
         "tournaments": tournaments,
     }
-
-    return Response(UserStatisticsSerializer(data).data, status=200)
 
 #Display all user games
 @extend_schema(

@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     
     'users',
     'dashboards',
+    'userprofile',
+    'friendship',
 ]
 
 REST_FRAMEWORK = {
