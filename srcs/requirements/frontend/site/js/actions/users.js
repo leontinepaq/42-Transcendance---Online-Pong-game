@@ -139,5 +139,6 @@ async function handleUsers()
 /*
     - TODO -->
         - changer userData quand le pull sera fait -> recup tous les users same time 
+        - voir aussi recup les stats des joueurs quand 0 parties effectuees 
 
 */
