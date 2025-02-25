@@ -71,7 +71,7 @@ class Ball:
                 and abs(self.y - paddle.y) <= (paddle.height / 2):
             self.velocity_x *= -1
             hit_position = (self.y - paddle.y) / paddle.height - 0.5
-            self.velocity_y = hit_position * 1.5
+            self.velocity_y = hit_position * 2.0
             return True
         return False
 
@@ -110,12 +110,10 @@ class Pong:
 
     def update_ai_paddle(self):
         if self.use_ai and self.ball.x > 50:  # AI moves only when the ball is on its side
-            reaction_chance = 0.7  # 80% chance to react to ball movement
+            reaction_chance = 0.8  # 80% chance to react to ball movement
             if random.random() < reaction_chance:
                 target_y = self.ball.y + random.uniform(-7, 7)  # AI aims slightly off
                 move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
-                if move_amount < 2:
-                    return 
                 if self.right.y < target_y:
                     self.right.move(move_amount)
                 elif self.right.y > target_y:
@@ -138,7 +136,8 @@ class Pong:
             "left": self.left.get_state(),
             "right": self.right.get_state(),
             "ball": self.ball.get_state(),
-            "paused": self.paused
+            "paused": self.paused,
+            "score": self.score
         }
         
     def toogle_pause(self):

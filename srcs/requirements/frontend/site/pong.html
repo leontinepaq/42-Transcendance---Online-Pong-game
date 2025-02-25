@@ -35,7 +35,7 @@
     </div>
 
     <script>
-        const socket = new WebSocket("/ws/pingpong/");
+        const socket = new WebSocket("/ws/pong/type/id/");
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
@@ -58,6 +58,7 @@
 
         socket.onmessage = function(event) {
             const state = JSON.parse(event.data);
+            console.log(state);
         
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -93,15 +94,22 @@
         document.addEventListener("keydown", (event) => {
             if (event.key === "ArrowUp") {
                 event.preventDefault();
-                socket.send(JSON.stringify({ paddle_y: -5 }));
+                socket.send(JSON.stringify({
+                    toogle_pause: false,
+                    paddle_y: -5}));
             }
             else if (event.key === "ArrowDown") {
                 event.preventDefault();
-                socket.send(JSON.stringify({ paddle_y: paddle_y }));
+                socket.send(JSON.stringify({
+                    toogle_pause: false,
+                    paddle_y: 5}));
             }
-			else if (event.key === "Escape") {
+			else if (event.key === " ") {
 				event.preventDefault();
-				socket.send(JSON.stringify({ pause: true}));
+				socket.send(JSON.stringify({
+                    toogle_pause: true,
+                    paddle_y: 0
+                }));
 			}
         });
     </script>
