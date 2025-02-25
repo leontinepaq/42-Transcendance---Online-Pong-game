@@ -68,17 +68,18 @@ async function getFriendInfo()
 async function getFriendStatistic(id)
 {
     let statUser;
+    let response = [];
     try
     {
-        const response = await fetch(`api/dashboards/user-statistics/?user_id=${id}`); 
-        if (!response.ok)
-            throw new Error('ERROR');
-        statUser = await response.json();
+        response = await fetch(`api/dashboards/display-all-user-stats/`); 
+        // if (!response.ok)
+            // throw new Error('ERROR');
+        // statUser = await response.json();
         console.log(statUser);
     }
     catch(error)
     {
-        console.log("Error.")
+        console.log("Error.", error)
     }
     return (statUser);
 }
@@ -107,9 +108,7 @@ async function handleFriends()
 
             const userId = parseInt(e.target.getAttribute("data-id"));
 
-            // const statUser = await getFriendStatistic(userId);
-
-            console.log(userId);
+            const statUser = await getFriendStatistic(userId);
             
             const user = userData.find(u => u.id === userId);
     

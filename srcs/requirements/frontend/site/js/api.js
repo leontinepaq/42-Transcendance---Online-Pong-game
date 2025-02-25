@@ -90,9 +90,6 @@ async function parseJsonResponse(response) {
 }
 
 
-
-
-
 export async function activateAuthenticator() {
 	try {
 		console.log('clicked');
