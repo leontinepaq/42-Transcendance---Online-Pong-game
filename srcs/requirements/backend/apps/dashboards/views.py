@@ -55,9 +55,28 @@ def display_all_users_stats(request):
 
 #helper function to fetch user statistics
 def get_user_stats(user_profile):
-    participant = get_object_or_404(Participant, user=user_profile)
+    # participant = get_object_or_404(Participant, user=user_profile)
+    try:
+        participant = Participant.objects.get(user=user_profile)
+    except Participant.DoesNotExist:
+        participant = None
+
     if not participant:
-        return None
+        return {
+        "user": user_profile.username,
+        "total_games_played": 0,
+        "wins": 0,
+        "losses": 0,
+        "winrate": 0.0,
+        "winstreak": 0,
+        "total_time_played": timedelta(seconds=0),
+        "solo_games": 0,
+        "multiplayer_games": 0,
+        "online_games": 0,
+        "unique_opponents_count": 0,
+        "games": [],
+        "tournaments": [],
+    }
 
     games = Game.objects.filter(Q(player1=participant) | Q(player2=participant))
     total_games_played = games.count()
