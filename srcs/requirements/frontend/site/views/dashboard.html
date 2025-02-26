@@ -1,7 +1,7 @@
 <a data-action="navigate" href="dashboard" class="btn action-btn w-100 text-center">REFRESH</a>
 <p></p>
 
-<div class="container dashboard-block d-grid custom-border">
+<div class="container dashboard-block d-grid">
 	<!-- ROW 1 -->
 	<div class="row">
 		<div class="col">
@@ -12,36 +12,41 @@
 
 		<div class="col d-grid">
 			<div class="custom-border">
-				<h5>Matches Won</h5>
-				<span class="stat-value" id="matches-won">0</span>
+				<h4>Matches Won</h4>
+				<p class="stat-value" id="matches-won">-10</p>
 			</div>
 			<div class="custom-border">
-				<h5>Win Streak</h5>
-				<span class="stat-value" id="win-streak">0</span>
+				<h4>Win Streak</h4>
+				<p class="stat-value" id="win-streak">-10</p>
 			</div>
 		</div>
 	
-	<div class="col custom-border">
-		<h5>Pie chart</h5>
-		<canvas id="win-rate-chart"></canvas>
+	<div class="col custom-border chart-container">
+		<div class="chart-wrapper">
+			<canvas id="win-rate-chart"></canvas>
+			<div class="chart-text">
+				<span id="win-rate-percentage" class="chart-percentage">0%</span>
+				<span class="chart-label">Win Rate</span>
+			</div>
+		</div>
 	</div>
 	</div>
 
 	<!-- ROW 2 -->
 	<div class="row">
 		<div class="col custom-border">
-			<h5>Pie chart</h5>
+			<h4>Pie chart</h4>
 			<canvas id="game-mode-chart"></canvas>
 		</div>
 	
 		<div class="col d-grid">
 			<div class="custom-border">
-				<h5>Total Time Played</h5>
-				<span class="stat-value" id="total-time">00:00:00</span>
+				<h4>Total Time Played</h4>
+				<p class="stat-value" id="total-time">00:00:00</p>
 			</div>
 			<div class="custom-border">
-				<h5>Online Opponents Played</h5>
-				<span class="stat-value" id="online-opponents">0</span>
+				<h4>Online Opponents Played</h4>
+				<p class="stat-value" id="online-opponents">-10</p>
 			</div>
 		</div>
 	</div>
@@ -49,9 +54,11 @@
 	<!-- ROW 3 -->
 	<div class="row">
 		<div class="col-12 custom-border">
-			<h5>Match Results (Last 7 Days)</h5>
+			<h4>Match Results (Last 7 Days)</h4>
 			<canvas id="match-results-chart"></canvas>
 		</div>
 	</div>
 </div>
+
+
 	

@@ -13,7 +13,7 @@
 }
 
 /* GENERAL */
-canvas {
+#stars {
 	position: fixed;
 	top: 0;
 	left: 0;
