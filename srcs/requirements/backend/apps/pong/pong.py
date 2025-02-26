@@ -3,6 +3,11 @@ import math
 
 TOLERANCE = 0.5
 
+class Ball:
+    pass
+
+def symetric(x):
+    return 100 - x
 
 class Paddle:
     height = 15
@@ -27,19 +32,16 @@ class Paddle:
         elif self.y + self.height / 2 > 100:
             self.y = 100 - self.height / 2
 
-    def get_state(self):
-        return {
-            "top_left_corner": {
-                "x": self.x - self.width / 2,
-                "y": self.y - self.height / 2
-            },
-            "center": {
-                "x": self.x,
-                "y": self.y
-            },
-            "height": self.height,
-            "width": self.width
-        }
+    def get_state(self, sym=False):
+        x = self.x
+        y = self.y
+        if sym:
+            x = symetric(x)
+        return {"top_left_corner": {"x": x - self.width / 2,
+                                    "y": y - self.height / 2},
+                "center": {"x": x, "y": y},
+                "height": self.height,
+                "width": self.width}
 
 
 class Ball:
@@ -67,20 +69,28 @@ class Ball:
         return False
 
     def bounce_paddle(self, paddle: Paddle):
-        if abs(self.x - paddle.x) <= (paddle.width / 2 + self.radius) \
-                and abs(self.y - paddle.y) <= (paddle.height / 2):
-            self.velocity_x *= -1
-            hit_position = (self.y - paddle.y) / paddle.height - 0.5
-            self.velocity_y = hit_position * 2.0
-            return True
-        return False
+        if paddle.right and paddle.x - self.x > paddle.width / 2 + self.radius:
+            return False
+        if not paddle.right and self.x - paddle.x > paddle.width / 2 + self.radius:
+            return False
+        # if abs(self.x - paddle.x) > (paddle.width / 2 + self.radius):
+        #     return False
+        if abs(self.y - paddle.y) > (paddle.height / 2 + self.radius):
+            return False
+        self.velocity_x *= -1.05
+        hit_position = (self.y - paddle.y) / paddle.height - 0.5
+        self.velocity_y = hit_position * 2.0
+        return True
 
     def is_out(self):
         return self.x < 0 or self.x > 100
 
-    def get_state(self):
+    def get_state(self, sym=False):
+        x = self.x
+        if sym:
+            x = symetric(x)
         return {
-            "x": self.x,
+            "x": x,
             "y": self.y,
             "r": self.radius
         }
@@ -93,7 +103,7 @@ class Pong:
         self.right = Paddle(right=True)
         self.score = [0, 0]
         self.use_ai = use_ai
-        self.paused = False
+        self.paused = True
         self.reset()
 
     def reset(self):
@@ -109,15 +119,17 @@ class Pong:
             self.right.move(delta)
 
     def update_ai_paddle(self):
-        if self.use_ai and self.ball.x > 50:  # AI moves only when the ball is on its side
-            reaction_chance = 0.8  # 80% chance to react to ball movement
-            if random.random() < reaction_chance:
-                target_y = self.ball.y + random.uniform(-7, 7)  # AI aims slightly off
-                move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
-                if self.right.y < target_y:
-                    self.right.move(move_amount)
-                elif self.right.y > target_y:
-                    self.right.move(-move_amount)
+        # if self.use_ai and self.ball.x > 50:  # AI moves only when the ball is on its side
+        reaction_chance = 0.5  # 80% chance to react to ball movement
+        if random.random() < reaction_chance:
+            # AI aims slightly off
+            target_y = self.ball.y + random.uniform(-7, 7)
+            move_amount = self.ai_speed * \
+                random.uniform(0.8, 1.2)  # Imperfect speed
+            if self.right.y < target_y:
+                self.right.move(move_amount)
+            elif self.right.y > target_y:
+                self.right.move(-move_amount)
 
     def update_ball(self):
         self.ball.update()
@@ -125,24 +137,24 @@ class Pong:
         self.ball.bounce_paddle(self.left)
         self.ball.bounce_paddle(self.right)
         if self.ball.is_out():
-            if self.ball.x < 0:
+            if self.ball.x > 100:
                 self.score[0] += 1
             else:
                 self.score[1] += 1
             self.reset()
 
-    def get_state(self):
+    def get_state(self, sym=False):
         return {
-            "left": self.left.get_state(),
-            "right": self.right.get_state(),
-            "ball": self.ball.get_state(),
+            "left": self.left.get_state(sym),
+            "right": self.right.get_state(sym),
+            "ball": self.ball.get_state(sym),
             "paused": self.paused,
             "score": self.score
         }
-        
-    def toogle_pause(self):
+
+    def toggle_pause(self):
         self.paused = not self.paused
-        
+
     def is_paused(self):
         return self.paused
 
