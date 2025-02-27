@@ -48,7 +48,8 @@ async function plotWinRate(data)
 export async function loadUserStats()
 {
 	try {
-		const data =await authFetchJson('api/dashboard/display-user-stats/', {method: 'GET'});
+		const data = await authFetchJson('api/dashboard/dis play-user-stats/', {method: 'GET'});
+		console.log(data);
 		updateStatValues(data);
 		plotWinRate(data);
 	}
