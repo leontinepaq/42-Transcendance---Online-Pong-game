@@ -3,9 +3,6 @@ import math
 
 TOLERANCE = 0.5
 
-class Ball:
-    pass
-
 def symetric(x):
     return 100 - x
 
@@ -73,8 +70,6 @@ class Ball:
             return False
         if not paddle.right and self.x - paddle.x > paddle.width / 2 + self.radius:
             return False
-        # if abs(self.x - paddle.x) > (paddle.width / 2 + self.radius):
-        #     return False
         if abs(self.y - paddle.y) > (paddle.height / 2 + self.radius):
             return False
         self.velocity_x *= -1.05
@@ -94,7 +89,6 @@ class Ball:
             "y": self.y,
             "r": self.radius
         }
-
 
 class Pong:
     def __init__(self, use_ai=True):
@@ -144,16 +138,22 @@ class Pong:
             self.reset()
 
     def get_state(self, sym=False):
+        score=[self.score[0], self.score[1]]
+        if sym:
+            score=[self.score[1], self.score[0]]            
         return {
             "left": self.left.get_state(sym),
             "right": self.right.get_state(sym),
             "ball": self.ball.get_state(sym),
             "paused": self.paused,
-            "score": self.score
+            "score": score
         }
 
     def toggle_pause(self):
         self.paused = not self.paused
+        
+    def pause(self):
+        self.paused = True
 
     def is_paused(self):
         return self.paused

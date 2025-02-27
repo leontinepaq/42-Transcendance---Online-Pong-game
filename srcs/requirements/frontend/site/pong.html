@@ -38,7 +38,7 @@
     
     <div class="controls">
         <p>Use <strong>Arrow Up</strong> and <strong>Arrow Down</strong> to move your paddle.</p>
-        <p>Game controls: You play against AI.</p>
+        <p>Use <strong>Space</strong> to pause.</p>
     </div>
 
     <script>
@@ -79,6 +79,11 @@
             console.log("Received: ", event);
             const state = JSON.parse(event.data);
             console.log(state);
+
+            if (state.alert)
+            {
+                alert(state.message);
+            };
             
             //Score
             document.getElementById("leftScore").textContent = state.score[0];
