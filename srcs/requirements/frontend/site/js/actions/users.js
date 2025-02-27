@@ -126,7 +126,7 @@ async function handleUsers()
             {
                 btn.textContent = "ADD";
                 btn.classList.remove("added");
-                btn.style.background = "#07911a66"; // Forcer la couleura
+                btn.style.background = ""; // Forcer la couleura
 
             }
             else
