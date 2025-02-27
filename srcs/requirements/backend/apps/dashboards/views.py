@@ -29,7 +29,13 @@ def display_user_stats(request):
     if not user_id:
         user_profile = request.user
     else:
-        user_profile = get_object_or_404(UserProfile, id=user_id)
+        try:
+            user_profile = UserProfile.objects.get(id=user_id)
+        except UserProfile.DoesNotExist:
+            user_profile = None
+    
+    if not user_profile:
+        return Response({"message": "User not found"}, status=404)
 
     stats = get_user_stats(user_profile)
     if stats is None:
@@ -144,12 +150,21 @@ def display_user_games(request):
     if not user_id:
         user = request.user
     else:
-        user = get_object_or_404(UserProfile, id=user_id)
+        try:
+            user = UserProfile.objects.get(id=user_id)
+        except UserProfile.DoesNotExist:
+            user = None
 
     if not user:
         return Response({"message": "User not found"}, status=404)
 
-    participant = get_object_or_404(Participant, user=user)
+    try:
+        participant = Participant.objects.get(user=user)
+    except Participant.DoesNotExist:
+        participant = None
+
+    if not participant:
+        return Response([], status=200)
 
     games = Game.objects.filter(Q(player1=participant) | Q(player2=participant)).select_related("player1", "player2", "winner")
     return Response(GameSerializer(games, many=True).data, status=200)
@@ -171,12 +186,21 @@ def display_user_tournaments(request):
     if not user_id:
         user = request.user
     else:
-        user = get_object_or_404(UserProfile, id=user_id)
+        try:
+            user = UserProfile.objects.get(id=user_id)
+        except UserProfile.DoesNotExist:
+            user = None
 
     if not user:
         return Response({"message": "User not found"}, status=404)
 
-    participant = get_object_or_404(Participant, user=user)
+    try:
+        participant = Participant.objects.get(user=user)
+    except Participant.DoesNotExist:
+        participant = None
+
+    if not participant:
+        return Response([], status=200)
 
     tournaments = Tournament.objects.filter(players=participant).prefetch_related("players", "games", "winner")
     return Response(TournamentSerializer(tournaments, many=True).data, status=200)

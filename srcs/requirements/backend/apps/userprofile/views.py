@@ -97,24 +97,17 @@ def display_other_profile(request):
     return Response(serializer.data, status=200)
 
 @extend_schema(
-    summary="display all users profiles except own user's profile",
-    description="fetches wall users profiles and returns its data",
+    summary="display all users profiles",
+    description="fetches all users profiles and returns its data",
     responses={
         200:UserProfileSerializer
     }
-
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def display_all_profiles(request):
-    user_id = request.query_params.get("user_id")
-
-    if not user_id or not user_id.isdigit():
-        return Response({"message": "invalid or missing user id"}, status=400)
-
-    user = get_object_or_404(UserProfile, id=int(user_id))
-    serializer = UserProfileSerializer(user)
-
+    users = UserProfile.objects.all()
+    serializer = UserProfileSerializer(users, many=True)
     return Response(serializer.data, status=200)
 
 @extend_schema(
