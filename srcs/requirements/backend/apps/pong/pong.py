@@ -43,7 +43,7 @@ class Paddle:
 
 class Ball:
     radius = 1
-    speed = 2
+    speed = 3
 
     def reset(self):
         self.x = 50
@@ -73,7 +73,7 @@ class Ball:
         if abs(self.y - paddle.y) > (paddle.height / 2 + self.radius):
             return False
         self.velocity_x *= -1.05
-        hit_position = (self.y - paddle.y) / paddle.height - 0.5
+        hit_position = (self.y - paddle.y) / paddle.height
         self.velocity_y = hit_position * 2.0
         return True
 
