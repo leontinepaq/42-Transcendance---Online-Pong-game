@@ -43,15 +43,10 @@ services:
     depends_on:
       - backend
 
-  # pong:
-  #   build: ./requirements/pong
-  #   container_name: pong
-  #   restart: always
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     postgre:
-  #         condition: service_healthy
+  redis:
+    image: redis
+    container_name: redis
+
 
 volumes:
   db:
