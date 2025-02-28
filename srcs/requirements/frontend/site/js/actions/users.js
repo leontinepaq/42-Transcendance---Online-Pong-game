@@ -35,32 +35,17 @@ function appendUser(user, userlist)
 async function getUserInfo()
 {
     let tab = [];
-    let nbr = 1;
-    // try
-    // {
-    //     const user = await authFetchJson(`api/userprofile/display-other-profile?user_id=${nbr}`, {method: 'GET'});
-    //     console.log(user);
-    // }
-    // catch (error)
-    // {
-    //     console.log("Error.", error);
-    // }
-    while (1)
+
+    try
     {
-        try
-        {
-            const user = await authFetchJson(`api/userprofile/display-other-profile?user_id=${nbr}`, {method: 'GET'});
-            console.log(user);
-            tab.push(user);
-            nbr++;
-        }
-        catch(error)
-        {
-            // handleError(error, "Load user profile error");
-            break ;
-        }
+        tab = await authFetchJson(`api/userprofile/display-all-profiles`);
+        console.log(tab);
     }
-    return (tab);
+    catch (error)
+    {
+        console.log("Error.", error);
+    }
+    return tab;
 }
 
 async function getUserStatistic(id)
@@ -84,22 +69,20 @@ async function handleUsers()
 
     const userlist = document.getElementById('user-container');
 
-    const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
-
-    userlist.innerHTML = `
-    <div class="container mt-5">
-            <button data-action="friends" class="btn btn-primary see-friend">FRIENDS</button>
-    </div>  
-    `
-
     userData = await getUserInfo();
     userData.forEach(user => {
         appendUser(user, userlist);
     })
-    
+ 
+    useButton(userData);
+}
+
+function useButton(userData)
+{
     document.querySelectorAll(".view-profile").forEach(button => {
         button.addEventListener("click", async (e) => {
 
+            const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
             const userId = parseInt(e.target.getAttribute("data-id"));
 
             const statUser = await getUserStatistic(userId);
@@ -114,13 +97,12 @@ async function handleUsers()
             profileModal.show();
         });
     });
-    
+
     document.querySelectorAll(".add-friend").forEach(button => {
         button.addEventListener("click", (e) => {
             const btn = e.target;
 
             const isFriend = button.classList.contains("added");
-            const idTarget = e.target.getAttribute("data-id");
 
             if (isFriend)
             {
@@ -138,11 +120,3 @@ async function handleUsers()
         });
     });
 }
-
-
-/*
-    - TODO -->
-        - changer userData quand le pull sera fait -> recup tous les users same time 
-        - voir aussi recup les stats des joueurs quand 0 parties effectuees 
-
-*/
