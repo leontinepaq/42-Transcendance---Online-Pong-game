@@ -1,5 +1,5 @@
 import { navigate  } from "../router.js"
-import { authFetchJson } from "../api.js";
+import { authFetchJson, handleError }	from "../api.js";
 
 
 export const friendsActions = [
@@ -58,7 +58,7 @@ async function getFriendInfo()
         }
         catch(error)
         {
-            console.log("Error.", error);
+            // handleError(error, "Load user profile error");
             break ;
         }
     }
@@ -67,21 +67,17 @@ async function getFriendInfo()
 
 async function getFriendStatistic(id)
 {
-    let statUser;
-    let response = [];
+    let data;
     try
     {
-        response = await fetch(`api/dashboards/display-all-user-stats/`); 
-        // if (!response.ok)
-            // throw new Error('ERROR');
-        // statUser = await response.json();
-        console.log(statUser);
+		data = await authFetchJson(`api/dashboard/display-user-stats/?user_id=${id}`, {method: 'GET'});
+        console.log(data);
     }
     catch(error)
     {
-        console.log("Error.", error)
+        handleError(error, "Load user stats error");
     }
-    return (statUser);
+    return (data);
 }
 
 async function handleFriends()
@@ -89,8 +85,6 @@ async function handleFriends()
     let userData = [];
 
     const userlist = document.getElementById('user-container');
-    
-    const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
     
     userlist.innerHTML = `
     <div class="container mt-5">
@@ -100,8 +94,9 @@ async function handleFriends()
     userData = await getFriendInfo();
     userData.forEach(user => {
         if (user.is_active == true) // est ce que cest ca est connecte ?
-            appendUser(user, userlist);
+        appendUser(user, userlist);
     })
+    const profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
 
     document.querySelectorAll(".view-profile").forEach(button => {
         button.addEventListener("click", async (e) => {
@@ -115,6 +110,8 @@ async function handleFriends()
             document.getElementById("profile-avatar").src = user.avatar;
             document.getElementById("profile-name").innerText = user.username;
             document.getElementById("profile-email").innerText = `Email: ${user.email}`;
+            document.getElementById("profile-wins").innerText = `Wins: ${statUser.wins}`;
+            document.getElementById("profile-losses").innerText = `Losses: ${statUser.losses}`;
             if (user.is_active == true)
                 document.getElementById("profile-status").innerText = "Online";
             else
@@ -124,14 +121,26 @@ async function handleFriends()
         });
     });
 
-    // document.querySelectorAll(".add-friend").forEach(button => {
-    //     button.addEventListener("click", (e) => {
-    //         e.target.innerText = "Remove";
-    //         e.target.classList.remove("btn-primary");
-    //         e.target.classList.add("btn-success");
-    //         e.target.disabled = true; // desactive lutilisation du boutton 
-    //     });
-    // });
+    document.querySelectorAll(".add-friend").forEach(button => {
+        button.addEventListener("click", (e) => {
+            const btn = e.target;
+            const isFriend = button.classList.contains("added");
+            const idTarget = e.target.getAttribute("data-id");
+            
+            if (isFriend)
+            {
+                btn.textContent = "ADD";
+                btn.classList.remove("added");
+                btn.style.background = ""; // Forcer la couleur
+            }
+            else
+            {
+                btn.textContent = "REMOVE";
+                btn.classList.add("added");   
+                btn.style.background = "#07911a66"; // Forcer la couleura
+            }
+        });
+    });
 }
 
 /*

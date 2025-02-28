@@ -56,7 +56,7 @@ async function getUserInfo()
         }
         catch(error)
         {
-            console.log("Error.", error);
+            // handleError(error, "Load user profile error");
             break ;
         }
     }
@@ -65,20 +65,17 @@ async function getUserInfo()
 
 async function getUserStatistic(id)
 {
-    let statUser;
+    let data;
     try
     {
-        const response = await fetch(`api/dashboards/user-statistics/?user_id=${id}`); 
-        if (!response.ok)
-            throw new Error('ERROR');
-        statUser = await response.json();
-        console.log(statUser);
+		data = await authFetchJson(`api/dashboard/display-user-stats/?user_id=${id}`, {method: 'GET'});
+        console.log(data);
     }
     catch(error)
     {
-        console.log("Error.")
+        handleError(error, "Load user stats error");
     }
-    return (statUser);
+    return (data);
 }
 
 async function handleUsers()
@@ -105,34 +102,41 @@ async function handleUsers()
 
             const userId = parseInt(e.target.getAttribute("data-id"));
 
-            // const statUser = await getUserStatistic(userId);
+            const statUser = await getUserStatistic(userId);
             
             const user = userData.find(u => u.id === userId);
             
             document.getElementById("profile-avatar").src = user.avatar;
             document.getElementById("profile-name").innerText = user.username;
-
+            document.getElementById("profile-wins").innerText = `Wins: ${statUser.wins}`;
+            document.getElementById("profile-losses").innerText = `Losses: ${statUser.losses}`
+            
             profileModal.show();
         });
     });
     
-    // document.querySelectorAll(".add-friend").forEach(button => {
-    //     button.addEventListener("click", (e) => {
-    //         if (e.target.innerText == "ADD")
-    //         {    
-    //             e.target.innerText = "REMOVE";
-    //             e.target.classList.remove("btn-primary");
-    //             e.target.classList.add("btn-success");
-    //             // e.target.disabled = true; // desactive lutilisation du boutton 
-    //         }
-    //         else
-    //         {
-    //             e.target.innerText = "ADD";
-    //             e.target.classList.add("btn-success");
-    //             e.target.classList.remove("btn-primary");
-    //         }
-    //     });
-    // });
+    document.querySelectorAll(".add-friend").forEach(button => {
+        button.addEventListener("click", (e) => {
+            const btn = e.target;
+
+            const isFriend = button.classList.contains("added");
+            const idTarget = e.target.getAttribute("data-id");
+
+            if (isFriend)
+            {
+                btn.textContent = "ADD";
+                btn.classList.remove("added");
+                btn.style.background = ""; // Forcer la couleura
+
+            }
+            else
+            {
+                btn.textContent = "REMOVE";
+                btn.classList.add("added");
+                btn.style.background = "#07911a66"; // Forcer la couleura
+            }
+        });
+    });
 }
 
 
