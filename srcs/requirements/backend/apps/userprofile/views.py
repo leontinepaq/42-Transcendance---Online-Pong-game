@@ -82,7 +82,8 @@ def display_other_profile(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def display_all_profiles(request):
-    users = UserProfile.objects.all()
+    user = request.user
+    users = UserProfile.objects.exclude(id=user.id)
     serializer = UserPublicProfileSerializer(users, many=True)
     return Response(serializer.data, status=200)
 

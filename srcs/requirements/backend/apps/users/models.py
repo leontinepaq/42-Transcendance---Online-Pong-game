@@ -39,6 +39,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     avatar_url =            models.URLField(blank=True, null=True)
     created_at =            models.DateTimeField(auto_now_add=True)
     is_active =             models.BooleanField(default=True)
+    is_connected =          models.BooleanField(default=False)
     is_mail_activated =     models.BooleanField(default=False)
     is_staff =              models.BooleanField(default=False)
     is_two_factor_mail =    models.BooleanField(default=False)

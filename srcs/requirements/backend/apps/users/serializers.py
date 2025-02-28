@@ -15,6 +15,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
                   'avatar_url',
                   'theme',
                   'is_active',
+                  'is_connected',
                   'created_at',
                   'password',
                   'is_two_factor_mail',
@@ -39,7 +40,9 @@ class UserPublicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = ['username',
-                  'avatar_url']
+                  'avatar_url',
+                  'id',
+                  'is_connected']
 
     def create(self, validated_data):
         user = UserProfile.objects.create_user(
