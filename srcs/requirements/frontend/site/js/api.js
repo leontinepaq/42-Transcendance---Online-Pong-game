@@ -77,14 +77,15 @@ export async function fetchJson(url, options = {}) {
 
 async function parseJsonResponse(response) {
 	if (!response.ok) {
-		let message = "Unknown error";
+		let details = "Unknown error"
 		try {
 			const data = await response.json();
-			message = data.message || message;
+			console.log(data.details);
+			details = data.details;
 		} catch (error) {
 			console.warn("Failed to parse error response:", error);
 		}
-		throw new Error(message);
+		throw new Error(details);
 	}
 	return response.json();
 }

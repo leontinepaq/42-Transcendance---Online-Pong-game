@@ -108,7 +108,7 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
     async def receive(self, text_data):
         if self.get_connected_players() < 2:
             await self.send(json.dumps({"alert": True,
-                                        "message": "Waiting for both players to be connected"}))
+                                        "details": "Waiting for both players to be connected"}))
             return
         if self.master:
             return await self.process(text_data, "left")

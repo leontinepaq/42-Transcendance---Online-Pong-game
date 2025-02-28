@@ -35,11 +35,11 @@ def display_user_stats(request):
             user_profile = None
     
     if not user_profile:
-        return Response({"message": "User not found"}, status=404)
+        return Response({"details": "User not found"}, status=404)
 
     stats = get_user_stats(user_profile)
     if stats is None:
-        return Response({"message": "User not found"}, status=404)
+        return Response({"details": "User not found"}, status=404)
 
     return Response(UserStatisticsSerializer(stats).data, status=200)
 
@@ -156,7 +156,7 @@ def display_user_games(request):
             user = None
 
     if not user:
-        return Response({"message": "User not found"}, status=404)
+        return Response({"details": "User not found"}, status=404)
 
     try:
         participant = Participant.objects.get(user=user)
@@ -192,7 +192,7 @@ def display_user_tournaments(request):
             user = None
 
     if not user:
-        return Response({"message": "User not found"}, status=404)
+        return Response({"details": "User not found"}, status=404)
 
     try:
         participant = Participant.objects.get(user=user)
@@ -220,7 +220,7 @@ def display_user_tournaments(request):
 def display_game(request):
     game_id = request.query_params.get("game_id")
     if not game_id:
-        return GenericResponseSerializer({"message": "Game ID is required"}).response(400)
+        return GenericResponseSerializer({"details": "Game ID is required"}).response(400)
 
     game = get_object_or_404(Game.objects.select_related('player1', 'player2', 'winner', 'tournament'), id=game_id)
     return Response(GameSerializer(game).data, status=200)
@@ -240,7 +240,7 @@ def display_game(request):
 def display_tournament(request):
     tournament_id = request.query_params.get("tournament_id")
     if not tournament_id:
-        return GenericResponseSerializer({"message": "Tournament ID is required"}).response(400)
+        return GenericResponseSerializer({"details": "Tournament ID is required"}).response(400)
 
     tournament = get_object_or_404(Tournament.objects.prefetch_related('games', 'players'), id=tournament_id)
     return Response(TournamentSerializer(tournament).data, status=200)

@@ -27,31 +27,31 @@ def send_friend_request(request):
     sender = request.user
     receiver_id = request.query_params.get("user_id")
     if not receiver_id:
-        return Response({"message": "User ID is required"}, status=400)
+        return Response({"details": "User ID is required"}, status=400)
 
     receiver = get_object_or_404(UserProfile, id=receiver_id)
 
     if sender == receiver:
-        return Response({"message": "You can't send a friend request to yourself!"}, status=400)
+        return Response({"details": "You can't send a friend request to yourself!"}, status=400)
 
     if sender.friends.filter(id=receiver.id).exists():
-        return Response({"message":"You are already friends with this user"}, status=400)
+        return Response({"details":"You are already friends with this user"}, status=400)
 
     if receiver.blocked.filter(id=sender.id).exists():
-        return Response({"message": "This user blocked you motherfucker"}, status=400)
+        return Response({"details": "This user blocked you motherfucker"}, status=400)
 
     if sender.blocked.filter(id=receiver.id).exists():
-        return Response({"message": "You cannot send a friend request to a user you blocked"}, status=400)
+        return Response({"details": "You cannot send a friend request to a user you blocked"}, status=400)
 
     if FriendRequest.objects.filter(sender=sender, receiver=receiver).exists():
-        return Response({"message": "Friend request already sent"}, status=400)
+        return Response({"details": "Friend request already sent"}, status=400)
 
     if FriendRequest.objects.filter(sender=receiver, receiver=sender).exists():
-        return Response({"message": "This user already sent you a friend request. Go accept it"}, status=400)
+        return Response({"details": "This user already sent you a friend request. Go accept it"}, status=400)
 
     friend_request = FriendRequest.objects.create(sender=sender, receiver=receiver)
 
-    return Response({"message": "Friend request sent successfully"}, status=200)
+    return Response({"details": "Friend request sent successfully"}, status=200)
     
 @extend_schema(
     summary="Accepts friend request",
@@ -69,21 +69,21 @@ def accept_friend_request(request):
     receiver = request.user
     sender_id = request.query_params.get("sender_id")
     if not sender_id:
-        return Response({"message": "Sender ID is required"}, status=400)
+        return Response({"details": "Sender ID is required"}, status=400)
 
     sender = get_object_or_404(UserProfile, id=sender_id)
 
     friend_request = FriendRequest.objects.filter(sender=sender, receiver=receiver).first()
     if not friend_request:
-        return Response({"message": "No pending friend request found"}, status=404)
+        return Response({"details": "No pending friend request found"}, status=404)
 
     if sender.friends.filter(id=receiver.id).exists():
-        return Response({"message": "You are already friends with this user"}, status=400)
+        return Response({"details": "You are already friends with this user"}, status=400)
 
     receiver.friends.add(sender)
     friend_request.delete()
 
-    return Response({"message": "Friend request accepted"}, status=200)
+    return Response({"details": "Friend request accepted"}, status=200)
 
 @extend_schema(
     summary="Decline friend request",
@@ -100,17 +100,17 @@ def decline_friend_request(request):
     receiver = request.user
     sender_id = request.query_params.get("sender_id")
     if not sender_id:
-        return Response({"message": "Sender ID is required"}, status=400)
+        return Response({"details": "Sender ID is required"}, status=400)
 
     sender = get_object_or_404(UserProfile, id=sender_id)
 
     friend_request = FriendRequest.objects.filter(sender=sender, receiver=receiver).first()
     if not friend_request:
-        return Response({"message": "No pending friend request found"}, status=400)
+        return Response({"details": "No pending friend request found"}, status=400)
 
     friend_request.delete()
 
-    return Response({"message": "Friend request declined"}, status=200)
+    return Response({"details": "Friend request declined"}, status=200)
 
 @extend_schema(
     summary="Deletes friend",
@@ -127,15 +127,15 @@ def delete_friend(request):
     user = request.user
     unfriend_id = request.query_params.get("user_id")
     if not unfriend_id:
-        return Response({"message": "User ID is required"}, status=400)
+        return Response({"details": "User ID is required"}, status=400)
 
     unfriend = get_object_or_404(UserProfile, id=unfriend_id)
 
     if not user.friends.filter(id=unfriend.id).exists():
-        return Response({"message": "You are not friends with this user"}, status=400)
+        return Response({"details": "You are not friends with this user"}, status=400)
 
     user.friends.remove(unfriend)
-    return Response({"message": "User successfully unfriended"}, status=200)
+    return Response({"details": "User successfully unfriended"}, status=200)
 
 @extend_schema(
     summary="Blocks other user",
@@ -153,15 +153,15 @@ def block_user(request):
     user = request.user
     blocked_id = request.query_params.get("user_id")
     if not blocked_id:
-        return Response({"message": "User ID is required"}, status=400)
+        return Response({"details": "User ID is required"}, status=400)
 
     blocked = get_object_or_404(UserProfile, id=blocked_id)
 
     if user.blocked.filter(id=blocked.id).exists():
-        return Response({"message": "User is already blocked"}, status=400)
+        return Response({"details": "User is already blocked"}, status=400)
 
     user.blocked.add(blocked)
-    return Response({"message": "User succesfully blocked"}, status=200)
+    return Response({"details": "User succesfully blocked"}, status=200)
 
 
 @extend_schema(
@@ -179,15 +179,15 @@ def unblock_user(request):
     user = request.user
     unblocked_id = request.query_params.get("user_id")
     if not unblocked_id:
-        return Response({"message": "User ID is required"}, status=400)
+        return Response({"details": "User ID is required"}, status=400)
 
     unblocked = get_object_or_404(UserProfile, id=unblocked_id)
 
     if not user.blocked.filter(id=unblocked.id).exists():
-        return Response({"message": "User is not blocked"}, status=400)
+        return Response({"details": "User is not blocked"}, status=400)
 
     user.blocked.remove(unblocked)
-    return Response({"message": "User successfully unblocked"}, status=200)
+    return Response({"details": "User successfully unblocked"}, status=200)
 
 @extend_schema(
     summary="Display current user's friends",
@@ -218,7 +218,7 @@ def get_user_friends(request):
 def get_other_user_friends(request):
     user_id = request.query_params.get("user_id")
     if not user_id:
-        return Response({"message": "User ID is required"}, status=400)
+        return Response({"details": "User ID is required"}, status=400)
 
     user = get_object_or_404(UserProfile, id=user_id)
     friends = user.friends.all()

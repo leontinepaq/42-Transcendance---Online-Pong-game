@@ -11,3 +11,5 @@ down:
 
 stop:
 			docker compose -f ./srcs/docker-compose.yml stop
+
+re:			down up

@@ -39,11 +39,11 @@ def register(request):
     try:
         validate_email(email)
     except ValidationError:
-        return GenericResponseSerializer({"message": "Invalid email format"}).response(400)
+        return GenericResponseSerializer({"details": "Invalid email format"}).response(400)
     if not password or not confirm_password:
-        return GenericResponseSerializer({"message": "Both fields required"}).response(400)
+        return GenericResponseSerializer({"details": "Both fields required"}).response(400)
     if password != confirm_password:
-        return GenericResponseSerializer({"message": "Passwords do not match"}).response(400)
+        return GenericResponseSerializer({"details": "Passwords do not match"}).response(400)
 
     username_exists=User.objects.filter(username=username).exists()
     email_exists=User.objects.filter(email=email).exists()
@@ -54,7 +54,7 @@ def register(request):
     user=User.objects.create_user(email=email,
                                   username=username,
                                   password=password)
-    return GenericResponseSerializer({"message": "OK"}).response(201)
+    return GenericResponseSerializer({"details": "OK"}).response(201)
 
 ## LOGIN
 @extend_schema(
@@ -97,16 +97,16 @@ def login(request):
         return UserNotFoundErrorSerializer({}).response(404)
     user=authenticate(request, username=username, password=password)
     if user is None:
-        return ResponseLoginError({"message": "Wrong password"}).response(401)
+        return ResponseLoginError({"details": "Wrong password"}).response(401)
     if user.is_two_factor_mail and not user.is_mail_code_valid(two_factor_code):
-        return ResponseLoginError({"message": "Wrong code"}).response(401)
+        return ResponseLoginError({"details": "Wrong code"}).response(401)
     else:
         user.reset_2fa_code()
     if user.is_two_factor_auth and not user.is_auth_code_valid(two_factor_code):
-        return ResponseLoginError({"message": "Wrong code"}).response(401)
+        return ResponseLoginError({"details": "Wrong code"}).response(401)
     
     refresh=RefreshToken.for_user(user)
-    response=Response({"message": "Login successful"})
+    response=Response({"details": "Login successful"})
     print("JWT TOKEN IS \n", str(refresh.access_token))
     response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                         value=str(refresh.access_token),
@@ -126,13 +126,13 @@ def login(request):
 @extend_schema(
     summary="Ask for 2 factor authentication activation mail to be sent",
     description="Expecting nothing",
-    responses={200: inline_serializer("Mail sent", fields={"message": serializers.CharField(default="Mail sent")})}
+    responses={200: inline_serializer("Mail sent", fields={"details": serializers.CharField(default="Mail sent")})}
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def send_2fa_mail_activation(request):
     request.user.send_2fa_mail()
-    return GenericResponseSerializer({"message": "Sent"}).response(200)
+    return GenericResponseSerializer({"details": "Sent"}).response(200)
 
 @extend_schema(
     summary="Activate 2 factor authentication via mail. To be used after calling send_2fa_mail_activation",
@@ -140,9 +140,9 @@ def send_2fa_mail_activation(request):
     request=RequestVerify2faSerializer,
     responses={
         400:inline_serializer("Wrong code",
-                              fields = {"message": serializers.CharField(default="Wrong or expired code")}),
+                              fields = {"details": serializers.CharField(default="Wrong or expired code")}),
         200:inline_serializer("Activated",
-                              fields = {"message": serializers.CharField(default="Activated")}),
+                              fields = {"details": serializers.CharField(default="Activated")}),
     }
 )
 @api_view(["POST"])
@@ -155,8 +155,8 @@ def verify_2fa_mail(request):
         user.is_two_factor_mail = True
         user.is_two_factor_auth = False
         user.save()
-        return GenericResponseSerializer({"message": "Activated"}).response(200)
-    return GenericResponseSerializer({"message": "Wrong or expired code"}).response(404)
+        return GenericResponseSerializer({"details": "Activated"}).response(200)
+    return GenericResponseSerializer({"details": "Wrong or expired code"}).response(404)
 
 ## LOGOUT
 @extend_schema(
@@ -213,9 +213,9 @@ def get_2fa_qr_activation(request):
     request=RequestVerify2faSerializer,
     responses={
         400:inline_serializer("Wrong code",
-                              fields = {"message": serializers.CharField(default="Wrong or expired code")}),
+                              fields = {"details": serializers.CharField(default="Wrong or expired code")}),
         200:inline_serializer("Activated",
-                              fields = {"message": serializers.CharField(default="Activated")}),
+                              fields = {"details": serializers.CharField(default="Activated")}),
     }
 )
 @api_view(["POST"])
@@ -227,8 +227,8 @@ def verify_2fa_qr(request):
         user.is_two_factor_auth = True
         user.is_two_factor_mail = False
         user.save()
-        return GenericResponseSerializer({"message": "Activated"}).response(200)
-    return GenericResponseSerializer({"message": "Wrong or expired code"}).response(400)
+        return GenericResponseSerializer({"details": "Activated"}).response(200)
+    return GenericResponseSerializer({"details": "Wrong or expired code"}).response(400)
 
 ## TOKEN REFRESH
 class CookieTokenRefreshView(TokenRefreshView):
@@ -265,7 +265,7 @@ class CookieTokenRefreshView(TokenRefreshView):
 
         access_token = serializer.validated_data.get("access")
         print("JWT TOKEN IS \n", access_token)
-        response = Response({"message": "Token refreshed successfully"})
+        response = Response({"details": "Token refreshed successfully"})
         response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                             value=access_token,
                             max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
