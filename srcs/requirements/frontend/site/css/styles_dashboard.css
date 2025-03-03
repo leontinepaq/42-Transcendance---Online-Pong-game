@@ -37,7 +37,7 @@
 }
 
 .stat-value {
-    font-size: 3rem;
+    font-size: calc(var(--chart-font-size) * 0.5);
 	margin-top: -1rem;
 	margin-bottom: -1rem;
 }
@@ -62,7 +62,6 @@
 
 .chart-percentage {
     font-size: var(--chart-font-size);
-    font-weight: bold;
     display: block;
 }
 

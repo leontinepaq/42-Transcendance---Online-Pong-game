@@ -1,64 +1,70 @@
-<a data-action="navigate" href="dashboard" class="btn action-btn w-100 text-center">REFRESH</a>
+<a
+  data-action="navigate"
+  href="dashboard"
+  class="btn action-btn w-100 text-center"
+  >REFRESH</a
+>
 <p></p>
 
 <div class="container dashboard-block d-grid">
-	<!-- ROW 1 -->
-	<div class="row">
-		<div class="col">
-			<div id="lottie-animation" class="h-75" margin="auto">
-				<dotlottie-wc src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie" style="height: 100%" loop autoplay></dotlottie-wc>
-			</div>
-		</div>
+  <!-- ROW 1 -->
+  <div class="row">
+    <div class="col">
+      <div id="lottie-animation" class="w-75" margin="auto">
+        <dotlottie-wc
+          src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie"
+          loop
+          autoplay
+        ></dotlottie-wc>
+      </div>
+    </div>
 
-		<div class="col d-grid">
-			<div class="custom-border">
-				<h4>Matches Won</h4>
-				<p class="stat-value" id="matches-won">-10</p>
-			</div>
-			<div class="custom-border">
-				<h4>Win Streak</h4>
-				<p class="stat-value" id="win-streak">-10</p>
-			</div>
-		</div>
-	
-	<div class="col custom-border chart-container">
-		<div class="chart-wrapper">
-			<canvas id="win-rate-chart"></canvas>
-			<div class="chart-text">
-				<span id="win-rate-percentage" class="chart-percentage">0%</span>
-				<span class="chart-label">Win Rate</span>
-			</div>
-		</div>
-	</div>
-	</div>
+    <div class="col d-grid">
+      <div class="custom-border">
+        <h4>Matches Won</h4>
+        <p class="stat-value" id="matches-won">-10</p>
+      </div>
+      <div class="custom-border">
+        <h4>Win Streak</h4>
+        <p class="stat-value" id="win-streak">-10</p>
+      </div>
+    </div>
 
-	<!-- ROW 2 -->
-	<div class="row">
-		<div class="col custom-border">
-			<h4>Pie chart</h4>
-			<canvas id="game-mode-chart"></canvas>
-		</div>
-	
-		<div class="col d-grid">
-			<div class="custom-border">
-				<h4>Total Time Played</h4>
-				<p class="stat-value" id="total-time">00:00:00</p>
-			</div>
-			<div class="custom-border">
-				<h4>Online Opponents Played</h4>
-				<p class="stat-value" id="online-opponents">-10</p>
-			</div>
-		</div>
-	</div>
+    <div class="col custom-border chart-container">
+      <div class="chart-wrapper">
+        <canvas id="win-rate-chart"></canvas>
+        <div class="chart-text">
+          <span id="win-rate-percentage" class="chart-percentage">0%</span>
+          <span class="chart-label">Win Rate</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
-	<!-- ROW 3 -->
-	<div class="row">
-		<div class="col-12 custom-border">
-			<h4>Match Results (Last 7 Days)</h4>
-			<canvas id="match-results-chart"></canvas>
-		</div>
-	</div>
+  <!-- ROW 2 -->
+  <div class="row">
+    <div class="col custom-border">
+      <h4>Pie chart</h4>
+      <canvas id="game-mode-chart"></canvas>
+    </div>
+
+    <div class="col d-grid">
+      <div class="custom-border">
+        <h4>Total Time Played</h4>
+        <p class="stat-value" id="total-time">00:00:00</p>
+      </div>
+      <div class="custom-border">
+        <h4>Online Opponents Played</h4>
+        <p class="stat-value" id="online-opponents">-10</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3 -->
+  <div class="row">
+    <div class="col-12 custom-border">
+      <h4>Match Results (Last 7 Days)</h4>
+      <canvas id="match-results-chart"></canvas>
+    </div>
+  </div>
 </div>
-
-
-	
