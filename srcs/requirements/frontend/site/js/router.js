@@ -49,4 +49,4 @@ export async function navigate(route, ...params)
 	}
 };
 
-export default navigate;
+export default navigate; 
