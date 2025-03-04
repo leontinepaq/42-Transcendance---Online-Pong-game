@@ -15,10 +15,10 @@ async function loadView(view) {
 		app.querySelector('.container').innerHTML = html;
 		app.classList.add('active');
 		onRouteLoad[view]?.();
-			// if (view == 'home' || view == 'login' || view == 'signup' || view == 'dashboard')
-			// 	PlanetAnimation.init();
-			// else 
-			// 	PlanetAnimation.exit();
+		if (view == 'home' || view == 'login' || view == 'signup' || view == 'dashboard')
+			PlanetAnimation.init();
+		else 
+			PlanetAnimation.exit();
 	} catch (error) {
 		console.error("Error loading view:", error);
 		app.innerHTML = "<h1>Page Not Found</h1>";

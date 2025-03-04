@@ -1,4 +1,12 @@
 import { authFetchJson, handleError } from "../api.js";
+import {
+  createHistogram,
+  createDoughnutChart,
+  initChartJS,
+} from "../charts.js";
+import { colors } from "../theme.js";
+
+initChartJS();
 
 async function updateStatValues(data) {
   //todo @leontinepaq a changer quand fonctionne
@@ -16,38 +24,102 @@ async function updateStatValues(data) {
 }
 
 async function plotWinRate(data) {
-  const ctx = document.getElementById("win-rate-chart").getContext("2d");
-
-  const winColor = getComputedStyle(document.documentElement)
-    .getPropertyValue("--color-accent");
-  const lossColor = getComputedStyle(document.documentElement)
-    .getPropertyValue("--color-accent-light");
-
   data.winRate = 60; //todo @leontinepaq a changer quand fonctionne
 
-  new Chart(ctx, {
-    type: "doughnut",
-    data: {
-      labels: ["winning", "losing"],
-      datasets: [
-        {
-          data: [data.winRate, 100 - data.winRate],
-          backgroundColor: [winColor, lossColor],
-          borderWidth: 0,
-        },
-      ],
+  const ctx = document.getElementById("win-rate-chart").getContext("2d");
+  const labels = ["winning", "losing"];
+  const dataChart = [data.winRate, 100 - data.winRate];
+  const colorsChart = [colors.accent, colors.accentLight];
+  const options = {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
     },
-    options: {
-      maintainAspectRatio: true,
-      cutout: "50%",
-      plugins: {
-        legend: { display: false },
-      },
-    },
-  });
+  };
+  createDoughnutChart(ctx, labels, dataChart, colorsChart, options);
   document.getElementById(
     "win-rate-percentage"
   ).textContent = `${data.winRate}%`;
+}
+
+async function plotGamesPlayed(data) {
+  data.solo_games = 10; //todo @leontinepaq a changer quand fonctionne
+  data.multiplayer_games = 7;
+  data.online_games = 6;
+  //
+
+  const ctx = document.getElementById("games-played").getContext("2d");
+  const labels = ["SOLO", "MULTIPLAYER", "ONLINE"];
+  const dataChart = [
+    data.solo_games,
+    data.multiplayer_games,
+    data.online_games,
+  ];
+  const colorsChart = [
+    colors.accentSecondary,
+    colors.accentTertiary,
+    colors.accent,
+  ];
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "right",
+        labels: {
+          usePointStyle: true,
+          pointStyle: "circle",
+          font: {
+            size: 32,
+          },
+          boxWidth: 16,
+          boxHeight: 16,
+          padding: 30,
+        },
+      },
+    },
+    onResize: (chart, size) => {
+      const isSmallScreen = window.innerWidth < 1200;
+      chart.options.plugins.legend.position = isSmallScreen
+        ? "bottom"
+        : "right";
+      chart.options.plugins.legend.labels.font.size = isSmallScreen ? 24 : 32;
+      chart.options.plugins.legend.labels.padding = isSmallScreen ? 10 : 30;
+      chart.update();
+    },
+  };
+  createDoughnutChart(ctx, labels, dataChart, colorsChart, options);
+}
+
+async function plotGameHistory(data) {
+  //todo @leontinepaq a changer quand fonctionne
+  data.games = [
+    { date: "2025-03-01", wins: 2, losses: 1 },
+    { date: "2025-03-02", wins: 3, losses: 2 },
+    { date: "2025-03-03", wins: 1, losses: 1 },
+    { date: "2025-03-04", wins: 5, losses: 2 },
+    { date: "2025-03-05", wins: 3, losses: 1 },
+  ];
+  //
+
+  const ctx = document.getElementById("match-histogram").getContext("2d");
+  const labels = data.games.map((item) => item.date);
+  const wins = data.games.map((item) => item.wins);
+  const losses = data.games.map((item) => item.losses);
+  const datasets = [
+    {
+      label: "Wins",
+      data: wins,
+      backgroundColor: colors.accent,
+    },
+    {
+      label: "Losses",
+      data: losses,
+      backgroundColor: colors.accentLight,
+    },
+  ];
+  createHistogram(ctx, labels, datasets);
 }
 
 export async function loadUserStats() {
@@ -56,7 +128,11 @@ export async function loadUserStats() {
       method: "GET",
     });
     updateStatValues(data);
+    initChartJS();
+    window.dashboardCharts = [];
     plotWinRate(data);
+    plotGamesPlayed(data);
+    plotGameHistory(data);
   } catch (error) {
     handleError(error, "Load user stats error");
   }

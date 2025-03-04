@@ -36,9 +36,6 @@ export async function navigate(route, ...params)
 	try {
 		const state = { route, params };
 		const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
-		// if (currentRoute == "2fa" || currentRoute == "login")
-		//	 history.replaceState(state, title, `/${route}`);
-		// else
 		history.pushState(state, title, `/${route}`);
 		await loadView(route);
 	}

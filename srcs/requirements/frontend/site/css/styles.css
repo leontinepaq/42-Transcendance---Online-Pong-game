@@ -5,6 +5,7 @@
 	--color-accent:				#511DB2;
 	--color-accent-light:		#FFFFFF;
 	--color-accent-secondary:	#9628b3;
+	--color-accent-tertiary:	#F24C00;
 
 	--color-dark-transparent:	#00000066;
 	--color-light-transparent:	#FFFFFFCC;
@@ -64,6 +65,10 @@ body
 	color: var(--color-accent-light);
 	font-size: 4.25rem;
 }
+
+h1, h2, h3, h4, h5, h6 {
+	text-align: center;
+  }
 
 /* PAGE TITLE */
 h1
