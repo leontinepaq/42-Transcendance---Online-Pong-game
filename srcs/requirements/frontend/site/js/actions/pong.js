@@ -15,6 +15,7 @@ export const pongActions = [
     // },
 ];
 
+let isPaused = true;
 let socket;
 let canvas;
 let ctx;
@@ -74,7 +75,7 @@ export function closeSocket()
 
 function statePause()
 {
-    ctx.fillStyle = "rgba(70, 22, 22, 0.7)"; // Light overlay
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
     ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
 
     ctx.fillStyle = "white";
@@ -86,8 +87,8 @@ function statePause()
     const pauseX = canvas.width / 2 - 40;
     const pauseY = canvas.height / 2 - barHeight / 2;
 
-    ctx.fillRect(pauseX, pauseY, barWidth, barHeight);
-    ctx.fillRect(pauseX + 40, pauseY, barWidth, barHeight);
+    ctx.fillRect(pauseX + 10, pauseY, barWidth, barHeight);
+    ctx.fillRect(pauseX + 50, pauseY, barWidth, barHeight);
 }
 
 function drawBall(x, y, r)
@@ -155,8 +156,10 @@ function playGameSolo(event)
         "ArrowDown": { side: "right", paddle: 2 },
         " ": { toggle_pause: false}
     };
+
     console.log("keyActions[event.key] == ", keyActions[event.key]);
     console.log("event.key == ", event.key);
+    
     if (keyActions[event.key])
     {
         console.log("actions ====  ", keyActions[event.key]);
@@ -214,8 +217,8 @@ function playGameMulti(event)
                 toggle_pause: true,
                 side: keyActions[event.key].side || "left",
                 paddle: keyActions[event.key].paddle || 0
-            }));    
-        }  
+            }));
+        }
         else if (event.key === " " && isPaused)
         { 
             isPaused = false;
@@ -264,7 +267,6 @@ function playGame(mode)
     // }
 }
 
-let isPaused = true;
 // let rightDown = false;
 // let leftDown = false;
 // let rightUp = false; 
@@ -312,6 +314,7 @@ let isPaused = true;
 //     document.addEventListener("keyup", keyUpHandler);
 //     let interval = setInterval(playGameSolo, 5);
 // }
+
 /*
     - est ce que tout est reset quand la connexion websocket se ferme ?
 */
