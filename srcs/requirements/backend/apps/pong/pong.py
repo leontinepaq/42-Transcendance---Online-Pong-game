@@ -97,7 +97,7 @@ class Pong:
         self.right = Paddle(right=True)
         self.score = [0, 0]
         self.use_ai = use_ai
-        self.paused = True
+        self.paused = False
         self.reset()
 
     def reset(self):
