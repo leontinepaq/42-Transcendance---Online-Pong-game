@@ -8,16 +8,16 @@ from rest_framework.response import Response
 from users.models import UserProfile
 from .models import FriendRequest
 from .serializers import UserFriendsSerializer
-from users.serializers import GenericResponseSerializer
+from users.serializers import GenericResponse
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 @extend_schema(
     summary="Current user sends friend request to other user",
     description="Provide other user_id, current user sends friend request to other user. Backend checks if sender and receiver are the same user, if they are blocked, if friend request has already been sent, if they are already friends.",
     responses={
-        200: GenericResponseSerializer,
-        404: GenericResponseSerializer,
-        400: GenericResponseSerializer,
+        200: GenericResponse,
+        404: GenericResponse,
+        400: GenericResponse,
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
@@ -57,8 +57,8 @@ def send_friend_request(request):
     summary="Accepts friend request",
     description="After a friend request has been sent to a user, call this endpoint when the user accepts the friend request, making them both friends and deleting the friend request. Backend checks if they are already friends.",
     responses={
-        200: GenericResponseSerializer,
-        400: GenericResponseSerializer
+        200: GenericResponse,
+        400: GenericResponse
     },
     parameters=[OpenApiParameter(name="sender_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 
@@ -89,8 +89,8 @@ def accept_friend_request(request):
     summary="Decline friend request",
     description="After a friend request has been sent to a user, call this endpoint when the user declines the friend request, deleting the friend request",
     responses={
-        200: GenericResponseSerializer,
-        400: GenericResponseSerializer
+        200: GenericResponse,
+        400: GenericResponse
     },
     parameters=[OpenApiParameter(name="sender_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
@@ -116,8 +116,8 @@ def decline_friend_request(request):
     summary="Deletes friend",
     description="Provide other user ID. Current user deletes user_id friend",
     responses={
-        200: GenericResponseSerializer,
-        400: GenericResponseSerializer,
+        200: GenericResponse,
+        400: GenericResponse,
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
@@ -141,9 +141,9 @@ def delete_friend(request):
     summary="Blocks other user",
     description="Provide other user ID. Current user blocks other user, making him unable to add him as friend again",
     responses={
-        200: GenericResponseSerializer,
-        400: GenericResponseSerializer,
-        404: GenericResponseSerializer,
+        200: GenericResponse,
+        400: GenericResponse,
+        404: GenericResponse,
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
@@ -168,8 +168,8 @@ def block_user(request):
     summary="Unblocks user",
     description="Provide other user ID. Current user unblocks other user, making him able to send friend requests again.",
     responses={
-        200: GenericResponseSerializer,
-        400: GenericResponseSerializer,
+        200: GenericResponse,
+        400: GenericResponse,
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
@@ -193,7 +193,7 @@ def unblock_user(request):
     summary="Display current user's friends",
     description="Nothing needed, just a small endpoint to give you a list of all current user's friends",
     responses={
-        200: GenericResponseSerializer,
+        200: GenericResponse,
     }
 )
 @api_view(["GET"])
@@ -209,7 +209,7 @@ def get_user_friends(request):
     summary="Display other user's friends",
     description="Give user ID, returns user's list of friends",
     responses={
-        200: GenericResponseSerializer,
+        200: GenericResponse,
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
 )
@@ -230,7 +230,7 @@ def get_other_user_friends(request):
     summary="Display current user's block list",
     description="Gives you a list of all current user's blocked users",
     responses={
-        200: GenericResponseSerializer,
+        200: GenericResponse,
     }
 )
 @api_view(["GET"])
@@ -246,7 +246,7 @@ def get_user_blocked(request):
     summary="display current user's pending received friend requests",
     description="Gives you a list of all current user's pending received friend requests. Nothing needed",
     responses={
-        200: GenericResponseSerializer
+        200: GenericResponse
     }
 )
 @api_view(["GET"])
@@ -268,7 +268,7 @@ def get_received_friend_requests(request):
     summary="display current user's pending sent friend requests",
     description="Gives you a list of all current user's pending sent friend requests. Nothing needed",
     responses={
-        200: GenericResponseSerializer
+        200: GenericResponse
     }
 )
 @api_view(["GET"])

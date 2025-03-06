@@ -31,7 +31,8 @@ class UserProfileManager(BaseUserManager):
 
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email", "password"]
+    REQUIRED_FIELDS = ["email",
+                       "password"]
 
     id =                    models.AutoField(primary_key=True)
     username =              models.CharField(max_length=30, unique=True)

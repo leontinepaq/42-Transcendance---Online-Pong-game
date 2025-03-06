@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from users.serializers import GenericResponseSerializer
+from users.serializers import GenericResponse
 
-class UpdateAvatarResponseSerializer(GenericResponseSerializer):
+class UpdateAvatarResponseSerializer(GenericResponse):
     avatar_url = serializers.URLField(required=False)
     
 class UpdateEmailRequestSerializer(serializers.Serializer):

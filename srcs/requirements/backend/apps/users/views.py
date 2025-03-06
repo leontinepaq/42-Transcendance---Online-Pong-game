@@ -1,15 +1,19 @@
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import (get_user_model,
+                                 authenticate)
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.request import Request
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import (api_view,
+                                       permission_classes)
+from rest_framework.permissions import (AllowAny,
+                                        IsAuthenticated)
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework import status
-from drf_spectacular.utils import extend_schema, OpenApiParameter, inline_serializer
+from drf_spectacular.utils import (extend_schema,
+                                   OpenApiParameter,
+                                   inline_serializer)
 from .serializers import *
 from io import BytesIO
 from rest_framework import serializers
@@ -26,7 +30,7 @@ User=get_user_model()
     description="Expecting JSON",
     request=RequestRegisterSerializer,
     responses={400: ResponseRegisterErrorSerializer,
-               201: GenericResponseSerializer}
+               201: GenericResponse}
 )
 @api_view(["POST"])
 @permission_classes([AllowAny])
@@ -39,11 +43,11 @@ def register(request):
     try:
         validate_email(email)
     except ValidationError:
-        return GenericResponseSerializer({"details": "Invalid email format"}).response(400)
+        return GenericResponse({"details": "Invalid email format"}).response(400)
     if not password or not confirm_password:
-        return GenericResponseSerializer({"details": "Both fields required"}).response(400)
+        return GenericResponse({"details": "Both fields required"}).response(400)
     if password != confirm_password:
-        return GenericResponseSerializer({"details": "Passwords do not match"}).response(400)
+        return GenericResponse({"details": "Passwords do not match"}).response(400)
 
     username_exists=User.objects.filter(username=username).exists()
     email_exists=User.objects.filter(email=email).exists()
@@ -54,7 +58,7 @@ def register(request):
     user=User.objects.create_user(email=email,
                                   username=username,
                                   password=password)
-    return GenericResponseSerializer({"details": "OK"}).response(201)
+    return GenericResponse({"details": "OK"}).response(201)
 
 ## LOGIN
 @extend_schema(
@@ -132,7 +136,7 @@ def login(request):
 @permission_classes([IsAuthenticated])
 def send_2fa_mail_activation(request):
     request.user.send_2fa_mail()
-    return GenericResponseSerializer({"details": "Sent"}).response(200)
+    return GenericResponse({"details": "Mail sent"}).response(200)
 
 @extend_schema(
     summary="Activate 2 factor authentication via mail. To be used after calling send_2fa_mail_activation",
@@ -155,8 +159,8 @@ def verify_2fa_mail(request):
         user.is_two_factor_mail = True
         user.is_two_factor_auth = False
         user.save()
-        return GenericResponseSerializer({"details": "Activated"}).response(200)
-    return GenericResponseSerializer({"details": "Wrong or expired code"}).response(404)
+        return GenericResponse({"details": "Activated"}).response(200)
+    return GenericResponse({"details": "Wrong or expired code"}).response(404)
 
 ## LOGOUT
 @extend_schema(
@@ -227,8 +231,8 @@ def verify_2fa_qr(request):
         user.is_two_factor_auth = True
         user.is_two_factor_mail = False
         user.save()
-        return GenericResponseSerializer({"details": "Activated"}).response(200)
-    return GenericResponseSerializer({"details": "Wrong or expired code"}).response(400)
+        return GenericResponse({"details": "Activated"}).response(200)
+    return GenericResponse({"details": "Wrong or expired code"}).response(400)
 
 ## TOKEN REFRESH
 class CookieTokenRefreshView(TokenRefreshView):

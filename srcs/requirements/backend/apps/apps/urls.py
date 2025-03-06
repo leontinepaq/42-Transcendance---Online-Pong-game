@@ -13,7 +13,7 @@ urlpatterns = [
     path('token/refresh/', CookieTokenRefreshView.as_view()),
     
     path('user/', include("users.urls")),
-    path('userprofile/', include("userprofile.urls")),
+    path('profile/', include("userprofile.urls")),
     path('dashboard/', include("dashboards.urls")),
     path('friends/', include("friendship.urls"))
 ]

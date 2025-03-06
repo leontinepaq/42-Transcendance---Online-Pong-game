@@ -27,35 +27,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'password': {'write_only': True},
         }
 
-    def create(self, validated_data):
-        user = UserProfile.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-        )
-        return user
-
 
 class UserPublicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['username',
-                  'avatar_url',
-                  'id',
-                  'is_connected']
-
-    def create(self, validated_data):
-        user = UserProfile.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password'],
-        )
-        return user
+        fields = ['id',
+                  'username',
+                  'avatar_url']
+        read_only_fields = ['id',
+                            'username',
+                            'avatar_url']
 
 # GENERICS
 
 
-class GenericResponseSerializer(serializers.Serializer):
+class GenericResponse(serializers.Serializer):
     details = serializers.CharField(default="details")
 
     def response(self, _status=200):
@@ -67,13 +53,18 @@ class RequestUsernameSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
 
 
-class UserNotFoundErrorSerializer(GenericResponseSerializer):
+class UserNotFoundErrorSerializer(GenericResponse):
     details = serializers.CharField(default="User does not exist")
-
+    
+    def __init__(self, *args, **kwargs):
+        if 'data' not in kwargs:
+            kwargs['data'] = {'details': 'User not found'}        
+        super().__init__(*args, **kwargs)
+        
 # PRE-LOGIN
 
 
-class ResponsePreLogin(GenericResponseSerializer):
+class ResponsePreLogin(GenericResponse):
     details = None
     two_factor_mail = serializers.BooleanField(default=False)
     two_factor_auth = serializers.BooleanField(default=False)
@@ -88,11 +79,11 @@ class RequestLoginSerializer(serializers.Serializer):
     two_factor_code = serializers.CharField(default="123456")
 
 
-class ResponseLoginError(GenericResponseSerializer):
+class ResponseLoginError(GenericResponse):
     details = serializers.CharField(default="Wrong code/Wrong password")
 
 
-class ResponseLoginSuccess(GenericResponseSerializer):
+class ResponseLoginSuccess(GenericResponse):
     details = serializers.CharField(default="Login successful")
 
 # LOGOUT
@@ -111,7 +102,7 @@ class RequestRegisterSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-class ResponseRegisterErrorSerializer(GenericResponseSerializer):
+class ResponseRegisterErrorSerializer(GenericResponse):
     details = serializers.CharField(default="Username or email already exists")
     username = serializers.BooleanField(default=False)
     email = serializers.BooleanField(default=False)

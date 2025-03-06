@@ -9,7 +9,7 @@ from users.models import UserProfile
 from .models import Game, Tournament, Participant
 from .serializers import (GameSerializer, TournamentSerializer, 
     UserStatisticsSerializer, ParticipantSerializer, RequestCreateGameSerializer, RequestCreateTournamentSerializer)
-from users.serializers import GenericResponseSerializer
+from users.serializers import GenericResponse
 from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 
 #Display user stats by ID
@@ -17,7 +17,7 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
     summary="Fetch user's stats identified by ID.",
     description="Fetch all user's gaming stats. User is identified by ID. If no ID provided, returns current user's stats",
     responses={
-        404: GenericResponseSerializer,
+        404: GenericResponse,
         200: UserStatisticsSerializer
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY)],
@@ -48,7 +48,7 @@ def display_user_stats(request):
     summary="Displays all users statistics",
     description="Go fetch all users in the database and returns their gaming statistics",
     responses={
-        404: GenericResponseSerializer,
+        404: GenericResponse,
         200: UserStatisticsSerializer(many=True)
     },
 )
@@ -138,7 +138,7 @@ def get_user_stats(user_profile):
     summary="View all played games by user identified by ID",
     description="Fetch all games played by user identified by ID. If no ID in request, sends all games played by current user",
     responses={
-        404: GenericResponseSerializer,
+        404: GenericResponse,
         200: GameSerializer(many=True),
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
@@ -174,7 +174,7 @@ def display_user_games(request):
     summary="View all tournament played by user identified by ID",
     description="Fetch all tournaments played by user identified by ID. If no ID in request, sends all tournaments played by current user",
     responses={
-        404: GenericResponseSerializer,
+        404: GenericResponse,
         200: TournamentSerializer(many=True),
     },
     parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
@@ -210,7 +210,7 @@ def display_user_tournaments(request):
     summary="Fetch one game info identified by ID",
     description="Fetch game info to display on frontend. Must provide game ID",
     responses={
-        404: GenericResponseSerializer,
+        404: GenericResponse,
         200: GameSerializer,
     },
     parameters=[OpenApiParameter(name="game_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)],
@@ -220,7 +220,7 @@ def display_user_tournaments(request):
 def display_game(request):
     game_id = request.query_params.get("game_id")
     if not game_id:
-        return GenericResponseSerializer({"details": "Game ID is required"}).response(400)
+        return GenericResponse({"details": "Game ID is required"}).response(400)
 
     game = get_object_or_404(Game.objects.select_related('player1', 'player2', 'winner', 'tournament'), id=game_id)
     return Response(GameSerializer(game).data, status=200)
@@ -230,7 +230,7 @@ def display_game(request):
     summary="Fetch one tournament info identified by ID",
     description="Fetch info stats to display on frontend. Must provide tournament ID",
     responses={
-        404: GenericResponseSerializer,
+        404: GenericResponse,
         200: TournamentSerializer
     },
     parameters=[OpenApiParameter(name="tournament_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, required=True)]
@@ -240,7 +240,7 @@ def display_game(request):
 def display_tournament(request):
     tournament_id = request.query_params.get("tournament_id")
     if not tournament_id:
-        return GenericResponseSerializer({"details": "Tournament ID is required"}).response(400)
+        return GenericResponse({"details": "Tournament ID is required"}).response(400)
 
     tournament = get_object_or_404(Tournament.objects.prefetch_related('games', 'players'), id=tournament_id)
     return Response(TournamentSerializer(tournament).data, status=200)
@@ -250,9 +250,9 @@ def display_tournament(request):
     summary="Create a game",
     description="Creates a game, saves its participants and ID and returns it. Needs player1_type (= ai, guest or user), player1_id if player1 is a user, player1_name if player1 is not AI. Same for player2.",
     responses={
-        201: GenericResponseSerializer,
-        400: GenericResponseSerializer,
-        404: GenericResponseSerializer,
+        201: GenericResponse,
+        400: GenericResponse,
+        404: GenericResponse,
     },
     request=RequestCreateGameSerializer,
 )
