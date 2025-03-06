@@ -19,6 +19,12 @@ let isPaused = true;
 let socket;
 let canvas;
 let ctx;
+let keysPressed = {
+    "ArrowUp": false,
+    "ArrowDown": false,
+    "w": false,
+    "s": false,
+};
 
 function initGameSolo()
 {
@@ -149,94 +155,94 @@ function messageSocket()
     }; 
 }
 
-function playGameSolo(event)
+function keyDownHandler(event)
 {
-    const keyActions = {
-        "ArrowUp": { side: "right", paddle: -2 },
-        "ArrowDown": { side: "right", paddle: 2 },
-        " ": { toggle_pause: false}
-    };
-
-    console.log("keyActions[event.key] == ", keyActions[event.key]);
-    console.log("event.key == ", event.key);
-    
-    if (keyActions[event.key])
+    if (event.key in keysPressed)
     {
-        console.log("actions ====  ", keyActions[event.key]);
+        keysPressed[event.key] = true;
         event.preventDefault();
-        if (event.key === " " && !isPaused)
-        {
-            isPaused = true;
-            socket.send(JSON.stringify({
-                toggle_pause: true,
-                side: keyActions[event.key].side || "left",
-                paddle: keyActions[event.key].paddle || 0
-            }));    
-        }  
-        else if (event.key === " " && isPaused)
-        { 
-            isPaused = false;
-            socket.send(JSON.stringify({ 
-                toggle_pause: true,
-                side: keyActions[event.key].side || "left",
-                paddle: keyActions[event.key].paddle || 0
-            }));
-        }
-        else
-        {
-            socket.send(JSON.stringify({
-                toggle_pause: false,
-                side: keyActions[event.key].side || "left",
-                paddle: keyActions[event.key].paddle || 0
-            }));
-        }
+    }
+    event.preventDefault();
+    console.log(event.key);
+    if (event.key === " " && !isPaused)
+    {
+        isPaused = true;
+        socket.send(JSON.stringify({
+            toggle_pause: true,
+            side: "left",
+            paddle: 0
+        }));
+    }
+    else if (event.key === " " && isPaused)
+    { 
+        isPaused = false;
+        socket.send(JSON.stringify({ 
+            toggle_pause: true,
+            side: "left",
+            paddle: 0
+        }));
     }
 }
 
-function playGameMulti(event)
+function keyUpHandler(event)
 {
-    const keyActions = {
-        "ArrowUp": { side: "right", paddle: -2 },
-        "ArrowDown": { side: "right", paddle: 2 },
-        "w": { side: "left", paddle: -2 },
-        "s": { side: "left", paddle: 2 },
-        " ": { toggle_pause: false}
-    };
-
-    console.log("keyActions[event.key] == ", keyActions[event.key]);
-    console.log("event.key == ", event.key);
-    
-    if (keyActions[event.key])
+    if (event.key in keysPressed)
     {
-        console.log("actions ====  ", keyActions[event.key]);
+        keysPressed[event.key] = false;
         event.preventDefault();
-        if (event.key === " " && !isPaused)
-        {
-            isPaused = true;
-            socket.send(JSON.stringify({
-                toggle_pause: true,
-                side: keyActions[event.key].side || "left",
-                paddle: keyActions[event.key].paddle || 0
-            }));
-        }
-        else if (event.key === " " && isPaused)
-        { 
-            isPaused = false;
-            socket.send(JSON.stringify({ 
-                toggle_pause: true,
-                side: keyActions[event.key].side || "left",
-                paddle: keyActions[event.key].paddle || 0
-            }));
-        }
-        else
+    }
+}
+
+function playGameMulti()
+{
+    if (!isPaused)
+    {
+        if (keysPressed["w"])
         {
             socket.send(JSON.stringify({
                 toggle_pause: false,
-                side: keyActions[event.key].side || "left",
-                paddle: keyActions[event.key].paddle || 0
+                side: "left",
+                paddle: -2
+            }));
+        }
+        if (keysPressed["s"])
+        {
+            socket.send(JSON.stringify({
+                toggle_pause: false,
+                side: "left",
+                paddle: 2
+            }));
+        }
+        if (keysPressed["ArrowUp"])
+        {
+            socket.send(JSON.stringify({
+                toggle_pause: false,
+                side: "right",
+                paddle: -2
+            }));
+        }
+        if (keysPressed["ArrowDown"])
+        {
+            socket.send(JSON.stringify({
+                toggle_pause: false,
+                side: "right",
+                paddle: 2
             }));
         }
     }
+    // if (keysPressed[" "]) {
+    //     isPaused = !isPaused;
+    //     socket.send(JSON.stringify({ toggle_pause: true }));
+    // }
+}
+function pauseButton()
+{
+    isPaused = !isPaused;
+    socket.send(JSON.stringify({
+        toggle_pause: true,
+        side: "left",
+        paddle: 0
+    }));
 }
 
 function playGame(mode)
@@ -246,20 +252,25 @@ function playGame(mode)
     
     handleSocket();
     messageSocket();
-    if (mode === "solo")
-    {    
-        document.removeEventListener("keydown", playGameSolo);
-        document.removeEventListener("keydown", playGameMulti);
+    // if (mode === "solo")
+    // {    
+    //     document.removeEventListener("keydown", playGameSolo);
+    //     document.removeEventListener("keydown", playGameMulti);
         
-        document.addEventListener("keydown", playGameSolo);
-    }
-    else if (mode === "multi")
-    {
-        document.removeEventListener("keydown", playGameSolo);
-        document.removeEventListener("keydown", playGameMulti);
-
-        document.addEventListener("keydown", playGameMulti);
-    }
+    //     document.addEventListener("keydown", playGameSolo);
+    // }
+    // else if (mode === "multi")
+    // {
+        // document.removeEventListener("keydown", playGameSolo);
+        document.removeEventListener("keydown", keyDownHandler);
+        document.addEventListener("keydown", keyDownHandler);
+        document.removeEventListener("keyup", keyUpHandler);
+        document.addEventListener("keyup", keyUpHandler);
+        setInterval(playGameMulti, 16);
+        const boutton = document.getElementById('pause');
+        boutton.removeEventListener('click', pauseButton);
+        boutton.addEventListener('click', pauseButton)
+    // }
     // else if (mode === "online")
     // {
     //     document.removeEventListener("keydown", playGameOnline);
@@ -267,56 +278,52 @@ function playGame(mode)
     // }
 }
 
-// let rightDown = false;
-// let leftDown = false;
-// let rightUp = false; 
-// let leftUp = false;
-
-// function keydownHandler(event)
-// {
-    // if (event.key === " ")
-    //     isPaused = !isPaused;
-    // else
-    // {
-        // if (event.key === "ArrowUp")
-        //     rightUp = true;
-        // if (event.key === "ArrowDown")
-        //     rightDown = true;
-        // if (event.key === "w")
-        //     leftUp = true;
-        // if (event.key === "s")
-        //     leftDown = true;
-        // console.log(leftDown);
-    // }
-// }
-
-// function keyUpHandler(event)
-// {
-    // if (event.key === " ")
-    //     isPaused = !isPaused;
-    // else
-    // {
-        // if (event.key === "ArrowUp")
-        //     rightUp = false;
-        // if (event.key === "ArrowDown")
-        //     rightDown = false;
-        // if (event.key === "w")
-        //     leftUp = false;
-        // if (event.key === "s")
-        //     leftDown = false;
-        // console.log(leftDown);
-    // }
-// }
-
-// function game()
-// {
-//     document.addEventListener("keydown", keydownHandler);
-//     document.addEventListener("keyup", keyUpHandler);
-//     let interval = setInterval(playGameSolo, 5);
-// }
-
 /*
-    - est ce que tout est reset quand la connexion websocket se ferme ?
+    - les deux paddles doivent bouger at the same time
 */
+
+// function playGameSolo(event)
+// {
+//     const keyActions = {
+//         "ArrowUp": { side: "right", paddle: -2 },
+//         "ArrowDown": { side: "right", paddle: 2 },
+//         " ": { toggle_pause: false}
+//     };
+
+//     console.log("keyActions[event.key] == ", keyActions[event.key]);
+//     console.log("event.key == ", event.key);
+    
+//     if (keyActions[event.key])
+//     {
+//         console.log("actions ====  ", keyActions[event.key]);
+//         event.preventDefault();
+//         if (event.key === " " && !isPaused)
+//         {
+//             isPaused = true;
+//             socket.send(JSON.stringify({
+//                 toggle_pause: true,
+//                 side: keyActions[event.key].side || "left",
+//                 paddle: keyActions[event.key].paddle || 0
+//             }));    
+//         }  
+//         else if (event.key === " " && isPaused)
+//         { 
+//             isPaused = false;
+//             socket.send(JSON.stringify({ 
+//                 toggle_pause: true,
+//                 side: keyActions[event.key].side || "left",
+//                 paddle: keyActions[event.key].paddle || 0
+//             }));
+//         }
+//         else (!isPaused)
+//         {
+//             socket.send(JSON.stringify({
+//                 toggle_pause: false,
+//                 side: keyActions[event.key].side || "left",
+//                 paddle: keyActions[event.key].paddle || 0
+//             }));
+//         }
+//     }
+// }
 
 export default closeSocket;
