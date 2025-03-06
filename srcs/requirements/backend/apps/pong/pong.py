@@ -140,7 +140,7 @@ class Pong:
     def get_state(self, sym=False):
         score=[self.score[0], self.score[1]]
         if sym:
-            score=[self.score[1], self.score[0]]            
+            score=[self.score[1], self.score[0]]
         return {
             "left": self.left.get_state(sym),
             "right": self.right.get_state(sym),

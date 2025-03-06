@@ -3,32 +3,52 @@ import { navigate  } from "../router.js"
 export const pongActions = [
     {
         selector: '[data-action="playGameSolo"]',
-        handler: initGame
+        handler: initGameSolo
     },
     {
         selector: '[data-action="playGameMultiplayer"]',
-        handler: initGame
+        handler: initGameMulti
     },
-    {
-        selector: '[data-action="playGameOnline"]',
-        handler: initGame
-    },
+    // {
+    //     selector: '[data-action="playGameOnline"]',
+    //     handler: initGameOnline
+    // },
 ];
 
-function initGame()
+let isPaused = true;
+let socket;
+let canvas;
+let ctx;
+
+function initGameSolo()
 {
     navigate('pong');
     setTimeout(function() {
-        playGame();
+        socket = new WebSocket("/ws/pong/solo/");   // solo
+        playGame("solo");
     }, 500)
 }
 
-export function playGame()
+function initGameMulti()
 {
-    const socket = new WebSocket("/ws/pong/multi/");   // solo - multi - online/id
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
+    navigate('pong');
+    setTimeout(function() {
+        socket = new WebSocket("/ws/pong/multi/");   // multi
+        playGame("multi");
+    }, 500)
+}
 
+// function initGameOnline()
+// {
+//     navigate('pong');
+//     setTimeout(function() {
+//         socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
+//         playGame();
+//     }, 500)
+// }
+
+function handleSocket()
+{
     socket.onopen = function ()
     {
         console.log("✅ WebSocket connected!");
@@ -43,239 +63,260 @@ export function playGame()
     {
         console.log("🔴 WebSocket closed.");
     };
+}
 
-    function drawBall(x, y, r)
+export function closeSocket()
+{
+    if (socket)
     {
-        ctx.beginPath();
-        ctx.arc(
-            x * canvas.width / 100,  // X coordinate of the ball
-            y * canvas.height / 100, // Y coordinate of the ball
-            r * canvas.width / 100,  // radius of the ball
-            0,                       // Starting angle
-            Math.PI * 2              // Ending angle -> 360 for complete circle
-        );
-        ctx.fill();
-    };
+        socket.close();
+    }
+}
 
+function statePause()
+{
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
+    ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
+
+    ctx.fillStyle = "white";
+    ctx.font = "50px Arial";
+    ctx.textAlign = "center";
+
+    const barWidth = 20;
+    const barHeight = 100;
+    const pauseX = canvas.width / 2 - 40;
+    const pauseY = canvas.height / 2 - barHeight / 2;
+
+    ctx.fillRect(pauseX + 10, pauseY, barWidth, barHeight);
+    ctx.fillRect(pauseX + 50, pauseY, barWidth, barHeight);
+}
+
+function drawBall(x, y, r)
+{
+    ctx.beginPath();
+    ctx.arc(
+        x * canvas.width / 100,
+        y * canvas.height / 100,
+        r * canvas.width / 100,
+        0,
+        Math.PI * 2 
+    );
+    ctx.fill();
+};
+
+function drawPaddle(state)
+{
+    ctx.fillRect(
+        state.left.top_left_corner.x * canvas.width / 100,
+        state.left.top_left_corner.y * canvas.height / 100,
+        state.left.width * canvas.width / 100,
+        state.left.height * canvas.height / 100
+    );
+    ctx.fillRect(
+        state.right.top_left_corner.x * canvas.width / 100,
+        state.right.top_left_corner.y * canvas.height / 100,
+        state.right.width * canvas.width / 100,
+        state.right.height * canvas.height / 100
+    );
+}
+
+function messageSocket() 
+{
     socket.onmessage = function(event)
     {
-        console.log("Received: ", event);
+        // console.log("Received: ", event);
         const state = JSON.parse(event.data);
-        console.log(state);
-
+        // console.log(state);
+    
         if (state.alert)
         {
             alert(state.message);
         };
         
-        //Score
         document.getElementById("leftScore").textContent = state.score[0];
         document.getElementById("rightScore").textContent = state.score[1];
-
-        // Clear canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+    
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
     
-        // Draw ball
         drawBall(state.ball.x, state.ball.y, state.ball.r);
-        // Draw paddles
-        ctx.fillRect(
-            state.left.top_left_corner.x * canvas.width / 100,  // X coordinate of top left corner of the rectangle
-            state.left.top_left_corner.y * canvas.height / 100, // Y coordinate of top left corner of the rectangle
-            state.left.width * canvas.width / 100,              // Width of the rectangle
-            state.left.height * canvas.height / 100             // Length of the rectangle
-        );
-        ctx.fillRect(
-            state.right.top_left_corner.x * canvas.width / 100,  // X coordinate of top left corner of the rectangle
-            state.right.top_left_corner.y * canvas.height / 100, // Y coordinate of top left corner of the rectangle
-            state.right.width * canvas.width / 100,              // Width of the rectangle
-            state.right.height * canvas.height / 100             // Length of the rectangle
-        );
-
-        // Draw PAUSED text if the game is paused
-        if (state.paused) {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
-            ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
-    
-            ctx.fillStyle = "white";
-            ctx.font = "50px Arial";
-            ctx.textAlign = "center";
-    
-            // Draw two vertical bars for the pause sign
-            const barWidth = 20; // Width of the pause bars
-            const barHeight = 100; // Height of the pause bars
-            const pauseX = canvas.width / 2 - 40; // X position for the first bar
-            const pauseY = canvas.height / 2 - barHeight / 2; // Y position for the bars
-    
-            // Left bar
-            ctx.fillRect(pauseX, pauseY, barWidth, barHeight);
-            
-            // Right bar
-            ctx.fillRect(pauseX + 40, pauseY, barWidth, barHeight);
+        drawPaddle(state);
+        
+        if (state.paused)
+        {
+            statePause();
         }
+    }; 
+}
+
+function playGameSolo(event)
+{
+    const keyActions = {
+        "ArrowUp": { side: "right", paddle: -2 },
+        "ArrowDown": { side: "right", paddle: 2 },
+        " ": { toggle_pause: false}
     };
 
-    // Send paddle movement when pressing arrow keys
-    document.addEventListener("keydown", (event) => {
-        const keyActions = {
-            "ArrowUp": { side: "right", paddle: -5 },
-            "ArrowDown": { side: "right", paddle: 5 },
-            "q": { side: "left", paddle: -5 },
-            "a": { side: "left", paddle: 5 },
-            " ": { toggle_pause: true}
-        };
+    console.log("keyActions[event.key] == ", keyActions[event.key]);
+    console.log("event.key == ", event.key);
     
-        if (keyActions[event.key]) {
-            event.preventDefault();
+    if (keyActions[event.key])
+    {
+        console.log("actions ====  ", keyActions[event.key]);
+        event.preventDefault();
+        if (event.key === " " && !isPaused)
+        {
+            isPaused = true;
             socket.send(JSON.stringify({
-                toggle_pause: keyActions[event.key].toggle_pause || false,
+                toggle_pause: true,
+                side: keyActions[event.key].side || "left",
+                paddle: keyActions[event.key].paddle || 0
+            }));    
+        }  
+        else if (event.key === " " && isPaused)
+        { 
+            isPaused = false;
+            socket.send(JSON.stringify({ 
+                toggle_pause: true,
                 side: keyActions[event.key].side || "left",
                 paddle: keyActions[event.key].paddle || 0
             }));
         }
-    });
-    // let baseWidth = 480;
-    // let baseHeight = 320;
-    
-    // let leftUp, leftDown, rightUp, rightDown;
-
-    // const pong = document.getElementById('Pong');
-    // // todo: revoir la taille dinitialisaton du canvas 
-    // pong.innerHTML =
-    // `
-    //     <canvas id="myCanvas" width=980 height=680"></canvas>
-    // `;
-    
-    // let canvas = document.getElementById('myCanvas');
-    // let ctx = canvas.getContext("2d");
-
-    // function resize()
-    // {
-    //     let canvasWidth = window.innerHeight;
-    //     let canvasHeight = canvasWidth * (baseHeight / baseWidth);
-
-    //     canvas.height = canvasHeight;
-    //     canvas.width = canvasWidth;
-    //     drawFont();
-    //     drawBall();
-    //     drawPaddleLeft();
-    //     drawPaddleRight();
-    // }
-
-    // function keyDownHandler(e)
-    // {
-    //     if (e.key == "ArrowDown")
-    //         rightDown = true;
-    //     else if (e.key == "ArrowUp")
-    //         rightUp = true;
-    //     if (e.key == "s" || e.key == "S")
-    //         leftDown = true;
-    //     else if (e.key == "w" || e.key == "W")
-    //         leftUp = true;
-    // }
-    
-    // function keyUpHandler(e)
-    // {
-    //     if (e.key == "ArrowDown")
-    //         rightDown = false;
-    //     else if (e.key == "ArrowUp")
-    //         rightUp = false;
-    //     if (e.key == "s" || e.key == "S")
-    //         leftDown = false;
-    //     else if (e.key == "w" || e.key == "W")
-    //         leftUp = false;
-    // }
-    
-    // function drawFont()
-    // {
-    //     ctx.beginPath();
-    //     ctx.rect(0, 0, canvas.width, canvas.height);
-    //     ctx.fillStyle = "#052f4d";
-    //     ctx.fill();
-    //     ctx.closePath();
-    // }
-    
-    // function drawBall()
-    // {
-    //     ctx.beginPath();
-    //     ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, Math.PI * 2, false);
-    //     ctx.fillStyle = "#ebedee";
-    //     ctx.fill();
-    //     ctx.closePath();
-    // }
-    
-    // function drawPaddleLeft()
-    // {
-    //     ctx.beginPath();
-    //     ctx.rect(10, (canvas.height / 2 - 40), 10, 80);
-    //     ctx.fillStyle = "rgba(9, 9, 46, 0.5)";
-    //     ctx.fill();
-    //     ctx.closePath();    
-    // }
-    
-    // function drawPaddleRight()
-    // {
-    //     ctx.beginPath();
-    //     ctx.rect(canvas.width - 20, canvas.height / 2 - 40, 10, 80);
-    //     ctx.fillStyle = "rgba(9, 9, 46, 0.5)";
-    //     ctx.fill();
-    //     ctx.closePath(); 
-    // }
-    
-    // function draw()
-    // {
-    //     drawFont();
-    //     drawBall();
-    //     drawPaddleLeft();
-    //     drawPaddleRight();
-    // }
-    
-    // window.addEventListener('resize', function() {
-    //     resize();
-    // });
-    // document.addEventListener("keydown", keyDownHandler, false);
-    // document.addEventListener("keyup", keyUpHandler, false);
-
-    // let interval = setInterval(draw, 10);
+        else
+        {
+            socket.send(JSON.stringify({
+                toggle_pause: false,
+                side: keyActions[event.key].side || "left",
+                paddle: keyActions[event.key].paddle || 0
+            }));
+        }
+    }
 }
 
-// function send_RightPaddle()
-// {
-//     if (rightUp)
-//     {
-//         socket.send(JSON.stringify({side: "1", direction: "0"}));
-//     }
-//     if (rightDown)
-//     {
-//         socket.send(JSON.stringify({side: "1", direction: "1"}));
-//     }
-// }
+function playGameMulti(event)
+{
+    const keyActions = {
+        "ArrowUp": { side: "right", paddle: -2 },
+        "ArrowDown": { side: "right", paddle: 2 },
+        "w": { side: "left", paddle: -2 },
+        "s": { side: "left", paddle: 2 },
+        " ": { toggle_pause: false}
+    };
 
-// function send_LeftPaddle()
-// {
-//     if (leftUp)
-//     {
-//         socket.send(JSON.stringify({side: "0", direction: "0"}));
-//     }
-//     if (leftDown)
-//     {
-//         socket.send(JSON.stringify({side: "0", direction: "1"}));
-//     }
-// }
-
-// socket.onopen = () =>
-// {
-//     console.log("Connected");    
-// };
+    console.log("keyActions[event.key] == ", keyActions[event.key]);
+    console.log("event.key == ", event.key);
     
-// socket.onmessage = (event) =>
-// {
-//     const data = JSON.parse(event);
+    if (keyActions[event.key])
+    {
+        console.log("actions ====  ", keyActions[event.key]);
+        event.preventDefault();
+        if (event.key === " " && !isPaused)
+        {
+            isPaused = true;
+            socket.send(JSON.stringify({
+                toggle_pause: true,
+                side: keyActions[event.key].side || "left",
+                paddle: keyActions[event.key].paddle || 0
+            }));
+        }
+        else if (event.key === " " && isPaused)
+        { 
+            isPaused = false;
+            socket.send(JSON.stringify({ 
+                toggle_pause: true,
+                side: keyActions[event.key].side || "left",
+                paddle: keyActions[event.key].paddle || 0
+            }));
+        }
+        else
+        {
+            socket.send(JSON.stringify({
+                toggle_pause: false,
+                side: keyActions[event.key].side || "left",
+                paddle: keyActions[event.key].paddle || 0
+            }));
+        }
+    }
+}
+
+function playGame(mode)
+{
+    canvas = document.getElementById("gameCanvas");
+    ctx = canvas.getContext("2d");
     
-//     game_over = data.game_over;
-//     xBall = data.ball[0];
-//     yBall = data.ball[1];
-//     y_leftPaddle = data.paddle_left;
-//     y_rightPaddle = data.paddle_right;
+    handleSocket();
+    messageSocket();
+    if (mode === "solo")
+    {    
+        document.removeEventListener("keydown", playGameSolo);
+        document.removeEventListener("keydown", playGameMulti);
+        
+        document.addEventListener("keydown", playGameSolo);
+    }
+    else if (mode === "multi")
+    {
+        document.removeEventListener("keydown", playGameSolo);
+        document.removeEventListener("keydown", playGameMulti);
+
+        document.addEventListener("keydown", playGameMulti);
+    }
+    // else if (mode === "online")
+    // {
+    //     document.removeEventListener("keydown", playGameOnline);
+    //     document.addEventListener("keydown", playGameOnline);
+    // }
+}
+
+// let rightDown = false;
+// let leftDown = false;
+// let rightUp = false; 
+// let leftUp = false;
+
+// function keydownHandler(event)
+// {
+    // if (event.key === " ")
+    //     isPaused = !isPaused;
+    // else
+    // {
+        // if (event.key === "ArrowUp")
+        //     rightUp = true;
+        // if (event.key === "ArrowDown")
+        //     rightDown = true;
+        // if (event.key === "w")
+        //     leftUp = true;
+        // if (event.key === "s")
+        //     leftDown = true;
+        // console.log(leftDown);
+    // }
 // }
 
+// function keyUpHandler(event)
+// {
+    // if (event.key === " ")
+    //     isPaused = !isPaused;
+    // else
+    // {
+        // if (event.key === "ArrowUp")
+        //     rightUp = false;
+        // if (event.key === "ArrowDown")
+        //     rightDown = false;
+        // if (event.key === "w")
+        //     leftUp = false;
+        // if (event.key === "s")
+        //     leftDown = false;
+        // console.log(leftDown);
+    // }
+// }
+
+// function game()
+// {
+//     document.addEventListener("keydown", keydownHandler);
+//     document.addEventListener("keyup", keyUpHandler);
+//     let interval = setInterval(playGameSolo, 5);
+// }
+
+/*
+    - est ce que tout est reset quand la connexion websocket se ferme ?
+*/
+
+export default closeSocket;

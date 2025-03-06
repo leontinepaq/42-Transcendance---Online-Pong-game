@@ -1,5 +1,6 @@
 import checkAuth from './api.js';
 import loadView from './views.js';
+import closeSocket from './actions/pong.js'
 
 window.addEventListener(
 	'popstate', 
@@ -8,6 +9,7 @@ window.addEventListener(
 		console.log("route is ", event.state.route);
 		const newRoute = await authRedirector(event.state.route);
 		console.log("new route is ", newRoute);
+		closeSocket(); // si socket pong open on va la fermer
 		loadView(newRoute);
 	}
 });
@@ -25,7 +27,6 @@ export async function authRedirector(route)
 	return route;
 }
 
-
 export async function navigate(route, ...params)
 {
 	console.log('Navigating: ', route);
@@ -34,6 +35,7 @@ export async function navigate(route, ...params)
 	route = newRoute;
 
 	try {
+		closeSocket(); // si socket pong open on va la fermer
 		const state = { route, params };
 		const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
 		history.pushState(state, title, `/${route}`);
@@ -44,4 +46,4 @@ export async function navigate(route, ...params)
 	}
 };
 
-export default navigate;
+export default navigate; 

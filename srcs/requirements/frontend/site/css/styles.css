@@ -178,11 +178,15 @@ form
     width: 60vmin; /* 60% du plus petit cote (largeur ou hauteur) */
     height: 40vmin; 
     margin: 0 auto; /* Centrer le rectangle de jeu */
-    border-radius: 16px;
+    border-radius: 12px;
 }
 
+#leftScore, #rightScore, #tiret
+{
+	font-size: xx-large;
+}
 
-/* todo @leontinepaq a changef */
+/* todo @leontinepaq a changer */
 .modal
 {
 	color: var(--color-dark);
