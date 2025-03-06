@@ -57,7 +57,9 @@ REST_FRAMEWORK = {'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework_simplejwt.a
                                              'rest_framework.parsers.MultiPartParser',]}
 
 # TO CHANGE AFTER DEVELOPMENT ACCES TOKEN LIFETIME SHOULD BE MINUTE=15
-SIMPLE_JWT = {"ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
+SIMPLE_JWT = {"SIGNING_KEY": SECRET_KEY,
+              "ALGORITHM": "HS256",  # Ensure this is properly set
+              "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
               "REFRESH_TOKEN_LIFETIME": timedelta(hours=7),
               "ROTATE_REFRESH_TOKENS": True,
               "BLACKLIST_AFTER_ROTATION": True,

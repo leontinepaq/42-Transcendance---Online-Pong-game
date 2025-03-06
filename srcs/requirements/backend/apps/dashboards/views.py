@@ -15,12 +15,13 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiTypes
 #Display user stats by ID
 @extend_schema(
     summary="Fetch user's stats identified by ID.",
-    description="Fetch all user's gaming stats. User is identified by ID. If no ID provided, returns current user's stats",
-    responses={
-        404: GenericResponse,
-        200: UserStatisticsSerializer
-    },
-    parameters=[OpenApiParameter(name="user_id", type=OpenApiTypes.INT, location=OpenApiParameter.QUERY)],
+    description="Fetch all user's gaming stats. User is \
+        identified by ID. If no ID provided, returns current user's stats",
+    responses={404: GenericResponse,
+               200: UserStatisticsSerializer},
+    parameters=[OpenApiParameter(name="user_id",
+                                 type=OpenApiTypes.INT,
+                                 location=OpenApiParameter.QUERY)],
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

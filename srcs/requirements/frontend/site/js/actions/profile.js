@@ -37,7 +37,7 @@ export async function loadUserProfile()
 	usernameElem.textContent = "**charging username**"; //todo @leontinepaq a changer ?
 	emailElem.textContent = "**charging email**";
 	try {
-		const user = await authFetchJson('api/userprofile/', {method: 'GET'});
+		const user = await authFetchJson('api/profile/', {method: 'GET'});
 		usernameElem.textContent = user.username;
 		emailElem.textContent = user.email;
 		if (user.avatarUrl)
@@ -76,9 +76,9 @@ async function switchToDisplayMode(button, valueDisplay, input, confirmInput)
 }
 
 const PROFILE_FIELDS = {
-	username:	{ endpoint: "api/userprofile/update-username/",	key: "new_username" },
-	email:		{ endpoint: "api/userprofile/update-email/",	key: "new_email" },
-	password:	{ endpoint: "api/userprofile/update-password/", key: "new_password", confirmKey: "confirm_password"}
+	username:	{ endpoint: "api/profile/update/username/",	key: "new_username" },
+	email:		{ endpoint: "api/profile/update/email/",	key: "new_email" },
+	password:	{ endpoint: "api/profile/update/password/", key: "new_password", confirmKey: "confirm_password"}
 };
 
 async function updateProfileField(field, input, confirmInput)
@@ -132,7 +132,7 @@ async function disable2fa(element, event)
 {
 	try 
 	{
-		const response = await authFetchJson("/api/userprofile/deactivate-2fa/", {
+		const response = await authFetchJson("/api/profile/deactivate_2fa/", {
 			method: "PUT",
 			headers: {"Content-Type": "application/json"},
 		});

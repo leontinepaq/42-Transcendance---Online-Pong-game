@@ -75,7 +75,7 @@ def pre_login(request):
     username=request.data.get("username")
 
     if User.objects.filter(username=username).exists() == False:
-        return UserNotFoundErrorSerializer({}).response(404)
+        return UserNotFoundErrorSerializer().response()
     user = User.objects.get(username=username)
     if user.is_two_factor_mail:
         user.send_2fa_mail()
@@ -241,7 +241,7 @@ class CookieTokenRefreshView(TokenRefreshView):
         description="Refreshes the access token using the refresh token stored in cookies.",
         parameters=[
             OpenApiParameter(
-                name="refresh_token",
+                name=settings.SIMPLE_JWT["REFRESH_COOKIE"],
                 type=str,
                 location=OpenApiParameter.COOKIE,
                 required=True,
@@ -256,20 +256,18 @@ class CookieTokenRefreshView(TokenRefreshView):
         refresh_token = request.COOKIES.get(settings.SIMPLE_JWT["REFRESH_COOKIE"])
 
         if not refresh_token:
-            return Response(ResponseRefreshTokenErrorMissing,
-                            status=status.HTTP_401_UNAUTHORIZED)
+            return ResponseRefreshTokenErrorMissing().response()
         
         serializer = self.get_serializer(data={"refresh": refresh_token})
 
         try:
             serializer.is_valid(raise_exception=True)
         except TokenError as e:
-            return Response(ResponseRefreshTokenErrorInvalid,
-                            status=status.HTTP_400_BAD_REQUEST)
+            return ResponseRefreshTokenErrorInvalid.response()
 
         access_token = serializer.validated_data.get("access")
         print("JWT TOKEN IS \n", access_token)
-        response = Response({"details": "Token refreshed successfully"})
+        response = ResponseRefreshToken().response()
         response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                             value=access_token,
                             max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
