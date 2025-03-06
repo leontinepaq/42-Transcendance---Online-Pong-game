@@ -1,4 +1,5 @@
 import { navigate  } from "../router.js"
+import { handleError } from "../api.js";
 
 export const pongActions = [
     {
@@ -126,22 +127,40 @@ function drawPaddle(state)
     );
 }
 
+function handleEndGame()
+{
+    const winnerModal = new bootstrap.Modal(document.getElementById('winnerModal'));
+    winnerModal.show();
+    const closeendgame = document.getElementById('closeendgame');
+    closeendgame.addEventListener('click', function(){
+        closeSocket();
+        navigate("playerMode");
+    })
+    const rejouer = document.getElementById('rejouer');
+    rejouer.addEventListener('click', function() {
+        closeSocket();
+        initGameMulti();
+    })
+}
+
 function messageSocket() 
 {
     socket.onmessage = function(event)
     {
-        // console.log("Received: ", event);
         const state = JSON.parse(event.data);
-        // console.log(state);
-    
+
         if (state.alert)
         {
-            alert(state.message);
+            handleError(state.alert, "handle game error")
         };
         
         document.getElementById("leftScore").textContent = state.score[0];
         document.getElementById("rightScore").textContent = state.score[1];
-    
+        if (state.score[0] == 5 || state.score[1] == 5)
+        {
+            closeSocket();
+            handleEndGame();
+        }
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
     
@@ -163,7 +182,6 @@ function keyDownHandler(event)
         event.preventDefault();
     }
     event.preventDefault();
-    console.log(event.key);
     if (event.key === " " && !isPaused)
     {
         isPaused = true;
@@ -230,11 +248,8 @@ function playGameMulti()
             }));
         }
     }
-    // if (keysPressed[" "]) {
-    //     isPaused = !isPaused;
-    //     socket.send(JSON.stringify({ toggle_pause: true }));
-    // }
 }
+
 function pauseButton()
 {
     isPaused = !isPaused;
@@ -245,6 +260,12 @@ function pauseButton()
     }));
 }
 
+function endgameButton()
+{
+    closeSocket();
+    navigate('playerMode');
+}
+
 function playGame(mode)
 {
     canvas = document.getElementById("gameCanvas");
@@ -252,24 +273,22 @@ function playGame(mode)
     
     handleSocket();
     messageSocket();
-    // if (mode === "solo")
-    // {    
-    //     document.removeEventListener("keydown", playGameSolo);
-    //     document.removeEventListener("keydown", playGameMulti);
-        
-    //     document.addEventListener("keydown", playGameSolo);
-    // }
-    // else if (mode === "multi")
+    // if (mode === "solo" || mode === "multi")
     // {
-        // document.removeEventListener("keydown", playGameSolo);
+        // evenement touches paddle bitch
         document.removeEventListener("keydown", keyDownHandler);
         document.addEventListener("keydown", keyDownHandler);
         document.removeEventListener("keyup", keyUpHandler);
         document.addEventListener("keyup", keyUpHandler);
         setInterval(playGameMulti, 16);
+        // boutton pause en plus du space
         const boutton = document.getElementById('pause');
         boutton.removeEventListener('click', pauseButton);
         boutton.addEventListener('click', pauseButton)
+        // boutton endgame / fin de jeu rho --> maybe rajouter un modal ?
+        const endgame = document.getElementById('endgame');
+        endgame.removeEventListener('click', endgameButton);
+        endgame.addEventListener('click', endgameButton)
     // }
     // else if (mode === "online")
     // {
@@ -279,51 +298,10 @@ function playGame(mode)
 }
 
 /*
-    - les deux paddles doivent bouger at the same time
+     - handle les erreurs possibles 
+     - page de win et page de loose (same page pour le solo et le multi i guess) --> modal bootstrap
+     - score = premier arriver jusqu'a 5
+     - quand partie finie -> soit on rejoue soit on fait fin du jeu ?
 */
-
-// function playGameSolo(event)
-// {
-//     const keyActions = {
-//         "ArrowUp": { side: "right", paddle: -2 },
-//         "ArrowDown": { side: "right", paddle: 2 },
-//         " ": { toggle_pause: false}
-//     };
-
-//     console.log("keyActions[event.key] == ", keyActions[event.key]);
-//     console.log("event.key == ", event.key);
-    
-//     if (keyActions[event.key])
-//     {
-//         console.log("actions ====  ", keyActions[event.key]);
-//         event.preventDefault();
-//         if (event.key === " " && !isPaused)
-//         {
-//             isPaused = true;
-//             socket.send(JSON.stringify({
-//                 toggle_pause: true,
-//                 side: keyActions[event.key].side || "left",
-//                 paddle: keyActions[event.key].paddle || 0
-//             }));    
-//         }  
-//         else if (event.key === " " && isPaused)
-//         { 
-//             isPaused = false;
-//             socket.send(JSON.stringify({ 
-//                 toggle_pause: true,
-//                 side: keyActions[event.key].side || "left",
-//                 paddle: keyActions[event.key].paddle || 0
-//             }));
-//         }
-//         else (!isPaused)
-//         {
-//             socket.send(JSON.stringify({
-//                 toggle_pause: false,
-//                 side: keyActions[event.key].side || "left",
-//                 paddle: keyActions[event.key].paddle || 0
-//             }));
-//         }
-//     }
-// }
 
 export default closeSocket;

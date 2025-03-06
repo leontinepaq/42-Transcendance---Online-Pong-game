@@ -3,7 +3,38 @@
     <span id="tiret">-</span>
     <span id="rightScore"> 0</span>
 </div>
+<!-- <div class="container-fluid">
+    <div class="row">
+        <div class="text-start" id="leftScore">
+            <h2>5</h2>
+        </div>
+        <div class="text-end" id="rightScore">
+            <h2>4</h2>
+        </div>
+    </div>
+</div> -->
 <canvas id="gameCanvas" width="500" height="300"></canvas>
 <div> 
     <button class="mt-4 btn" id="pause">PAUSE</button>
 </div>
+<!-- Modal de victoire -->
+<div class="modal" id="winnerModal" tabindex="-1" aria-labelledby="winnerModalLabel" aria-hidden="true" data-bs-backdrop="false">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="winnerModalLabel">Félicitations !</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center">
+          <h3 id="winnerName">Le vainqueur est : <span id="winner-name-text"></span></h3>
+          <p>Bravo pour cette victoire incroyable !</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="closeendgame">Fermer</button>
+          <button type="button" class="btn btn-primary" id="rejouer">Rejouer</button>
+        </div>
+      </div>
+    </div>
+</div>
+<button type="button" class="mt-3 btn btn-primary" id="endgame">Fin du jeu</button>
+  
