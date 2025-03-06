@@ -17,21 +17,24 @@ function reinitializeLottie(el) {
   const src = el.getAttribute("src");
   const loop = el.getAttribute("loop");
   const autoplay = el.getAttribute("autoplay");
+  const style = el.getAttribute("style");
 
   parent.removeChild(el);
   const newLottie = document.createElement("dotlottie-wc");
   newLottie.setAttribute("src", src);
   newLottie.setAttribute("loop", loop);
   newLottie.setAttribute("autoplay", autoplay);
-  newLottie.style.width = "100%";
-  newLottie.style.height = "100%";
+  newLottie.setAttribute("style", style);
   parent.appendChild(newLottie);
+  console.log("Reloading lottie animation"); //todo @leontinepaq a supp
 }
 
 function handleComponentsResize() {
-  // window.dashboardCharts.forEach((chart) => {
-  //   chart.resize();
-  // });
+  if (window.dashboardCharts) {
+    window.dashboardCharts.forEach((chart) => {
+      chart.resize();
+    });
+  }
   const lottieEls = document.querySelectorAll("dotlottie-wc");
   if (lottieEls) {
     lottieEls.forEach((el) => {

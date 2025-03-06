@@ -1,44 +1,43 @@
-import { navigateAction }			from "./actions/navigate.js";
-import { logoutAction }				from "./actions/logout.js";
-import { loginActions }				from "./actions/login.js";
-import { signupActions }			from "./actions/signup.js";
-import { pongActions }				from "./actions/pong.js";
-import { friendsActions }			from "./actions/friends.js";
-import { profileActions }			from "./actions/profile.js";
-import { verify2faEmailActions }	from "./actions/validate2faEmail.js"
-import { verify2faAppActions }		from "./actions/validate2faApp.js"
-import { usersActions } 			from "./actions/users.js";
+import { navigateAction } from "./actions/navigate.js";
+import { logoutAction } from "./actions/logout.js";
+import { loginActions } from "./actions/login.js";
+import { signupActions } from "./actions/signup.js";
+import { pongActions } from "./actions/pong.js";
+import { friendsActions } from "./actions/friends.js";
+import { profileActions } from "./actions/profile.js";
+import { verify2faEmailActions } from "./actions/validate2faEmail.js";
+import { verify2faAppActions } from "./actions/validate2faApp.js";
+import { usersActions } from "./actions/users.js";
 import { tournamentActions } from "./actions/tournament.js";
 
 // Table des actions à gérer, "..." = concat
 const clickActions = [
-	...logoutAction,
-	...navigateAction,
-	...loginActions,
-	...signupActions,
-	...pongActions,
-	...friendsActions,
-	...usersActions,
-	...profileActions,
-	...verify2faEmailActions,
-	...verify2faAppActions,
-	...tournamentActions
+  ...logoutAction,
+  ...navigateAction,
+  ...loginActions,
+  ...signupActions,
+  ...pongActions,
+  ...friendsActions,
+  ...usersActions,
+  ...profileActions,
+  ...verify2faEmailActions,
+  ...verify2faAppActions,
+  ...tournamentActions,
 
-	// ...TwofaActions,
+  // ...TwofaActions,
 ];
 
 export function initEventDelegation() {
-	document.body.addEventListener("click", async (event) => {
-		for (const action of clickActions) 
-		{
-			const el = event.target.closest(action.selector);
-			if (el) {
-				event.preventDefault();
-				await action.handler(el, event);
-				break;
-			}
-		}
-	});
+  document.body.addEventListener("click", async (event) => {
+    for (const action of clickActions) {
+      const el = event.target.closest(action.selector);
+      if (el) {
+        event.preventDefault();
+        await action.handler(el, event);
+        break;
+      }
+    }
+  });
 }
 
 /*
@@ -81,8 +80,6 @@ export function initEventDelegation() {
  *  - actions/login.js avec les deux actions a faire sur cette page: signin ou forgot-pwd
 
 */
-
-
 
 // todo @leontinepaq voir si mieux de le faire que sur l'app
 // const app = document.getElementById("body");
