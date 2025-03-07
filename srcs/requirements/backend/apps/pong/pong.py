@@ -43,7 +43,7 @@ class Paddle:
 
 class Ball:
     radius = 1
-    speed = 3
+    speed = 1.5
 
     def reset(self):
         self.x = 50

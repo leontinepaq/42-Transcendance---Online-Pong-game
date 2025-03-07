@@ -29,9 +29,9 @@ function reinitializeLottie(el) {
 }
 
 function handleComponentsResize() {
-  window.dashboardCharts.forEach((chart) => {
-    chart.resize();
-  });
+  // window.dashboardCharts.forEach((chart) => {
+  //   chart.resize();
+  // });
   const lottieEls = document.querySelectorAll("dotlottie-wc");
   if (lottieEls) {
     lottieEls.forEach((el) => {

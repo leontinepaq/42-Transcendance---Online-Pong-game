@@ -17,7 +17,9 @@ export const pongActions = [
 ];
 
 let isPaused = true;
+let mode;
 let socket;
+let interval;
 let canvas;
 let ctx;
 let keysPressed = {
@@ -32,7 +34,8 @@ function initGameSolo()
     navigate('pong');
     setTimeout(function() {
         socket = new WebSocket("/ws/pong/solo/");   // solo
-        playGame("solo");
+        mode = "solo";
+        playGame(mode);
     }, 500)
 }
 
@@ -41,7 +44,8 @@ function initGameMulti()
     navigate('pong');
     setTimeout(function() {
         socket = new WebSocket("/ws/pong/multi/");   // multi
-        playGame("multi");
+        mode = "multi";
+        playGame(mode);
     }, 500)
 }
 
@@ -50,7 +54,8 @@ function initGameMulti()
 //     navigate('pong');
 //     setTimeout(function() {
 //         socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
-//         playGame();
+//         mode = "online";
+//         playGame(mode);
 //     }, 500)
 // }
 
@@ -111,36 +116,67 @@ function drawBall(x, y, r)
     ctx.fill();
 };
 
+// +5 -5 --> valeur arbitraire
 function drawPaddle(state)
 {
     ctx.fillRect(
-        state.left.top_left_corner.x * canvas.width / 100,
+        state.left.top_left_corner.x * canvas.width / 100 + 5,
         state.left.top_left_corner.y * canvas.height / 100,
         state.left.width * canvas.width / 100,
         state.left.height * canvas.height / 100
     );
     ctx.fillRect(
-        state.right.top_left_corner.x * canvas.width / 100,
+        state.right.top_left_corner.x * canvas.width / 100 - 5,
         state.right.top_left_corner.y * canvas.height / 100,
         state.right.width * canvas.width / 100,
         state.right.height * canvas.height / 100
     );
 }
 
-function handleEndGame()
+function handleEndGame(name)
 {
     const winnerModal = new bootstrap.Modal(document.getElementById('winnerModal'));
+    const winnerName = document.getElementById('winner-name');
+    if (name === "one")
+        winnerName.textContent = "player 1";
+    else
+        winnerName.textContent = "player 2";
     winnerModal.show();
+
+    // evenement croix du modal pour close
     const closeendgame = document.getElementById('closeendgame');
     closeendgame.addEventListener('click', function(){
-        closeSocket();
         navigate("playerMode");
     })
+
+    // evenement boutton fermer du modal
+    const closeendgame1 = document.getElementById('closeendgame1');
+    closeendgame1.addEventListener('click', function(){
+        navigate("playerMode");
+    })
+
+    // evenement boutton rejouer du modal
     const rejouer = document.getElementById('rejouer');
     rejouer.addEventListener('click', function() {
-        closeSocket();
-        initGameMulti();
+        if (mode == "solo")
+            initGameSolo();
+        else if (mode == "multi")
+            initGameMulti();
     })
+}
+
+function checkScore(state)
+{
+    document.getElementById("leftScore").textContent = state.score[0];
+    document.getElementById("rightScore").textContent = state.score[1];
+    if (state.score[0] == 1 || state.score[1] == 1)
+    {
+        closeSocket();
+        if (state.score[0] == 1)
+            handleEndGame("one");
+        else
+            handleEndGame("two");
+    }
 }
 
 function messageSocket() 
@@ -148,29 +184,19 @@ function messageSocket()
     socket.onmessage = function(event)
     {
         const state = JSON.parse(event.data);
-
         if (state.alert)
-        {
-            handleError(state.alert, "handle game error")
-        };
-        
-        document.getElementById("leftScore").textContent = state.score[0];
-        document.getElementById("rightScore").textContent = state.score[1];
-        if (state.score[0] == 5 || state.score[1] == 5)
-        {
-            closeSocket();
-            handleEndGame();
-        }
+            handleError(state.alert, "handle game error");   
+
+        checkScore(state);
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
-    
+
         drawBall(state.ball.x, state.ball.y, state.ball.r);
         drawPaddle(state);
-        
-        if (state.paused)
-        {
+
+        if (state.paused) // si bouton pause on affiche lecran de pause
             statePause();
-        }
     }; 
 }
 
@@ -270,26 +296,33 @@ function playGame(mode)
 {
     canvas = document.getElementById("gameCanvas");
     ctx = canvas.getContext("2d");
-    
+    isPaused = true;
+
     handleSocket();
     messageSocket();
-    // if (mode === "solo" || mode === "multi")
-    // {
+    if (mode === "solo" || mode === "multi")
+    {
         // evenement touches paddle bitch
         document.removeEventListener("keydown", keyDownHandler);
         document.addEventListener("keydown", keyDownHandler);
         document.removeEventListener("keyup", keyUpHandler);
         document.addEventListener("keyup", keyUpHandler);
-        setInterval(playGameMulti, 16);
+
+        // clearinterval pour repetition des frames 
+        clearInterval(interval);
+        interval = setInterval(playGameMulti, 16);
+        console.log("interval == ", interval);
+        
         // boutton pause en plus du space
         const boutton = document.getElementById('pause');
         boutton.removeEventListener('click', pauseButton);
         boutton.addEventListener('click', pauseButton)
+
         // boutton endgame / fin de jeu rho --> maybe rajouter un modal ?
         const endgame = document.getElementById('endgame');
         endgame.removeEventListener('click', endgameButton);
         endgame.addEventListener('click', endgameButton)
-    // }
+    }
     // else if (mode === "online")
     // {
     //     document.removeEventListener("keydown", playGameOnline);
@@ -298,10 +331,9 @@ function playGame(mode)
 }
 
 /*
-     - handle les erreurs possibles 
-     - page de win et page de loose (same page pour le solo et le multi i guess) --> modal bootstrap
-     - score = premier arriver jusqu'a 5
-     - quand partie finie -> soit on rejoue soit on fait fin du jeu ?
+     - handle les erreurs possibles
+    
+     - utiliser le mode multi pour les tournois --> page de jeu pong utiliser des modals pour specifier les affrontements
 */
 
 export default closeSocket;

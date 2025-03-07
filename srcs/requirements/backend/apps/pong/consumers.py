@@ -65,7 +65,7 @@ class PongSoloGameConsumer(AsyncWebsocketConsumer):
             if not self.game.is_paused():
                 self.game.update()
                 await self.update()
-            await asyncio.sleep(0.05)
+            await asyncio.sleep(0.02)
 
 class PongMultiGameConsumer(PongSoloGameConsumer):
     async def init(self):
