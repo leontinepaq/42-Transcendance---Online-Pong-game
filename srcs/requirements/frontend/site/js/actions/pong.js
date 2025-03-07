@@ -18,6 +18,7 @@ export const pongActions = [
 
 let isPaused = true;
 let socket;
+let interval;
 let canvas;
 let ctx;
 let keysPressed = {
@@ -131,14 +132,17 @@ function handleEndGame()
 {
     const winnerModal = new bootstrap.Modal(document.getElementById('winnerModal'));
     winnerModal.show();
+
     const closeendgame = document.getElementById('closeendgame');
     closeendgame.addEventListener('click', function(){
-        closeSocket();
+        navigate("playerMode");
+    })
+    const closeendgame1 = document.getElementById('closeendgame1');
+    closeendgame1.addEventListener('click', function(){
         navigate("playerMode");
     })
     const rejouer = document.getElementById('rejouer');
     rejouer.addEventListener('click', function() {
-        closeSocket();
         initGameMulti();
     })
 }
@@ -156,7 +160,7 @@ function messageSocket()
         
         document.getElementById("leftScore").textContent = state.score[0];
         document.getElementById("rightScore").textContent = state.score[1];
-        if (state.score[0] == 5 || state.score[1] == 5)
+        if (state.score[0] == 1 || state.score[1] == 1)
         {
             closeSocket();
             handleEndGame();
@@ -213,6 +217,7 @@ function keyUpHandler(event)
 
 function playGameMulti()
 {
+    console.log("pause == ", isPaused);
     if (!isPaused)
     {
         if (keysPressed["w"])
@@ -270,17 +275,23 @@ function playGame(mode)
 {
     canvas = document.getElementById("gameCanvas");
     ctx = canvas.getContext("2d");
+    isPaused = true;
     
     handleSocket();
     messageSocket();
-    // if (mode === "solo" || mode === "multi")
-    // {
+    if (mode === "solo" || mode === "multi")
+    {
         // evenement touches paddle bitch
         document.removeEventListener("keydown", keyDownHandler);
         document.addEventListener("keydown", keyDownHandler);
         document.removeEventListener("keyup", keyUpHandler);
         document.addEventListener("keyup", keyUpHandler);
-        setInterval(playGameMulti, 16);
+
+        // clearinterval pour repetition des frames 
+        clearInterval(interval);
+        interval = setInterval(playGameMulti, 16);
+        console.log("interval == ", interval);
+        
         // boutton pause en plus du space
         const boutton = document.getElementById('pause');
         boutton.removeEventListener('click', pauseButton);
@@ -289,7 +300,7 @@ function playGame(mode)
         const endgame = document.getElementById('endgame');
         endgame.removeEventListener('click', endgameButton);
         endgame.addEventListener('click', endgameButton)
-    // }
+    }
     // else if (mode === "online")
     // {
     //     document.removeEventListener("keydown", playGameOnline);
