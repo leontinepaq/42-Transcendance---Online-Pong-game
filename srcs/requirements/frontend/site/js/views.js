@@ -12,12 +12,7 @@ async function loadView(view) {
     app.querySelector(".container").innerHTML = html;
     app.classList.add("active");
     onRouteLoad[view]?.();
-    if (
-      view == "home" ||
-      view == "login" ||
-      view == "signup" ||
-      view == "dashboard"
-    )
+    if (view == "home" || view == "login" || view == "signup" || view == "dashboard")
       PlanetAnimation.init();
     else PlanetAnimation.exit();
   } catch (error) {

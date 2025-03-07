@@ -1,8 +1,6 @@
 // Fonction pour récupérer une variable CSS
 function getCSSVariable(name) {
-  return getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 }
 
 // Objet des couleurs basé sur les variables CSS

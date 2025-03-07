@@ -21,8 +21,7 @@ async function displayAuthSection(data, username) {
   document.getElementById("login-page-title").textContent =
     "Nice to see you again " + username + " !";
   if (data.two_factor_mail == true) {
-    document.getElementById("auth-label").textContent =
-      "2FA code received by mail";
+    document.getElementById("auth-label").textContent = "2FA code received by mail";
     show(document.getElementById("auth-input"));
   }
   if (data.two_factor_auth == true) {

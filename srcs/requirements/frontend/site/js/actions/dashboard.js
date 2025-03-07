@@ -1,9 +1,5 @@
 import { authFetchJson, handleError } from "../api.js";
-import {
-  createHistogram,
-  createDoughnutChart,
-  initChartJS,
-} from "../charts.js";
+import { createHistogram, createDoughnutChart, initChartJS } from "../charts.js";
 import { colors } from "../theme.js";
 
 initChartJS();
@@ -38,9 +34,7 @@ async function plotWinRate(data) {
     },
   };
   createDoughnutChart(ctx, labels, dataChart, colorsChart, options);
-  document.getElementById(
-    "win-rate-percentage"
-  ).textContent = `${data.winRate}%`;
+  document.getElementById("win-rate-percentage").textContent = `${data.winRate}%`;
 }
 
 async function plotGamesPlayed(data) {
@@ -51,16 +45,8 @@ async function plotGamesPlayed(data) {
 
   const ctx = document.getElementById("games-played").getContext("2d");
   const labels = ["SOLO", "MULTIPLAYER", "ONLINE"];
-  const dataChart = [
-    data.solo_games,
-    data.multiplayer_games,
-    data.online_games,
-  ];
-  const colorsChart = [
-    colors.accentSecondary,
-    colors.accentTertiary,
-    colors.accent,
-  ];
+  const dataChart = [data.solo_games, data.multiplayer_games, data.online_games];
+  const colorsChart = [colors.accentSecondary, colors.accentTertiary, colors.accent];
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -81,9 +67,7 @@ async function plotGamesPlayed(data) {
     },
     onResize: (chart, size) => {
       const isSmallScreen = window.innerWidth < 1200;
-      chart.options.plugins.legend.position = isSmallScreen
-        ? "bottom"
-        : "right";
+      chart.options.plugins.legend.position = isSmallScreen ? "bottom" : "right";
       chart.options.plugins.legend.labels.font.size = isSmallScreen ? 24 : 32;
       chart.options.plugins.legend.labels.padding = isSmallScreen ? 10 : 30;
       chart.update();
