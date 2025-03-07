@@ -131,7 +131,7 @@ form
 	text-align: center;
 }
 
-.btn:hover
+.btn:hover, .btn:focus
 {
 	color: var(--color-accent-light);
 	background: var(--color-accent-transparent);
@@ -149,7 +149,7 @@ form
 	transition: all 0.3 ease-in-out, border 0.15s ease-in-out;
 }
 
-.nav-btn:hover
+.nav-btn:hover, .nav-btn:focus
 {
 	font-size: 1.75rem;
 	border: 0.32rem solid var(--color-accent);
