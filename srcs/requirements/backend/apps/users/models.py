@@ -50,13 +50,10 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     totp_secret =           models.CharField(max_length=32, blank=True, null=True)
     friends =               models.ManyToManyField("self", blank=True)
     blocked =               models.ManyToManyField("self", blank=True, symmetrical=False)
-    
-    objects = UserProfileManager()
-    theme = models.CharField(
-        max_length=5,
-        choices=[("light", "Light"), ("dark", "Dark")],
-        default="light",
-    )
+    objects =               UserProfileManager()
+    theme =                 models.CharField(max_length=5,
+                                             choices=[("light", "Light"), ("dark", "Dark")],
+                                             default="light")
 
     def is_mail_code_valid(self, code):
         return (self.two_factor_code == code

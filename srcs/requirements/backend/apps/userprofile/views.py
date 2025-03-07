@@ -47,7 +47,7 @@ def profile(request):
                                             location=OpenApiParameter.QUERY,
                                             required=True)],
                responses={404: UserNotFoundErrorSerializer,
-                          200: UserProfileSerializer}
+                          200: UserPublicProfileSerializer}
                )
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
@@ -67,7 +67,7 @@ def other_profile(request):
 
 @extend_schema(summary="display all users profiles",
                description="fetches all users profiles and returns its data",
-               responses={200: UserProfileSerializer})
+               responses={200: UserPublicProfileSerializer(many=True)})
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def all_profiles(request):
