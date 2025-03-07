@@ -331,7 +331,9 @@ function playGame(mode)
 }
 
 /*
-     - handle les erreurs possibles 
+     - handle les erreurs possibles
+    
+     - utiliser le mode multi pour les tournois --> page de jeu pong utiliser des modals pour specifier les affrontements
 */
 
 export default closeSocket;
