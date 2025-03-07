@@ -112,16 +112,17 @@ function drawBall(x, y, r)
     ctx.fill();
 };
 
+// +10 -10 --> valeur arbitraire
 function drawPaddle(state)
 {
     ctx.fillRect(
-        state.left.top_left_corner.x * canvas.width / 100,
+        state.left.top_left_corner.x * canvas.width / 100 + 5,
         state.left.top_left_corner.y * canvas.height / 100,
         state.left.width * canvas.width / 100,
         state.left.height * canvas.height / 100
     );
     ctx.fillRect(
-        state.right.top_left_corner.x * canvas.width / 100,
+        state.right.top_left_corner.x * canvas.width / 100 - 5,
         state.right.top_left_corner.y * canvas.height / 100,
         state.right.width * canvas.width / 100,
         state.right.height * canvas.height / 100
@@ -147,31 +148,30 @@ function handleEndGame()
     })
 }
 
+function checkScore(state)
+{
+    document.getElementById("leftScore").textContent = state.score[0];
+    document.getElementById("rightScore").textContent = state.score[1];
+    if (state.score[0] == 1 || state.score[1] == 1)
+    {
+        closeSocket();
+        handleEndGame();
+    }
+}
+
 function messageSocket() 
 {
     socket.onmessage = function(event)
     {
         const state = JSON.parse(event.data);
-
         if (state.alert)
-        {
-            handleError(state.alert, "handle game error")
-        };
-        
-        document.getElementById("leftScore").textContent = state.score[0];
-        document.getElementById("rightScore").textContent = state.score[1];
-        if (state.score[0] == 1 || state.score[1] == 1)
-        {
-            closeSocket();
-            handleEndGame();
-        }
+            handleError(state.alert, "handle game error");   
+        checkScore(state);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "white";
-    
         drawBall(state.ball.x, state.ball.y, state.ball.r);
         drawPaddle(state);
-        
-        if (state.paused)
+        if (state.paused) // si bouton pause on affiche lecran de pause
         {
             statePause();
         }
@@ -276,7 +276,7 @@ function playGame(mode)
     canvas = document.getElementById("gameCanvas");
     ctx = canvas.getContext("2d");
     isPaused = true;
-    
+
     handleSocket();
     messageSocket();
     if (mode === "solo" || mode === "multi")
@@ -296,6 +296,7 @@ function playGame(mode)
         const boutton = document.getElementById('pause');
         boutton.removeEventListener('click', pauseButton);
         boutton.addEventListener('click', pauseButton)
+
         // boutton endgame / fin de jeu rho --> maybe rajouter un modal ?
         const endgame = document.getElementById('endgame');
         endgame.removeEventListener('click', endgameButton);
@@ -312,7 +313,7 @@ function playGame(mode)
      - handle les erreurs possibles 
      - page de win et page de loose (same page pour le solo et le multi i guess) --> modal bootstrap
      - score = premier arriver jusqu'a 5
-     - quand partie finie -> soit on rejoue soit on fait fin du jeu ?
+     - pouvoir catch le name pour afficher dans le modal le nom du vainqueur
 */
 
 export default closeSocket;
