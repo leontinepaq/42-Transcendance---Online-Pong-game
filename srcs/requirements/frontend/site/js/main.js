@@ -1,5 +1,5 @@
 import { initEventDelegation } from "./eventDelegator.js";
-import { authRedirector, navigate } from "./router.js";
+import { navigate } from "./router.js";
 import { SkyAnimation } from "./background/SkyAnimation.js";
 
 document.addEventListener("DOMContentLoaded", () => {
