@@ -111,7 +111,7 @@ form
 {
 	color: var(--color-accent-light);
 	background: var(--color-dark-transparent);
-	border: 0.2rem solid var(--color-accent-light);
+	/* border: 0.2rem solid var(--color-accent-light); */
 	box-shadow: 0 0 1rem var(--color-accent);
 }
 
@@ -127,11 +127,11 @@ form
 	font-size: 1.2rem;
 	text-transform: uppercase;
 	cursor: pointer;
-	transition: all 0.3s ease-in-out;
+	transition: all 0.1s ease-in-out;
 	text-align: center;
 }
 
-.btn:hover, .btn:focus
+.btn:hover, .btn:focus, .btn:active
 {
 	color: var(--color-accent-light);
 	background: var(--color-accent-transparent);
@@ -146,14 +146,7 @@ form
 	font-size: 1.5rem;
 	padding: 1rem 2rem;
 	color: var(--color-light);
-	transition: all 0.3 ease-in-out, border 0.15s ease-in-out;
-}
-
-.nav-btn:hover, .nav-btn:focus
-{
-	font-size: 1.75rem;
-	border: 0.32rem solid var(--color-accent);
-	transform: scale(1.1);
+	transition: all 0.1 ease-in-out, border 0.15s ease-in-out;
 }
 
 /* VIEW TRANSITIONS */
@@ -192,9 +185,48 @@ form
 	color: var(--color-dark);
 }
 
+.modal-content
+{
+	background-color: var(--color-accent-secondary);
+}
+
 .card
 {
 	background-color: var(--color-light);
 	border-radius: 16px;
 	color:#000;
+}
+
+/* Modal Background */
+
+.neon-border
+{
+	border: 1px solid white;
+	box-shadow: inset 0px 0px 0px 3px rgba(107, 0, 107, 0.8),
+	inset 0px 0px 0px 6px rgba(107, 14, 107, 0.3),
+	0px 0px 0px 2px rgba(107, 0, 107, 0.8),
+	0px 0px 0px 6px rgba(107, 0, 107, 0.3);
+}
+
+.modal-dialog, .modal.show .modal-dialog
+{
+	top: 50%;
+	transform: translateY(-50%);;
+}
+
+.modal-content {
+	font-size:1.5rem;
+	background: #20002c;
+	color: white;
+}
+
+.btn-close
+{
+	color: white;
+}
+
+.modal-footer
+{
+	border-top: none;
+	padding-top: 0;
 }
