@@ -34,7 +34,7 @@ body
 	min-height: calc(100vh - 24rem);  /* 100vh minus navbar height * 2 to be centered*/
 	display: flex;
 	justify-content: center;
-	align-items: center;
+	align-items: flex-start;
 }
 
 .container
@@ -131,7 +131,7 @@ form
 	text-align: center;
 }
 
-.btn:hover, .btn:focus, .btn:active
+.btn:hover, .btn:focus, .btn:active, .nav-pills .nav-link.active
 {
 	color: var(--color-accent-light);
 	background: var(--color-accent-transparent);
@@ -139,7 +139,7 @@ form
 }
 
 /* NAVIGATION MENU */
-.nav-btn
+.nav-btn, .nav-pills .nav-link
 {
 	background: var(--color-dark-transparent);
 	border-radius: 1rem;
@@ -229,4 +229,23 @@ form
 {
 	border-top: none;
 	padding-top: 0;
+}
+
+/* NAVBAR */
+.nav-justified .nav-link
+{
+	height:100%;
+}
+
+.nav-pills .nav-link
+{
+	color:white;
+	font-size: 1.5rem;
+	padding:0.35rem
+}
+
+.nav-link .badge
+{
+	padding: 0.35em;
+	background-color: red;
 }
