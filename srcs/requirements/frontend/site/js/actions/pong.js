@@ -122,7 +122,8 @@ function drawPaddle(state) {
   );
 }
 
-function handleEndGame(name) {
+function handleEndGame(name) // handle la creation des games ici 
+{
   const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
   const winnerName = document.getElementById("winner-name");
   if (name === "one") winnerName.textContent = "player 1";
@@ -144,8 +145,9 @@ function handleEndGame(name) {
   // evenement boutton rejouer du modal
   const rejouer = document.getElementById("rejouer");
   rejouer.addEventListener("click", function () {
-    if (mode == "solo") initGameSolo();
-    else if (mode == "multi") initGameMulti();
+    navigate("playerMode");
+    // if (mode == "solo") initGameSolo();
+    // else if (mode == "multi") initGameMulti();
   });
 }
 
@@ -276,7 +278,8 @@ function playGame(mode) {
 
   handleSocket();
   messageSocket();
-  if (mode === "solo" || mode === "multi") {
+  if (mode === "solo" || mode === "multi")
+  {
     // evenement touches paddle bitch
     document.removeEventListener("keydown", keyDownHandler);
     document.addEventListener("keydown", keyDownHandler);
@@ -288,6 +291,14 @@ function playGame(mode) {
     interval = setInterval(playGameMulti, 16);
     console.log("interval == ", interval);
 
+    // utiliser ces events listener pour tous les modals --> permet de continuer a scroller
+    document.addEventListener("shown.bs.modal", function () {
+        document.body.style.overflow = "auto";
+    });
+    document.addEventListener("hidden.bs.modal", function () {
+        document.body.style.overflow = "";
+    });
+  
     // boutton pause en plus du space
     const boutton = document.getElementById("pause");
     boutton.removeEventListener("click", pauseButton);
