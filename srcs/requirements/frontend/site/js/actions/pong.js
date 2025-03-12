@@ -145,9 +145,9 @@ function handleEndGame(name) // handle la creation des games ici
   // evenement boutton rejouer du modal
   const rejouer = document.getElementById("rejouer");
   rejouer.addEventListener("click", function () {
-    navigate("playerMode");
-    // if (mode == "solo") initGameSolo();
-    // else if (mode == "multi") initGameMulti();
+    // navigate("playerMode");
+    if (mode == "solo") initGameSolo();
+    else if (mode == "multi") initGameMulti();
   });
 }
 

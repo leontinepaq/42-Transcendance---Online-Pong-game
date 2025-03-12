@@ -9,6 +9,6 @@ urlpatterns = [
     path("display-game/", display_game, name="display_game"),
     path("display-tournaments/", display_tournament, name="display_tournaments"),
     path("create-game/", create_game, name="create_game"),
-    path("create_tournament/", create_tournament, name="create_tournament"),
+    path("create-tournament/", create_tournament, name="create_tournament"),
 ]
 

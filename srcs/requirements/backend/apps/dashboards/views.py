@@ -304,7 +304,7 @@ def create_tournament(request):
 
     player1 = create_participant("user", player_id=user.id)
     if isinstance(player1, Response):
-        return player2
+        return player1
 
     player2 = create_participant(request.data.get("player2_type"), request.data.get("player2_id"), request.data.get("player2_name"))
     if isinstance(player2, Response):
@@ -336,8 +336,8 @@ def create_tournament(request):
     if duplicate_names:
         return Response({"error": f"Duplicate player names found: {', '.join(set(duplicate_names))}"}, status=400)
 
-
     tournament = Tournament.objects.create(name=name, creator=user)
+
     tournament.players.add(player1, player2, player3, player4)
 
     return Response(TournamentSerializer(tournament).data, status=201)
