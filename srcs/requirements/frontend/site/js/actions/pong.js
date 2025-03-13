@@ -1,5 +1,6 @@
 import { navigate } from "../router.js";
 import { handleError } from "../api.js";
+import { authFetchJson } from "../api.js";
 
 export const pongActions = [
   {
@@ -122,7 +123,7 @@ function drawPaddle(state) {
   );
 }
 
-function handleEndGame(name) // handle la creation des games ici 
+async function handleEndGame(name) // handle la creation des games ici 
 {
   const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
   const winnerName = document.getElementById("winner-name");
@@ -132,23 +133,31 @@ function handleEndGame(name) // handle la creation des games ici
 
   // evenement croix du modal pour close
   const closeendgame = document.getElementById("closeendgame");
-  closeendgame.addEventListener("click", function () {
-    navigate("playerMode");
-  });
-
+  if (closeendgame)
+  {
+    closeendgame.addEventListener("click", function () {
+      navigate("playerMode");
+    });
+  }
+  
   // evenement boutton fermer du modal
   const closeendgame1 = document.getElementById("closeendgame1");
-  closeendgame1.addEventListener("click", function () {
-    navigate("playerMode");
-  });
+  if (closeendgame1)
+  {
+    closeendgame1.addEventListener("click", function () {
+      navigate("playerMode");
+    });
+  }
 
   // evenement boutton rejouer du modal
   const rejouer = document.getElementById("rejouer");
-  rejouer.addEventListener("click", function () {
-    // navigate("playerMode");
-    if (mode == "solo") initGameSolo();
-    else if (mode == "multi") initGameMulti();
-  });
+  if (rejouer)
+  {
+    rejouer.addEventListener("click", function () {
+      if (mode == "solo") initGameSolo();
+      else if (mode == "multi") initGameMulti();
+    });
+  }
 }
 
 function checkScore(state) {
@@ -271,7 +280,21 @@ function endgameButton() {
   navigate("playerMode");
 }
 
-function playGame(mode) {
+async function playGame(mode) {
+  const response = await fetch("api/dashboards/create-game/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      "player1_type": "user",
+      "player1_id": 1,
+      "player1_name": "string",
+      "player2_type": "user",
+      "player2_id": 2,
+      "player2_name": "tes1t",
+    }),
+  });
+  const users = await authFetchJson(`api/dashboards/display-game/?game_id=1`);
+  console.log(users);
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
   isPaused = true;
@@ -301,13 +324,19 @@ function playGame(mode) {
   
     // boutton pause en plus du space
     const boutton = document.getElementById("pause");
-    boutton.removeEventListener("click", pauseButton);
-    boutton.addEventListener("click", pauseButton);
+    if (boutton)
+    {
+      boutton.removeEventListener("click", pauseButton);
+      boutton.addEventListener("click", pauseButton);
+    }
 
     // boutton endgame / fin de jeu rho --> maybe rajouter un modal ?
     const endgame = document.getElementById("endgame");
-    endgame.removeEventListener("click", endgameButton);
-    endgame.addEventListener("click", endgameButton);
+    if (endgame)
+    {
+      endgame.removeEventListener("click", endgameButton);
+      endgame.addEventListener("click", endgameButton);
+    }
   }
   // else if (mode === "online")
   // {
@@ -318,7 +347,6 @@ function playGame(mode) {
 
 /*
      - handle les erreurs possibles
-    
      - utiliser le mode multi pour les tournois --> page de jeu pong utiliser des modals pour specifier les affrontements
 */
 

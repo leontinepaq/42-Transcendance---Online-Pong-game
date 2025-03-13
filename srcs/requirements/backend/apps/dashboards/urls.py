@@ -11,4 +11,3 @@ urlpatterns = [
     path("create-game/", create_game, name="create_game"),
     path("create-tournament/", create_tournament, name="create_tournament"),
 ]
-
