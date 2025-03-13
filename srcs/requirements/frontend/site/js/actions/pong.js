@@ -135,6 +135,8 @@ async function handleEndGame(name) // handle la creation des games ici
   const closeendgame = document.getElementById("closeendgame");
   if (closeendgame)
   {
+    document.removeEventListener("keydown", keyDownHandler);
+    document.removeEventListener("keyup", keyUpHandler);    
     closeendgame.addEventListener("click", function () {
       navigate("playerMode");
     });
@@ -144,6 +146,8 @@ async function handleEndGame(name) // handle la creation des games ici
   const closeendgame1 = document.getElementById("closeendgame1");
   if (closeendgame1)
   {
+    document.removeEventListener("keydown", keyDownHandler);
+    document.removeEventListener("keyup", keyUpHandler);
     closeendgame1.addEventListener("click", function () {
       navigate("playerMode");
     });
@@ -164,6 +168,8 @@ function checkScore(state) {
   document.getElementById("leftScore").textContent = state.score[0];
   document.getElementById("rightScore").textContent = state.score[1];
   if (state.score[0] == 1 || state.score[1] == 1) {
+    document.removeEventListener("keydown", keyDownHandler);
+    document.removeEventListener("keyup", keyUpHandler);
     closeSocket();
     if (state.score[0] == 1) handleEndGame("one");
     else handleEndGame("two");
@@ -277,30 +283,14 @@ function pauseButton() {
 
 function endgameButton() {
   closeSocket();
+  document.removeEventListener("keydown", keyDownHandler);
+  document.removeEventListener("keyup", keyUpHandler);
   navigate("playerMode");
 }
 
-async function playGame(mode) {
-  const response = await fetch("api/dashboards/create-game/", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      "player1_type": "user",
-      "player1_id": 1,
-      "player1_name": "string",
-      "player2_type": "user",
-      "player2_id": 2,
-      "player2_name": "tes1t",
-    }),
-  });
-  const users = await authFetchJson(`api/dashboards/display-game/?game_id=1`);
-  console.log(users);
-  canvas = document.getElementById("gameCanvas");
-  ctx = canvas.getContext("2d");
-  isPaused = true;
 
-  handleSocket();
-  messageSocket();
+function setupGame(mode)
+{
   if (mode === "solo" || mode === "multi")
   {
     // evenement touches paddle bitch
@@ -308,12 +298,12 @@ async function playGame(mode) {
     document.addEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
     document.addEventListener("keyup", keyUpHandler);
-
+  
     // clearinterval pour repetition des frames
     clearInterval(interval);
     interval = setInterval(playGameMulti, 16);
     console.log("interval == ", interval);
-
+  
     // utiliser ces events listener pour tous les modals --> permet de continuer a scroller
     document.addEventListener("shown.bs.modal", function () {
         document.body.style.overflow = "auto";
@@ -329,7 +319,7 @@ async function playGame(mode) {
       boutton.removeEventListener("click", pauseButton);
       boutton.addEventListener("click", pauseButton);
     }
-
+  
     // boutton endgame / fin de jeu rho --> maybe rajouter un modal ?
     const endgame = document.getElementById("endgame");
     if (endgame)
@@ -345,9 +335,19 @@ async function playGame(mode) {
   // }
 }
 
-/*
-     - handle les erreurs possibles
-     - utiliser le mode multi pour les tournois --> page de jeu pong utiliser des modals pour specifier les affrontements
-*/
+async function playGame(mode)
+{
+  canvas = document.getElementById("gameCanvas");
+  ctx = canvas.getContext("2d");
+  isPaused = true;
+
+  handleSocket();
+  messageSocket();
+  setupGame(mode);
+}
 
 export default closeSocket;
+
+/*
+  - detruire les evenements qd on quitte
+*/
