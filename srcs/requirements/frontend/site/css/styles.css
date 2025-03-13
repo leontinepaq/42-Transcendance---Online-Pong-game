@@ -10,6 +10,8 @@
 	--color-dark-transparent:	#00000066;
 	--color-light-transparent:	#FFFFFFCC;
 	--color-accent-transparent:	#511DB266;
+
+	--color-background:			#20002c;
 }
 
 /* GENERAL */
@@ -131,7 +133,7 @@ form
 	text-align: center;
 }
 
-.btn:hover, .btn:focus, .btn:active, .nav-pills .nav-link.active
+.btn:hover, .btn:focus, .nav-pills .nav-link.active
 {
 	color: var(--color-accent-light);
 	background: var(--color-accent-transparent);
@@ -179,26 +181,7 @@ form
 	font-size: xx-large;
 }
 
-/* todo @leontinepaq a changer */
-.modal
-{
-	color: var(--color-dark);
-}
-
-.modal-content
-{
-	background-color: var(--color-accent-secondary);
-}
-
-.card
-{
-	background-color: var(--color-light);
-	border-radius: 16px;
-	color:#000;
-}
-
-/* Modal Background */
-
+/* MODAL */
 .neon-border
 {
 	border: 1px solid white;
@@ -216,7 +199,7 @@ form
 
 .modal-content {
 	font-size:1.5rem;
-	background: #20002c;
+	background: var(--color-background);
 	color: white;
 }
 
@@ -231,7 +214,7 @@ form
 	padding-top: 0;
 }
 
-/* NAVBAR */
+/* FRIENDS */
 .nav-justified .nav-link
 {
 	height:100%;
@@ -248,4 +231,54 @@ form
 {
 	padding: 0.35em;
 	background-color: red;
+}
+
+.card-user
+{
+	background-color: var(--color-background);
+	color:white;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+.card-user .infos
+{
+	margin-left: 1rem;
+	text-align: left;
+}
+
+.card-user .username
+{
+	font-size: 2rem;
+}
+
+.card-user .mail
+{
+	font-size:1.5rem;
+	color: var(--color-accent-secondary);
+}
+
+.card-user .btn
+{
+	background: none;
+	padding:0rem 0.7rem;
+	border-radius: 0.5rem;
+	color: white;
+}
+
+.material-symbols-outlined
+{
+	line-height: 2 !important;
+}
+
+.card-user .btn-red:hover
+{
+	color:red;
+	border-color: red;
+}
+
+.card-user .btn-green:hover
+{
+	color:green;
+	border-color: green;
 }
