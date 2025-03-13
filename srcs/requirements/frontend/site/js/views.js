@@ -10,14 +10,15 @@ async function loadView(view) {
     const response = await fetch(`./views/${view}.html`);
     if (!response.ok) throw new Error("View not found");
     html = await response.text();
+    app.querySelector(".container").innerHTML = html;
     onRouteLoad[view]?.();
     if (view == "home" || view == "login" || view == "signup" || view == "dashboard")
       PlanetAnimation.init();
     else PlanetAnimation.exit();
   } catch (error) {
+    app.querySelector(".container").innerHTML = html;
     console.error("Error loading view:", error);
   }
-  app.querySelector(".container").innerHTML = html;
   app.classList.add("active");
 }
 

@@ -14,7 +14,7 @@
 /* Pour fixer la largeur des lignes et les centrer dans le container */
 .fixed-width-row {
   margin: 0 auto;
-  min-height: 25rem;
+  min-height: 2rem;
 }
 
 .container .dashboard-block > .row:first-child > [class*="col"] {

@@ -7,3 +7,10 @@ myenv
 
 /dir_lele/
 .vscode
+
+srcs/requirements/frontend/site/__mocks__
+srcs/requirements/frontend/site/__tests__
+node_modules
+jest.config.js
+package-lock.json
+package.json

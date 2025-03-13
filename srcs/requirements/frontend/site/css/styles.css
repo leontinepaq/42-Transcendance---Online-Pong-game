@@ -42,6 +42,7 @@ body
 .container
 {
 	height: 100%;
+	max-width: 1200px;
 	flex-wrap: wrap;
 }
 
@@ -124,7 +125,7 @@ form
 	background: var(--color-light-transparent);
 	border: 0.2rem solid var(--color-light);
 	border-radius: 1.5rem;
-	padding: 0.3rem 2rem;
+	padding: 0.3rem 1rem;
 	color: var(--color-dark);
 	font-size: 1.2rem;
 	text-transform: uppercase;

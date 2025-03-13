@@ -17,23 +17,29 @@ export const loginActions = [
   },
 ];
 
-async function displayAuthSection(data, username) {
+export async function displayAuthSection(data, username) {
   document.getElementById("login-page-title").textContent =
     "Nice to see you again " + username + " !";
   if (data.two_factor_mail == true) {
     document.getElementById("auth-label").textContent = "2FA code received by mail";
+    show(document.getElementsByName("auth-label"));
     show(document.getElementById("auth-input"));
   }
   if (data.two_factor_auth == true) {
     document.getElementById("auth-label").textContent =
       "2FA code from authentificator app";
+    show(document.getElementsByName("auth-label"));
     show(document.getElementById("auth-input"));
   }
-  show(document.getElementById("auth-step"));
-  hide(document.getElementById("pre-login"));
+  for (const el of document.getElementsByClassName("auth-login")) {
+    show(el);
+  }
+  for (const el of document.getElementsByClassName("pre-login")) {
+    hide(el);
+  }
 }
 
-async function handleSignin(element, event) {
+export async function handleSignin(element, event) {
   const username = document.getElementById("username").value;
   try {
     const data = await authFetchJson("/api/user/pre_login/", {
@@ -47,7 +53,7 @@ async function handleSignin(element, event) {
   }
 }
 
-async function handleAuth(element, event) {
+export async function handleAuth(element, event) {
   const username = document.getElementById("username").value;
   const password = document.getElementById("pwd-input").value;
   const two_factor_code = document.getElementById("auth-input").value;

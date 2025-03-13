@@ -12,7 +12,7 @@
 <div class="row w-100 justify-content-center mt-4">
   <div class="col-12 col-md-6 col-lg-4 d-flex flex-column gap-3">
     <!-- Étape 1 : Username -->
-    <form id="pre-login" class="w-100">
+    <form class="w-100 pre-login">
       <input
         type="text"
         class="form-control"
@@ -25,7 +25,7 @@
     </form>
 
     <!-- Étape 2 : Authentification (dynamique : mot de passe ou 2FA) -->
-    <form id="auth-step" class="w-100 d-none">
+    <form class="w-100 d-none auth-login">
       <label>Password</label>
       <input
         type="password"
@@ -33,7 +33,7 @@
         id="pwd-input"
         placeholder="Password"
         required />
-      <label id="auth-label"></label>
+      <label id="auth-label" class="d-none"></label>
       <input
         type="text"
         id="auth-input"
@@ -44,12 +44,12 @@
           LOG IN
         </button>
         <button data-action="forgot-pwd" type="button" class="btn action-btn w-100">
-          FORGOTTEN PASSWORD ?
+          FORGOT PASSWORD ?
         </button>
       </div>
     </form>
 
-    <div class="mt-3 d-flex justify-content-center">
+    <div class="mt-3 d-flex justify-content-center pre-login">
       <a
         data-action="navigate"
         href="signup"
@@ -57,5 +57,14 @@
         >SIGN UP</a
       >
     </div>
+    <div class="mt-3 d-flex justify-content-center d-none auth-login">
+      <a
+        data-action="navigate"
+        href="login"
+        class="btn action-btn w-100 text-center au"
+        >BACK TO SIGNIN</a
+      >
+    </div>
+
   </div>
 </div>
