@@ -46,6 +46,31 @@ body
 	flex-wrap: wrap;
 }
 
+/* SCROLLBAR */
+/* Style the entire scrollbar */
+::-webkit-scrollbar {
+	width: 10px; /* Adjust width */
+	height: 10px; /* For horizontal scrollbars */
+  }
+  
+  /* Style the scrollbar track (background) */
+  ::-webkit-scrollbar-track {
+	background: var(--color-dark); /* Dark background */
+	border-radius: 10px; /* Rounded corners */
+  }
+  
+  /* Style the scrollbar handle (draggable part) */
+  ::-webkit-scrollbar-thumb {
+	background: linear-gradient(45deg, var(--color-accent), var(--color-accent-secondary)); /* Gradient color */
+	border-radius: 10px;
+	border: 2px solid #1e1e1e; /* Border to separate from track */
+  }
+  
+  /* On hover, make the scrollbar more visible */
+  ::-webkit-scrollbar-thumb:hover {
+	background: linear-gradient(45deg, var(--color-accent), var(--color-accent-secondary));
+  }
+
 /* NAVBAR */
 .navbar {
 	height: 12rem;
