@@ -288,7 +288,6 @@ function endgameButton() {
   navigate("playerMode");
 }
 
-
 function setupGame(mode)
 {
   if (mode === "solo" || mode === "multi")
@@ -335,7 +334,7 @@ function setupGame(mode)
   // }
 }
 
-async function playGame(mode)
+function playGame(mode)
 {
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
