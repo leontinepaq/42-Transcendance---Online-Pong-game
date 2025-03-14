@@ -107,19 +107,37 @@ function drawBall(x, y, r) {
   ctx.fill();
 }
 
+// Function to draw a rectangle with rounded corners
+function drawRoundedRect(x, y, width, height, radius) {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.arcTo(x + width, y, x + width, y + radius, radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+  ctx.lineTo(x + radius, y + height);
+  ctx.arcTo(x, y + height, x, y + height - radius, radius);
+  ctx.lineTo(x, y + radius);
+  ctx.arcTo(x, y, x + radius, y, radius);
+  ctx.closePath();
+  ctx.fill();
+}
+
 // +5 -5 --> valeur arbitraire
 function drawPaddle(state) {
-  ctx.fillRect(
+  drawRoundedRect(
     (state.left.top_left_corner.x * canvas.width) / 100 + 5,
     (state.left.top_left_corner.y * canvas.height) / 100,
     (state.left.width * canvas.width) / 100,
-    (state.left.height * canvas.height) / 100
+    (state.left.height * canvas.height) / 100, 
+    5
   );
-  ctx.fillRect(
+  drawRoundedRect(
     (state.right.top_left_corner.x * canvas.width) / 100 - 5,
     (state.right.top_left_corner.y * canvas.height) / 100,
     (state.right.width * canvas.width) / 100,
-    (state.right.height * canvas.height) / 100
+    (state.right.height * canvas.height) / 100,
+    5
   );
 }
 
