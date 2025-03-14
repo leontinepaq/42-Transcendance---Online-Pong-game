@@ -108,7 +108,7 @@ async function plotGameHistory(data) {
 
 export async function loadUserStats() {
   try {
-    const data = await authFetchJson("api/dashboard/display-user-stats/", {
+    const data = await authFetchJson("api/dashboards/display-user-stats/", {
       method: "GET",
     });
     updateStatValues(data);
