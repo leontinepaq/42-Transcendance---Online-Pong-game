@@ -1,67 +1,134 @@
-<h1 class="text-center mb-5">Edit my profile</h1>
-<div class="row w-100">
-  <!-- Colonne gauche : Avatar -->
-  <div class="col-12 col-md-6 d-flex flex-column align-items-center mb-4 mb-md-0">
-    <!-- Avatar (placeholder ou URL dynamique) -->
-    <img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 100px" />
-    <button data-action="edit-avatar" class="btn btn-outline-primary">Edit Avatar</button>
-  </div>
+<div
+  class="container d-flex flex-column align-items-center"
+  style="min-height: inherit">
+  <a data-action="navigate" href="profile" class="btn">REFRESH</a>
 
-  <!-- Colonne droite : Informations du profil -->
-  <div class="d-flex flex-column col-12 col-md-6 gap-5 text-md-start justify-content-center">
-    <!-- Section Username -->
-    <div>
-      <label class="form-label">Username</label>
-      <div class="mb-2">
-        <span id="display-username" class="fs-5"></span>
-        <input type="text" id="edit-username" class="form-control d-none" />
-      </div>
-      <button data-action="toggle-edit" data-field="username" class="btn btn-outline-secondary">EDIT</button>
-    </div>
+  <h1 class="text-center mb-5">Edit my profile</h1>
+  <div class="col-12 col-md-8 col-lg-8">
+    <ul class="nav nav-pills nav-justified" id="profile-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link active"
+          id="profile-info-tab"
+          data-bs-toggle="pill"
+          data-bs-target="#profile-info"
+          type="button"
+          role="tab"
+          aria-controls="profile-info"
+          aria-selected="true">
+          PROFILE INFO
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+          class="nav-link"
+          id="security-tab"
+          data-bs-toggle="pill"
+          data-bs-target="#security"
+          type="button"
+          role="tab"
+          aria-controls="security"
+          aria-selected="false">
+          SECURITY
+        </button>
+      </li>
+    </ul>
 
-    <!-- Section Email -->
-    <div>
-      <label class="form-label">Email</label>
-      <div class="mb-2">
-        <span id="display-email" class="fs-5"></span>
-        <input type="email" id="edit-email" class="form-control d-none" />
-      </div>
-      <button data-action="toggle-edit" data-field="email" class="btn btn-outline-secondary">EDIT</button>
-    </div>
+    <div class="tab-content" id="profile-tabContent">
+      <!-- Profile Info -->
+      <div
+        class="tab-pane fade show active"
+        id="profile-info"
+        role="tabpanel"
+        aria-labelledby="profile-info-tab">
+        <div class="card card-user neon-border p-4 text-center">
+          <div class="card-body">
+            <!-- Avatar -->
+            <div class="d-flex flex-column align-items-center">
+              <img
+                id="profile-avatar"
+                src="assets/nyancat.jpeg"
+                alt="Avatar"
+                class="img-fluid rounded-circle"
+                style="max-width: 120px" />
+              <button class="btn btn-sm col-12 col-md-6 col-lg-3 mt-3">
+                Edit Avatar
+              </button>
+            </div>
 
-    <!-- Section Password -->
-    <div>
-      <label class="form-label">Password</label>
-      <div class="mb-2">
-        <input type="password" id="edit-password" class="form-control d-none" placeholder="New password" />
-        <input type="password" id="confirm-password" class="form-control d-none mt-2" placeholder="Confirm password" />
-      </div>
-      <div>
-        <button data-action="toggle-edit" data-field="password" class="btn btn-outline-secondary">EDIT</button>
-      </div>
-    </div>
+            <div class="text-start mt-4">
+              <!-- Username -->
+              <div
+                class="d-flex flex-column flex-lg-row justify-content-between align-items-center gap-4">
+                <div
+                  id="display-username"
+                  class="username col-12 col-lg-9 text-break text-center text-lg-start"></div>
+                <div class="col-12 col-md-6 col-lg-9 d-none">
+                  <input type="text" id="edit-username" class="form-control" />
+                </div>
+                <button
+                  data-action="toggle-edit"
+                  data-field="username"
+                  class="btn btn-sm col-12 col-md-6 col-lg-3 mt-2 mt-lg-0">
+                  EDIT USERNAME
+                </button>
+              </div>
 
-    <!-- Section 2FA -->
-    <div>
-      <label class="form-label">Two-Factor authentification</label>
-      <div class="mb-2 d-none" id="display-disable-2fa">
-        <span id="span-2fa-mail" class="fs-5 d-none">Two-factor authentification by mail is required</span>
-        <span id="span-2fa-app" class="fs-5 d-none">Two-factor authentification by app is required</span>
-        <div>
-          <button data-action="disable-2fa" class="btn btn-outline-secondary">DISABLE</button>
-        </div>
-      </div>
-      <div class="mb-2 d-none" id="display-enable-2fa">
-        <div>
-          <span class="fs-5">Two-factor authentification by mail</span>
-          <div>
-            <a data-action="navigate" href="validation2faEmail" class="btn btn-outline-secondary">ENABLE</a>
+              <!-- Email -->
+              <div
+                class="d-flex flex-column flex-lg-row justify-content-between align-items-center mt-4 gap-4">
+                <div
+                  id="display-email"
+                  class="mail col-12 col-lg-9 text-break text-center text-lg-start"></div>
+                <div class="col-12 col-md-6 col-lg-9 d-none">
+                  <input type="email" id="edit-email" class="form-control" />
+                </div>
+
+                <button
+                  data-action="toggle-edit"
+                  data-field="email"
+                  class="btn btn-sm col-12 col-md-6 col-lg-3 mt-2 mt-lg-0">
+                  EDIT EMAIL
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <div>
-          <span class="fs-5">Two-factor authentification by app</span>
-          <div>
-            <a data-action="navigate" href="validation2faApp" class="btn btn-outline-secondary">ENABLE</a>
+      </div>
+
+      <!-- Security -->
+      <div
+        class="tab-pane fade"
+        id="security"
+        role="tabpanel"
+        aria-labelledby="security-tab">
+        <!-- Password-->
+        <div class="card card-user neon-border gap-3 mt-4">
+          <div class="card-body align-items-center d-flex flex-column align-items-center">
+            <h5>Change Password</h5>
+            <input
+              type="password"
+              id="edit-password"
+              class="form-control my-2"
+              placeholder="New password" />
+            <input
+              type="password"
+              id="confirm-password"
+              class="form-control my-2"
+              placeholder="Confirm password" />
+            <button
+              data-action="toggle-edit"
+              data-field="password"
+              class="btn btn-sm col-12 col-md-6 col-lg-3 mt-3">
+              Update Password
+            </button>
+          </div>
+        </div>
+
+        <!-- 2FA -->
+        <div class="card card-user neon-border gap-3 mt-4">
+          <div class="card-body">
+            <h5>Two-Factor Authentication</h5>
           </div>
         </div>
       </div>

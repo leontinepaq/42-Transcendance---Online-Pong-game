@@ -37,7 +37,7 @@ export async function loadUserProfile() {
     emailElem.textContent = user.email;
     if (user.avatarUrl)
       document.getElementById("profile-avatar").src = user.avatarUrl;
-    display2fa(user);
+    // display2fa(user);
   } catch (error) {
     handleError(error, "Load user profile error");
   }
@@ -48,19 +48,19 @@ async function switchToEditMode(button, valueDisplay, input, confirmInput) {
     input.value = valueDisplay.textContent;
     hide(valueDisplay);
   }
-  show(input);
+  show(input.parentElement);
   if (confirmInput) show(confirmInput);
   button.textContent = "SAVE";
 }
 
-async function switchToDisplayMode(button, valueDisplay, input, confirmInput) {
+async function switchToDisplayMode(button, valueDisplay, input, confirmInput, field) {
   if (valueDisplay) {
     valueDisplay.textContent = input.value;
     show(valueDisplay);
   }
-  hide(input);
+  hide(input.parentElement);
   if (confirmInput) hide(confirmInput);
-  button.textContent = "EDIT";
+  button.textContent = "EDIT " + field.toUpperCase();
 }
 
 const PROFILE_FIELDS = {
@@ -103,12 +103,12 @@ async function toggleEdit(element, event) {
   const confirmInput = document.getElementById(`confirm-${field}`) || null;
   const button = element;
 
-  if (button.textContent === "EDIT")
+  if (button.textContent.trim() === "EDIT " + field.toUpperCase())
     switchToEditMode(button, valueDisplay, input, confirmInput);
-  else if (button.textContent === "SAVE") {
+  else if (button.textContent.trim() === "SAVE") {
     button.disabled = true;
     if (await updateProfileField(field, input, confirmInput))
-      switchToDisplayMode(button, valueDisplay, input, confirmInput);
+      switchToDisplayMode(button, valueDisplay, input, confirmInput, field);
     button.disabled = false;
   }
 }
