@@ -79,8 +79,8 @@ export function closeSocket() {
 }
 
 function statePause() {
-  ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
-  ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
+  // ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
+  // ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
 
   ctx.fillStyle = "white";
   ctx.font = "50px Arial";

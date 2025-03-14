@@ -9,40 +9,30 @@
     <h2 id="rightScore">0</h2>
   </div>
 </div>
-<canvas id="gameCanvas" width="600" height="400"></canvas>
+<div class="game-background neon-border d-flex justify-content-center">
+  <div class="paddle-rail d-flex justify-content-center">
+    <canvas id="gameCanvas" width="600" height="400"></canvas>
+  </div>
+</div>
 <div>
   <button class="mt-4 btn" id="pause">PAUSE</button>
 </div>
-<div
-  class="modal"
-  id="winnerModal"
-  tabindex="-1"
-  aria-labelledby="winnerModalLabel"
-  aria-hidden="true"
-  data-bs-backdrop="false">
+<div class="modal" id="winnerModal" tabindex="-1" aria-labelledby="winnerModalLabel" aria-hidden="true" data-bs-backdrop="false">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="winnerModalLabel">Congratulations !</h5>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          id="closeendgame"
-          aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" id="closeendgame" aria-label="Close"></button>
       </div>
       <div class="modal-body text-center">
-        <h3 id="winnerName">Winner is : <span id="winner-name"></span></h3>
+        <h3 id="winnerName">
+          Winner is :
+          <span id="winner-name"></span>
+        </h3>
         <p>What an amazing victory !</p>
       </div>
       <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-success"
-          data-bs-dismiss="modal"
-          id="closeendgame1">
-          Fermer
-        </button>
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="closeendgame1">Fermer</button>
         <button type="button" class="btn btn-primary" data-bs-dismiss="modal" id="rejouer">Rejouer</button>
       </div>
     </div>

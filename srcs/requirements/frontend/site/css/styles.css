@@ -167,14 +167,28 @@ form
 
 /* GAME */
 
+.game-background
+{
+	padding-left: 2rem;
+    padding-right: 2rem;
+	border-radius: 2rem;
+}
+
+.paddle-rail
+{
+	width: calc(100% - 25px);
+	border-left: dashed 3px #511db2a8;
+	border-right: dashed 3px #511db2a8;
+}
 	
 #gameCanvas{
-	background-color: #052f4d;
-    position: relative;
+	display:block;
+	/* background-color: #052f4d; */
+    /* position: relative; */
     width: 60vmin; /* 60% du plus petit cote (largeur ou hauteur) */
     height: 40vmin; 
     margin: 0 auto; /* Centrer le rectangle de jeu */
-    border-radius: 20px;
+    /* border-radius: 20px; */
 }
 
 #leftScore, #rightScore, #tiret
@@ -186,10 +200,10 @@ form
 .neon-border
 {
 	border: 1px solid white;
-	box-shadow: inset 0px 0px 0px 3px rgba(107, 0, 107, 0.8),
-	inset 0px 0px 0px 6px rgba(107, 14, 107, 0.3),
-	0px 0px 0px 2px rgba(107, 0, 107, 0.8),
-	0px 0px 0px 6px rgba(107, 0, 107, 0.3);
+	box-shadow: inset 0px 0px 0px 4px var(--color-accent),
+	inset 0px 0px 0px 8px #511db2a8,
+	0px 0px 0px 4px var(--color-accent),
+	0px 0px 0px 8px #511db2a8;
 }
 
 .modal-dialog, .modal.show .modal-dialog
