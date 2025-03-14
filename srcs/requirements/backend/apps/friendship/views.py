@@ -69,8 +69,8 @@ def send_request(request):
 
 
 @extend_schema(
-    summary="Display current user's pending friend requests",
-    description="Returns a list of pending friend requests received by the current user.",
+    summary="Display current user's pending friend requests's senders",
+    description="Returns a list of pending friend requests's senders received by the current user.",
     responses={200: PendingRequestSerializer(many=True)}
 )
 @api_view(["GET"])
@@ -78,7 +78,10 @@ def send_request(request):
 def pending_request(request):
     user = request.user
     friend_requests = FriendRequest.objects.filter(receiver=user)
-    serializer = PendingRequestSerializer(friend_requests, many=True)
+    senders = [friend_request.sender for friend_request in friend_request]
+
+    serializer = UserFriendsSerializer(senders, many=True)
+
     return Response(serializer.data, status=200)
 
 

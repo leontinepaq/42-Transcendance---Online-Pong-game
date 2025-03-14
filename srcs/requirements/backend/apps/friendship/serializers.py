@@ -8,6 +8,7 @@ class UserFriendsSerializer(serializers.ModelSerializer):
         model=UserProfile
         fields = ["id",
                   "username",
+                  "email",
                   "avatar_url"]
 
 class FriendRequestSerializer(serializers.ModelSerializer):
