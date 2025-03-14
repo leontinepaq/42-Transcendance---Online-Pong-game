@@ -176,7 +176,7 @@ form
 
 .paddle-rail
 {
-	width: calc(100% - 25px);
+	width: 95.6%;
 	border-left: dashed 3px #511db2a8;
 	border-right: dashed 3px #511db2a8;
 }
