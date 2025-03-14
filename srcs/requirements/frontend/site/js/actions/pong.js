@@ -153,8 +153,6 @@ async function handleEndGame(name) // handle la creation des games ici
   const closeendgame = document.getElementById("closeendgame");
   if (closeendgame)
   {
-    document.removeEventListener("keydown", keyDownHandler);
-    document.removeEventListener("keyup", keyUpHandler);    
     closeendgame.addEventListener("click", function () {
       navigate("playerMode");
     });
@@ -164,8 +162,6 @@ async function handleEndGame(name) // handle la creation des games ici
   const closeendgame1 = document.getElementById("closeendgame1");
   if (closeendgame1)
   {
-    document.removeEventListener("keydown", keyDownHandler);
-    document.removeEventListener("keyup", keyUpHandler);
     closeendgame1.addEventListener("click", function () {
       navigate("playerMode");
     });
@@ -312,8 +308,8 @@ function setupGame(mode)
   {
     // evenement touches paddle bitch
     document.removeEventListener("keydown", keyDownHandler);
-    document.addEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
+    document.addEventListener("keydown", keyDownHandler);
     document.addEventListener("keyup", keyUpHandler);
   
     // clearinterval pour repetition des frames
@@ -358,11 +354,19 @@ function playGame(mode)
   ctx = canvas.getContext("2d");
   isPaused = true;
 
+  resetKey();
   handleSocket();
   messageSocket();
   setupGame(mode);
 }
 
+function resetKey()
+{
+  keysPressed["w"] = false;
+  keysPressed["s"] = false;
+  keysPressed["ArrowUp"] = false;
+  keysPressed["ArrowDown"] = false;
+}
 export default closeSocket;
 
 /*
