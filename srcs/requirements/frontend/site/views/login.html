@@ -6,11 +6,11 @@
     src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie"
     autoplay
     loop
-    style="max-width: 12rem; aspect-ratio: 1 / 1"></dotlottie-wc>
+    style="max-width: 10rem; aspect-ratio: 1 / 1"></dotlottie-wc>
 </div>
-<h1 id="login-page-title">Welcome in space !</h1>
 <div class="row w-100 justify-content-center mt-4">
-  <div class="col-12 col-md-6 col-lg-4 d-flex flex-column gap-3">
+  <div class="d-flex flex-column gap-3" style="max-width: 30rem">
+    <h1 id="login-page-title">Welcome in space !</h1>
     <!-- Étape 1 : Username -->
     <form class="w-100 pre-login">
       <input
@@ -40,10 +40,16 @@
         class="form-control d-none"
         placeholder="Code" />
       <div class="d-flex justify-content-between gap-3 mt-2">
-        <button data-action="submit-auth" type="submit" class="btn action-btn w-100">
+        <button
+          data-action="submit-auth"
+          type="submit"
+          class="btn action-btn flex-grow-1">
           LOG IN
         </button>
-        <button data-action="forgot-pwd" type="button" class="btn action-btn w-100">
+        <button
+          data-action="forgot-pwd"
+          type="button"
+          class="btn action-btn flex-grow-1">
           FORGOT PASSWORD ?
         </button>
       </div>
@@ -65,6 +71,5 @@
         >BACK TO SIGNIN</a
       >
     </div>
-
   </div>
 </div>
