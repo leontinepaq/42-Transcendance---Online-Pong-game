@@ -1,4 +1,4 @@
-import { colors } from "./theme.js";
+import { colors, chartTheme } from "./theme.js";
 
 export function createHistogram(ctx, labels, datasets, options = {}) {
   const chart = new Chart(ctx, {
@@ -58,7 +58,7 @@ export function createDoughnutChart(ctx, labels, data, colors, options = {}) {
 }
 
 export function initChartJS() {
-  Chart.defaults.font.family = "'Jersey 15', 'serif'";
-  Chart.defaults.font.size = 18;
-  Chart.defaults.color = colors.accentLight;
+  Chart.defaults.font.family = chartTheme.fontFamily;
+  Chart.defaults.font.size = chartTheme.fontSize;
+  Chart.defaults.color = chartTheme.color;
 }

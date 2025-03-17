@@ -1,6 +1,6 @@
 import { authFetchJson, handleError } from "../api.js";
 import { createHistogram, createDoughnutChart, initChartJS } from "../charts.js";
-import { colors } from "../theme.js";
+import { colors, chartTheme } from "../theme.js";
 
 initChartJS();
 
@@ -56,9 +56,7 @@ async function plotGamesPlayed(data) {
         labels: {
           usePointStyle: true,
           pointStyle: "circle",
-          font: {
-            size: 32,
-          },
+          font: {},
           boxWidth: 16,
           boxHeight: 16,
           padding: 30,
@@ -68,7 +66,7 @@ async function plotGamesPlayed(data) {
     onResize: (chart, size) => {
       const isSmallScreen = window.innerWidth < 1200;
       chart.options.plugins.legend.position = isSmallScreen ? "bottom" : "right";
-      chart.options.plugins.legend.labels.font.size = isSmallScreen ? 24 : 32;
+      chart.options.plugins.legend.labels.font.size = isSmallScreen ? chartTheme.fontSize * 1.2 : chartTheme.fontSize * 1.4;
       chart.options.plugins.legend.labels.padding = isSmallScreen ? 10 : 30;
       chart.update();
     },
