@@ -339,8 +339,17 @@ form {
   border-radius: 1.5rem;
   padding: 1rem;
   font-size: 1.2rem;
-  height: 300px;
-  width: 200px;
+  min-height: 300px;
+  min-width: 250px;
+  height: 30vh;
+  width: 25vw;
+  background: var(--color-accent-transparent);
+}
+
+.dropup-chat .dropdown-menu > .d-flex
+{
+  height: 100%;
+  width: 100%;
 }
 
 .btn-chat {
@@ -352,14 +361,6 @@ form {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
   padding: 0rem 1rem;
-}
-
-.msg-received {
-  text-align: left;
-}
-
-.msg-received {
-  text-align: right;
 }
 
 .chat-user {
@@ -392,7 +393,9 @@ form {
   border-radius: 1rem;
   padding: 0.25rem;
   max-width: 75%;
-  text-wrap: pretty;
+  text-wrap: wrap;
+  overflow-wrap: break-word; /* Wraps at natural break points */
+  word-wrap: break-word; /* Older name for compatibility */
   margin-bottom: 0.2rem;
 }
 
@@ -403,4 +406,10 @@ form {
 
 .dropdown-menu .msg-area {
   overflow-y: auto; /* Enable scrolling if the content overflows */
+}
+
+.chat-users
+{
+  overflow-y: auto;
+  height: 100%;
 }
