@@ -8,10 +8,12 @@ export const friendsActions = [
   },
 ];
 
+//main function
 function initFriends() {
   navigate("friends");
   setTimeout(function () {
-    showTabUsers(1);
+    initTabs();
+    showTabUsers(FRIENDSTAB);
   }, 150);
 }
 
@@ -21,8 +23,31 @@ const BLOCKEDTAB = 3;
 const ALLTAB = 4;
 
 //UTILS
+
+function initTabs() {
+  console.log("Initializing tabs...");
+  const tabs = document.querySelectorAll('.nav-link');
+  tabs.forEach((button) => {
+    button.addEventListener('shown.bs.tab', (event) => {
+      console.log("Tab clicked: ", button.innerHTML);
+
+      const tabId = event.target.id;
+
+      if (tabId === "pills-friends-tab") {
+        showTabUsers(FRIENDSTAB);
+      } else if (tabId === "pills-pending-tab") {
+        showTabUsers(PENDINGTAB);
+      } else if (tabId === "pills-blocked-tab") {
+        showTabUsers(BLOCKEDTAB);
+      } else if (tabId === "pills-all-users-tab") {
+        showTabUsers(ALLTAB);
+      }
+    });
+  });
+}
+
 //create card user
-function appendUser(user, userlist, tab) {
+function appendUser(user, userList, tab) {
   const userCard = document.createElement("div");
   userCard.classList.add("col-md-4");
 
@@ -68,7 +93,7 @@ function appendUser(user, userlist, tab) {
           </div>
       `;
   }
-  userlist.appendChild(userCard);
+  userList.appendChild(userCard);
 }
 
 
@@ -100,44 +125,116 @@ function useButton(userData) {
     });
   });
 
-  document.querySelectorAll(".add-friend").forEach((button) => {
-    button.addEventListener("click", (e) => {
-      const btn = e.target;
-      const isFriend = button.classList.contains("added");
-
-      if (isFriend) {
-        btn.textContent = "ADD";
-        btn.classList.remove("added");
-        btn.style.background = ""; // Forcer la couleur
-      } else {
-        btn.textContent = "REMOVE";
-        btn.classList.add("added");
-        btn.style.background = "#07911a66";
-      }
+  function attachEventListener(className, handler) {
+    document.querySelectorAll(`.${className}`).forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const userId = parseInt(e.target.getAttribute("data-id"));
+        handler(userId);
+      });
     });
-  });
+  }
+
+  attachEventListener("unfriend", removeFriend);
+  attachEventListener("accept", acceptFriendRequest);
+  attachEventListener("decline", declineFriendRequest);
+  attachEventListener("unblock", unblockUser);
+  attachEventListener("addFriend", sendFriendRequest);
+  attachEventListener("block", blockUser);
 }
 
 //Va chercher les users de la tab correspondante, cree une card user pour chacun. 
 async function showTabUsers(tabNbr) {
   let userData = [];
+  let userList;
 
-  const userlist = document.getElementById("user-container");
-  userlist.innerHTML = "";
+  console.log("SHOWTABUSERS", tabNbr)
 
-  if (tabNbr === FRIENDSTAB)
+  if (tabNbr === FRIENDSTAB) {
+    userList = document.getElementById("pills-friends-tab");
     userData = await showFriends();
-  else if (tabNbr === PENDINGTAB)
+  }
+  else if (tabNbr === PENDINGTAB) {
+    userList = document.getElementById("pills-pending-tab");
     userData = await showPendingRequests();
-  else if (tabNbr === BLOCKEDTAB)
+  }
+  else if (tabNbr === BLOCKEDTAB) {
+    userList = document.getElementById("pills-blocked-tab");
     userData = await showBlockedUsers();
-  else if (tabNbr === ALLTAB)
+  }
+  else if (tabNbr === ALLTAB) {
+    userList = document.getElementById("pills-all-users-tab");
     userData = await showAllUsers();
+  }
   userData.forEach((user) => {
-    appendUser(user, userlist, tabNbr);
+    appendUser(user, userList, tabNbr);
   });
 
-  // useButton(userData);
+  useButton(userData);
+}
+
+//retourne un tableau avec tous les amis du user
+async function showFriends() {
+  let tab = [];
+  try {
+    tab = await authFetchJson(`api/friends/get-friends/`);
+    console.log("Friends:",tab);
+    return tab;
+  } catch (error) {
+    console.log("Error.", error);
+    return [];
+  }
+}
+
+// Show pending friend requests
+async function showPendingRequests() {
+  try {
+    const pendingRequests = await authFetchJson(`api/friends/pending-requests/`);
+    console.log("Pending requests:", pendingRequests);
+    return pendingRequests;
+  } catch (error) {
+    console.error("Error fetching pending requests:", error);
+    return [];
+  }
+}
+
+// Show blocked users
+async function showBlockedUsers() {
+  let tab = [];
+  try {
+    tab = await authFetchJson(`api/friends/blocked/`);
+    console.log("Blocked users:", tab);
+    return tab;
+  } catch (error) {
+    console.error("Error fetching blocked users:", error);
+    return [];
+  }
+}
+
+// Show all users
+async function showAllUsers() {
+  let tab = [];
+  try {
+    tab = await authFetchJson(`api/profile/all/`);
+    console.log("All users:", tab);
+    return tab;
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    return [];
+  }
+}
+
+//va chercher les stats d'un user identifie par id
+async function getUserStatistics(id) {
+  let data;
+  try {
+    data = await authFetchJson(`api/dashboard/display-user-stats/?user_id=${id}`, {
+      method: "GET",
+    });
+    console.log(data);
+  } catch (error) {
+    handleError(error, "Load user stats error");
+  }
+  return data;
 }
 
 // Send friend request
@@ -165,7 +262,7 @@ async function acceptFriendRequest(userId) {
 }
 
 // Reject friend request
-async function rejectFriendRequest(userId) {
+async function declineFriendRequest(userId) {
   try {
     const response = await authFetchJson(`api/friends/decline-request/${userId}/`, {
       method: "POST",
@@ -212,69 +309,5 @@ async function unblockUser(userId) {
   }
 }
 
-// Show pending friend requests
-async function showPendingRequests() {
-  try {
-    const pendingRequests = await authFetchJson(`api/friends/pending-requests/`);
-    console.log("Pending requests:", pendingRequests);
-    return pendingRequests;
-  } catch (error) {
-    console.error("Error fetching pending requests:", error);
-    return [];
-  }
-}
-
-//retourne un tableau avec tous les amis du user
-async function showFriends() {
-  let tab = [];
-  try {
-    tab = await authFetchJson(`api/friends/get-friends`);
-    console.log(tab);
-    return tab;
-  } catch (error) {
-    console.log("Error.", error);
-    return [];
-  }
-}
-
-// Show blocked users
-async function showBlockedUsers() {
-  let tab = [];
-  try {
-    tab = await authFetchJson(`api/friends/blocked/`);
-    console.log(tab);
-    return tab;
-  } catch (error) {
-    console.error("Error fetching blocked users:", error);
-    return [];
-  }
-}
-
-// Show all users
-async function showAllUsers() {
-  let tab = [];
-  try {
-    tab = await authFetchJson(`api/profile/all/`);
-    console.log("All users:", users);
-    return tab;
-  } catch (error) {
-    console.error("Error fetching all users:", error);
-    return [];
-  }
-}
-
-//va chercher les stats d'un user identifie par id
-async function getUserStatistics(id) {
-  let data;
-  try {
-    data = await authFetchJson(`api/dashboard/display-user-stats/?user_id=${id}`, {
-      method: "GET",
-    });
-    console.log(data);
-  } catch (error) {
-    handleError(error, "Load user stats error");
-  }
-  return data;
-}
 
 

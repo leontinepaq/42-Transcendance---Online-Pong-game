@@ -12,7 +12,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path("", profile, name="display_profile"),
-    path("all", all_profiles, name="display_all_profiles"),
+    path("all/", all_profiles, name="display_all_profiles"),
     path("other", other_profile, name="display_other_profile"),
     path("update/email/", update_email, name="update_email"),
     path("update/username/", update_username, name="update_username"),

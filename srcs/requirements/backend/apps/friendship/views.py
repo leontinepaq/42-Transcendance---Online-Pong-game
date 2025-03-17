@@ -78,7 +78,7 @@ def send_request(request):
 def pending_request(request):
     user = request.user
     friend_requests = FriendRequest.objects.filter(receiver=user)
-    senders = [friend_request.sender for friend_request in friend_request]
+    senders = [friend_request.sender for friend_request in friend_requests]
 
     serializer = UserFriendsSerializer(senders, many=True)
 

@@ -21,7 +21,7 @@ urlpatterns = [
     path("block-user/<int:user_id>/", block_user, name="block_user"),
     path("unblock-user/<int:user_id>/", unblock_user, name="unblock_user"),
     #GET
-    path("friends/", get_friends, name="get_user_friends"),
+    path("get-friends/", get_friends, name="get_user_friends"),
     path("other-user-friends/<int:user_id>/", get_other_user_friends, name="get_other_user_friends"),
     path("blocked/", get_user_blocked, name="get_user_blocked"),
     path("pending-requests/", pending_request, name="pending_requests"),
