@@ -37,7 +37,7 @@ export async function loadUserProfile() {
     emailElem.textContent = user.email;
     if (user.avatarUrl)
       document.getElementById("profile-avatar").src = user.avatarUrl;
-    // display2fa(user);
+    display2fa(user);
   } catch (error) {
     handleError(error, "Load user profile error");
   }
@@ -48,12 +48,23 @@ async function switchToEditMode(button, valueDisplay, input, confirmInput) {
     input.value = valueDisplay.textContent;
     hide(valueDisplay);
   }
-  show(input.parentElement);
+  show(input.parentElement); //todo @leontinepaq a checker si pas plutot par le parent 
   if (confirmInput) show(confirmInput);
   button.textContent = "SAVE";
 }
 
-async function switchToDisplayMode(button, valueDisplay, input, confirmInput, field) {
+async function switchToDisplayMode(
+  button,
+  valueDisplay,
+  input,
+  confirmInput,
+  field
+) {
+  if (field == "password") {
+    input.value = "";
+    confirmInput.value = "";
+    return;
+  }
   if (valueDisplay) {
     valueDisplay.textContent = input.value;
     show(valueDisplay);
@@ -88,7 +99,7 @@ async function updateProfileField(field, input, confirmInput) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    console.log("Update profile: " + response.message);
+    console.log("Update profile: " + response.details);
     return true;
   } catch (error) {
     handleError(error, "Update profile error");
@@ -105,7 +116,10 @@ async function toggleEdit(element, event) {
 
   if (button.textContent.trim() === "EDIT " + field.toUpperCase())
     switchToEditMode(button, valueDisplay, input, confirmInput);
-  else if (button.textContent.trim() === "SAVE") {
+  else if (
+    button.textContent.trim() === "SAVE" ||
+    button.textContent.trim() === "UPDATE PASSWORD"
+  ) {
     button.disabled = true;
     if (await updateProfileField(field, input, confirmInput))
       switchToDisplayMode(button, valueDisplay, input, confirmInput, field);
