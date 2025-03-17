@@ -9,7 +9,8 @@
     style="max-width: 10rem; aspect-ratio: 1 / 1"></dotlottie-wc>
 </div>
 <div class="row w-100 justify-content-center mt-4">
-  <div class="d-flex flex-column gap-3" style="max-width: 30rem">
+  <div class="d-flex flex-column gap-3"
+  style="max-width: 30rem">
     <h1 id="login-page-title">Welcome in space !</h1>
     <!-- Étape 1 : Username -->
     <form class="w-100 pre-login">
@@ -33,23 +34,17 @@
         id="pwd-input"
         placeholder="Password"
         required />
-      <label id="auth-label" class="d-none"></label>
+      <label id="auth-label" class="2fa-enabled d-none"></label>
       <input
         type="text"
         id="auth-input"
-        class="form-control d-none"
+        class="2fa-enabled form-control d-none"
         placeholder="Code" />
       <div class="d-flex justify-content-between gap-3 mt-2">
-        <button
-          data-action="submit-auth"
-          type="submit"
-          class="btn action-btn flex-grow-1">
+        <button data-action="submit-auth" type="submit" class="btn action-btn  flex-grow-1">
           LOG IN
         </button>
-        <button
-          data-action="forgot-pwd"
-          type="button"
-          class="btn action-btn flex-grow-1">
+        <button data-action="forgot-pwd" type="button" class="btn action-btn flex-grow-1">
           FORGOT PASSWORD ?
         </button>
       </div>
@@ -71,5 +66,6 @@
         >BACK TO SIGNIN</a
       >
     </div>
+
   </div>
 </div>

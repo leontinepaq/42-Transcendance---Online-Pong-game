@@ -20,23 +20,15 @@ export const loginActions = [
 export async function displayAuthSection(data, username) {
   document.getElementById("login-page-title").textContent =
     "Nice to see you again " + username + " !";
-  if (data.two_factor_mail == true) {
+  if (data.two_factor_mail == true)
     document.getElementById("auth-label").textContent = "2FA code received by mail";
-    show(document.getElementsByName("auth-label"));
-    show(document.getElementById("auth-input"));
-  }
-  if (data.two_factor_auth == true) {
+  if (data.two_factor_auth == true)
     document.getElementById("auth-label").textContent =
       "2FA code from authentificator app";
-    show(document.getElementsByName("auth-label"));
-    show(document.getElementById("auth-input"));
-  }
-  for (const el of document.getElementsByClassName("auth-login")) {
-    show(el);
-  }
-  for (const el of document.getElementsByClassName("pre-login")) {
-    hide(el);
-  }
+  if (data.two_factor_mail == true || data.two_factor_auth == true)
+    for (const el of document.getElementsByClassName("2fa-enabled")) show(el);
+  for (const el of document.getElementsByClassName("auth-login")) show(el);
+  for (const el of document.getElementsByClassName("pre-login")) hide(el);
 }
 
 export async function handleSignin(element, event) {

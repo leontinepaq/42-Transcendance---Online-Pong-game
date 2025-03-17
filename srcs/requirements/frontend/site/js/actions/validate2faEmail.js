@@ -17,7 +17,7 @@ export async function send2faEmail() {
     const response = await authFetchJson("/api/user/send_2fa_mail_activation/", {
       method: "POST",
     });
-    console.log("send2faEmail: " + response.message);
+    console.log("send2faEmail: " + response.details);
   } catch (error) {
     handleError(error, "Send 2fa error");
   }

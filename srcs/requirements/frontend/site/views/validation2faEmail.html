@@ -1,10 +1,9 @@
-<h1 id="page-title">Email verification required</h1>
+<h1 id="page-title">Email verification required to enable two-factor authentification</h1>
 <div class="row w-100 justify-content-center mt-4">
-  <div class="col-12 col-md-8 col-lg-6 d-flex flex-column gap-3">
-    <h3>
-      You chose two factor authentification by email<br />
-      Please confirm your email address with the code you received
-    </h3>
+  <div class="d-flex flex-column gap-3" style="max-width: 30rem">
+    <h4>
+      Confirm your email address with the code you received:
+    </h4>
     <input
       type="text"
       class="form-control"
@@ -17,13 +16,6 @@
     <button data-action="send-new-code" type="submit" class="btn w-100">
       SEND NEW CODE
     </button>
-    <div class="d-flex justify-content-between gap-3 mt-2">
-      <button data-action="disable-2fa" type="submit" class="btn action-btn w-100">
-        DISABLE 2FA
-      </button>
-      <button data-action="logout" type="button" class="btn action-btn w-100">
-        LOGOUT
-      </button>
-    </div>
+    <a data-action="navigate" href="profile" class="btn btn-outline-secondary">BACK TO PROFILE</a>
   </div>
 </div>
