@@ -11,7 +11,7 @@
   --color-light-transparent: #ffffffcc;
   --color-accent-transparent: #511db266;
 
-  --color-background: #20002c;
+  --color-background: #20002cb8;
 }
 
 /* GENERAL */
@@ -339,6 +339,8 @@ form {
   border-radius: 1.5rem;
   padding: 1rem;
   font-size: 1.2rem;
+  max-height: 400px;
+  max-width: 400px;
   min-height: 300px;
   min-width: 250px;
   height: 30vh;
