@@ -1,8 +1,6 @@
 import { navigate } from "../router.js";
 import { authFetchJson, handleError } from "../api.js";
 
-//<div class="mail">${user.email}</div>
-
 export const friendsActions = [
   {
     selector: '[data-action="friends"]',
@@ -361,7 +359,6 @@ async function sendFriendRequest(userId) {
 
 // Accept friend request
 async function acceptFriendRequest(userId) {
-  console.log("userIdaccept == ", userId)
   try {
     const response = await authFetchJson(`api/friends/accept-request/${userId}/`, {
       method: "POST",
@@ -370,6 +367,7 @@ async function acceptFriendRequest(userId) {
   } catch (error) {
     console.error("Error accepting friend request:", error);
   }
+  showTabUsers(PENDINGTAB);
 }
 
 // Reject friend request
@@ -382,6 +380,7 @@ async function declineFriendRequest(userId) {
   } catch (error) {
     console.error("Error rejecting friend request:", error);
   }
+  showTabUsers(PENDINGTAB);
 }
 
 // Remove friend
@@ -394,6 +393,7 @@ async function removeFriend(userId) {
   } catch (error) {
     console.error("Error removing friend:", error);
   }
+  showTabUsers(FRIENDSTAB);
 }
 
 // Block user
@@ -406,6 +406,7 @@ async function blockUser(userId) {
   } catch (error) {
     console.error("Error blocking user:", error);
   }
+  showTabUsers(ALLTAB);
 }
 
 // Unblock user
@@ -418,6 +419,7 @@ async function unblockUser(userId) {
   } catch (error) {
     console.error("Error unblocking user:", error);
   }
+  showTabUsers(BLOCKEDTAB);
 }
 
 
