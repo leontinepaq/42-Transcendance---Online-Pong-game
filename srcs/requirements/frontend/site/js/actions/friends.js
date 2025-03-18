@@ -1,6 +1,8 @@
 import { navigate } from "../router.js";
 import { authFetchJson, handleError } from "../api.js";
 
+//<div class="mail">${user.email}</div>
+
 export const friendsActions = [
   {
     selector: '[data-action="friends"]',
@@ -46,101 +48,6 @@ function initTabs() {
   });
 }
 
-//create card user
-function appendUser(user, userList, tab) {
-  const userCard = document.createElement("div");
-  userCard.classList.add("col-md-4");
-
-  if (tab === FRIENDSTAB) {
-    userCard.innerHTML = `
-          <div class="card user-card text-center p-3">
-              <img src="${user.avatar_url}" alt="Avatar de ${user.username}" class="user-avatar mx-auto" width="100" height="100">
-              <h5 class="mt-2">${user.username}</h5>
-              <button class="btn btn-primary unfriend" data-id="${user.id}">UNFRIEND</button>
-              <button class="btn btn-primary view-profile" data-action="userModal" data-id="${user.id}">Profile</button>
-          </div>
-      `;
-  }
-  if (tab === PENDINGTAB) {
-    userCard.innerHTML = `
-          <div class="card user-card text-center p-3">
-              <img src="${user.avatar_url}" alt="Avatar de ${user.username}" class="user-avatar mx-auto" width="100" height="100">
-              <h5 class="mt-2">${user.username}</h5>
-              <button class="btn btn-primary accept" data-id="${user.id}">ACCEPT</button>
-              <button class="btn btn-primary decline" data-id="${user.id}">DECLINE</button>
-              <button class="btn btn-primary view-profile" data-action="userModal" data-id="${user.id}">Profile</button>
-          </div>
-      `;
-  }
-  if (tab === BLOCKEDTAB) {
-    userCard.innerHTML = `
-          <div class="card user-card text-center p-3">
-              <img src="${user.avatar_url}" alt="Avatar de ${user.username}" class="user-avatar mx-auto" width="100" height="100">
-              <h5 class="mt-2">${user.username}</h5>
-              <button class="btn btn-primary unblock" data-id="${user.id}">UNBLOCK</button>
-              <button class="btn btn-primary view-profile" data-action="userModal" data-id="${user.id}">Profile</button>
-          </div>
-      `;
-  }
-  if (tab === ALLTAB) {
-    userCard.innerHTML = `
-          <div class="card user-card text-center p-3">
-              <img src="${user.avatar_url}" alt="Avatar de ${user.username}" class="user-avatar mx-auto" width="100" height="100">
-              <h5 class="mt-2">${user.username}</h5>
-              <button class="btn btn-primary addFriend" data-id="${user.id}">ADD</button>
-              <button class="btn btn-primary block" data-id="${user.id}">BLOCK</button>
-              <button class="btn btn-primary view-profile" data-action="userModal" data-id="${user.id}">Profile</button>
-          </div>
-      `;
-  }
-  userList.appendChild(userCard);
-}
-
-
-//Active les boutons profile (stats) et add/remove 
-function useButton(userData) {
-  document.querySelectorAll(".view-profile").forEach((button) => {
-    button.addEventListener("click", async (e) => {
-      const profileModal = new bootstrap.Modal(
-        document.getElementById("profileModal")
-      );
-
-      const userId = parseInt(e.target.getAttribute("data-id"));
-
-      const statUser = await getUserStatistics(userId);
-
-      const user = userData.find((u) => u.id === userId);
-
-      document.getElementById("profile-avatar").src = user.avatar;
-      document.getElementById("profile-name").innerText = user.username;
-      document.getElementById("profile-wins").innerText = `Wins: ${statUser.wins}`;
-      document.getElementById(
-        "profile-losses"
-      ).innerText = `Losses: ${statUser.losses}`;
-      if (user.is_active == true)
-        document.getElementById("profile-status").innerText = "Online";
-      else document.getElementById("profile-status").innerText = "Offline";
-
-      profileModal.show();
-    });
-  });
-
-  function attachEventListener(className, handler) {
-    document.querySelectorAll(`.${className}`).forEach((button) => {
-      button.addEventListener("click", (e) => {
-        const userId = parseInt(e.target.getAttribute("data-id"));
-        handler(userId);
-      });
-    });
-  }
-
-  attachEventListener("unfriend", removeFriend);
-  attachEventListener("accept", acceptFriendRequest);
-  attachEventListener("decline", declineFriendRequest);
-  attachEventListener("unblock", unblockUser);
-  attachEventListener("addFriend", sendFriendRequest);
-  attachEventListener("block", blockUser);
-}
 
 //Va chercher les users de la tab correspondante, cree une card user pour chacun. 
 async function showTabUsers(tabNbr) {
@@ -150,26 +57,228 @@ async function showTabUsers(tabNbr) {
   console.log("SHOWTABUSERS", tabNbr)
 
   if (tabNbr === FRIENDSTAB) {
-    userList = document.getElementById("pills-friends-tab");
+    userList = document.getElementById("pills-friends");
+    userList.innerHTML = "";
     userData = await showFriends();
   }
   else if (tabNbr === PENDINGTAB) {
-    userList = document.getElementById("pills-pending-tab");
+    userList = document.getElementById("pills-pending");
+    userList.innerHTML = "";
     userData = await showPendingRequests();
   }
   else if (tabNbr === BLOCKEDTAB) {
-    userList = document.getElementById("pills-blocked-tab");
+    userList = document.getElementById("pills-blocked");
+    userList.innerHTML = "";
     userData = await showBlockedUsers();
   }
   else if (tabNbr === ALLTAB) {
-    userList = document.getElementById("pills-all-users-tab");
+    userList = document.getElementById("pills-all-users");
+    userList.innerHTML = "";
     userData = await showAllUsers();
   }
   userData.forEach((user) => {
     appendUser(user, userList, tabNbr);
   });
+}
 
-  useButton(userData);
+//create card user
+function appendUser(user, userList, tab) {
+  const userCard = document.createElement("div");
+  userCard.classList.add("col-md-4");
+  userCard.dataset.userId = user.id;
+  console.log("appenduser id = ", user.id)
+
+  if (tab === FRIENDSTAB) {
+    userCard.innerHTML = `
+      <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <div class="avatar-container position-relative" style="cursor: pointer">
+                <img src="${user.avatar}" alt="Avatar" class="img-fluid rounded-circle neon-border view-profile-btn" data-user-id="${user.id}" style="max-width: 100px" />
+              </div>
+              <div class="infos ms-3">
+                <div class="username">${user.username}</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green d-none accept-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">accept</span>
+              </button>
+              <button type="button" class="btn btn-red d-none decline-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">decline</span>
+              </button>
+              <button type="button" class="btn d-none send-request-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">send request</span>
+              </button>
+              <button type="button" class="btn btn-red d-none block-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn removef-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removef</span>
+              </button>
+              <button type="button" class="btn d-none removeb-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removeb</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+  if (tab === PENDINGTAB) {
+    userCard.innerHTML = `
+    <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <div class="avatar-container position-relative" style="cursor: pointer">
+                <img src="${user.avatar}" alt="Avatar" class="img-fluid rounded-circle neon-border view-profile-btn" data-user-id="${user.id}" style="max-width: 100px" />
+              </div>
+              <div class="infos ms-3">
+                <div class="username">${user.username}</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green accept-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">accept</span>
+              </button>
+              <button type="button" class="btn btn-red decline-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">decline</span>
+              </button>
+              <button type="button" class="btn d-none send-request-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">send request</span>
+              </button>
+              <button type="button" class="btn btn-red d-none block-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn d-none removef-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removef</span>
+              </button>
+              <button type="button" class="btn d-none removeb-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removeb</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+  if (tab === BLOCKEDTAB) {
+    userCard.innerHTML = `
+    <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <div class="avatar-container position-relative" style="cursor: pointer">
+                <img src="${user.avatar}" alt="Avatar" class="img-fluid rounded-circle neon-border view-profile-btn" data-user-id="${user.id}" style="max-width: 100px" />
+              </div>
+              <div class="infos ms-3">
+                <div class="username">${user.username}</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green d-none accept-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">accept</span>
+              </button>
+              <button type="button" class="btn btn-red d-none decline-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">decline</span>
+              </button>
+              <button type="button" class="btn d-none send-request-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">send request</span>
+              </button>
+              <button type="button" class="btn btn-red d-none block-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn d-none removef-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removef</span>
+              </button>
+              <button type="button" class="btn removeb-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removeb</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+  if (tab === ALLTAB) {
+    userCard.innerHTML = `
+    <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <div class="avatar-container position-relative" style="cursor: pointer">
+                <img src="${user.avatar}" alt="Avatar" class="img-fluid rounded-circle neon-border view-profile-btn" data-user-id="${user.id}" style="max-width: 100px" />
+              </div>
+              <div class="infos ms-3">
+                <div class="username">${user.username}</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green d-none accept-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">accept</span>
+              </button>
+              <button type="button" class="btn btn-red d-none decline-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">decline</span>
+              </button>
+              <button type="button" class="btn send-request-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">send request</span>
+              </button>
+              <button type="button" class="btn btn-red block-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn d-none removef-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removef</span>
+              </button>
+              <button type="button" class="btn d-none removeb-btn" data-user-id="${user.id}">
+                <span class="material-symbols-outlined">removeb</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+  userList.appendChild(userCard);
+  useButton(userCard, user);
+}
+
+//Active les boutons profile (stats) et add/remove 
+function useButton(userCard, user) {
+
+  console.log("userId == ", user.id)
+
+  const viewProfileBtn = userCard.querySelector(".view-profile-btn");
+  if (viewProfileBtn) {
+    viewProfileBtn.addEventListener("click", async () => {
+      const profileModal = new bootstrap.Modal(
+        document.getElementById("profileModal")
+      );
+
+      const statUser = await getUserStatistics(user.id);
+
+      document.getElementById("profile-avatar").src = user.avatar;
+      document.getElementById("profile-name").innerText = user.username;
+      document.getElementById("profile-wins").innerText = `Wins: ${statUser.wins}`;
+      document.getElementById("profile-losses").innerText = `Losses: ${statUser.losses}`;
+      document.getElementById("profile-status").innerText = user.is_active ? "Online" : "Offline";
+
+      profileModal.show();
+    });
+  }
+
+  function attachEventListener(buttonClass, handler) {
+    const button = userCard.querySelector(`.${buttonClass}`);
+    if (button) {
+      button.addEventListener("click", () => {
+        handler(user.id);
+      });
+    }
+  }
+
+  attachEventListener("accept-btn", acceptFriendRequest);
+  attachEventListener("decline-btn", declineFriendRequest);
+  attachEventListener("send-request-btn", sendFriendRequest);
+  attachEventListener("block-btn", blockUser);
+  attachEventListener("removef-btn", removeFriend);
+  attachEventListener("removeb-btn", unblockUser);
 }
 
 //retourne un tableau avec tous les amis du user
@@ -225,6 +334,7 @@ async function showAllUsers() {
 
 //va chercher les stats d'un user identifie par id
 async function getUserStatistics(id) {
+  console.log("get user stats called ", user.id)
   let data;
   try {
     data = await authFetchJson(`api/dashboard/display-user-stats/?user_id=${id}`, {
@@ -251,6 +361,7 @@ async function sendFriendRequest(userId) {
 
 // Accept friend request
 async function acceptFriendRequest(userId) {
+  console.log("userIdaccept == ", userId)
   try {
     const response = await authFetchJson(`api/friends/accept-request/${userId}/`, {
       method: "POST",

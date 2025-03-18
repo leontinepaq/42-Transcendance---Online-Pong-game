@@ -19,6 +19,8 @@ from .serializers import (FriendRequestSerializer,
                           PendingRequestSerializer,
                           UserIdMissing)
 
+from users.serializers import UserPublicProfileSerializer
+
 
 @extend_schema(
     summary="Current user sends friend request to other user",
@@ -38,12 +40,11 @@ from .serializers import (FriendRequestSerializer,
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def send_request(request):
+def send_request(request, user_id):
     sender = request.user
-    receiver_id = request.query_params.get("user_id")
-    if not receiver_id:
+    if not user_id:
         return UserIdMissing().response()
-    receiver = get_object_or_404(UserProfile, id=receiver_id)
+    receiver = get_object_or_404(UserProfile, id=user_id)
 
     details = None
     if sender == receiver:
@@ -104,13 +105,12 @@ def pending_request(request):
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def accept_request(request):
+def accept_request(request, user_id):
     receiver = request.user
-    sender_id = request.query_params.get("user_id")
-    if not sender_id:
+    if not user_id:
         return UserIdMissing().response()
 
-    sender = UserProfile.objects.filter(id=sender_id).first()
+    sender = UserProfile.objects.filter(id=user_id).first()
     friend_request = FriendRequest.objects.filter(sender=sender,
                                                   receiver=receiver).first()
     if not friend_request:
@@ -138,13 +138,12 @@ def accept_request(request):
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def decline_request(request):
+def decline_request(request, user_id):
     receiver = request.user
-    sender_id = request.query_params.get("user_id")
-    if not sender_id:
+    if not user_id:
         return UserIdMissing().response()
 
-    sender = UserProfile.objects.filter(id=sender_id).first()
+    sender = UserProfile.objects.filter(id=user_id).first()
     friend_request = FriendRequest.objects.filter(sender=sender,
                                                   receiver=receiver).first()
     if not friend_request:
@@ -169,13 +168,12 @@ def decline_request(request):
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def delete_friend(request):
+def delete_friend(request, user_id):
     user = request.user
-    unfriend_id = request.query_params.get("user_id")
-    if not unfriend_id:
+    if not user_id:
         return UserIdMissing().response()
 
-    unfriend = UserProfile.objects.filter(id=unfriend_id).first()
+    unfriend = UserProfile.objects.filter(id=user_id).first()
     if not user.friends.filter(id=unfriend.id).exists():
         return Response({"details": "You are not friends with this user"},
                         status=404)
@@ -200,12 +198,11 @@ def delete_friend(request):
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def block_user(request):
+def block_user(request, user_id):
     user = request.user
-    blocked_id = request.query_params.get("user_id")
-    if not blocked_id:
+    if not user_id:
         return UserIdMissing().response()
-    blocked = UserProfile.objects.filter(id=blocked_id).first()
+    blocked = UserProfile.objects.filter(id=user_id).first()
     if not blocked:
         return UserNotFoundErrorSerializer().response()
     if user.blocked.filter(id=blocked.id).exists():
@@ -231,12 +228,11 @@ def block_user(request):
 )
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def unblock_user(request):
+def unblock_user(request, user_id):
     user = request.user
-    unblocked_id = request.query_params.get("user_id")
-    if not unblocked_id:
+    if not user_id:
         return UserIdMissing().response()
-    unblocked = UserProfile.objects.filter(id=unblocked_id).first()
+    unblocked = UserProfile.objects.filter(id=user_id).first()
     if not unblocked:
         return UserNotFoundErrorSerializer().response()
     if not user.blocked.filter(id=unblocked.id).exists():
@@ -248,21 +244,24 @@ def unblock_user(request):
     summary="Display current user's friends",
     description="Nothing needed, just a small endpoint to give you a list of all \
         current user's friends",
-    responses={200: UserFriendsSerializer(many=True),}
+    responses={200: UserPublicProfileSerializer(many=True),}
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_friends(request):
     user = request.user
     friends = user.friends.all()
-    serializer = UserFriendsSerializer(friends, many=True)
+    print("printing...")
+    for friend in friends:
+        print(friend.username)
+    serializer = UserPublicProfileSerializer(friends, many=True)
     return Response(serializer.data, status=200)
 
 
 @extend_schema(
     summary="Display other user's friends",
     description="Give user ID, returns user's list of friends",
-    responses={200: UserFriendsSerializer(many=True),
+    responses={200: UserPublicProfileSerializer(many=True),
                400: UserIdMissing,
                404: UserNotFoundErrorSerializer},
     parameters=[OpenApiParameter(name="user_id",
@@ -272,29 +271,28 @@ def get_friends(request):
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_other_user_friends(request):
-    user_id = request.query_params.get("user_id")
+def get_other_user_friends(request, user_id):
     if not user_id:
         return UserIdMissing().response()
     user = UserProfile.objects.filter(id=user_id)
     if not user.exists():
         return UserNotFoundErrorSerializer().response()
     friends = user.first().friends.all()
-    serializer = UserFriendsSerializer(friends, many=True)
+    serializer = UserPublicProfileSerializer(friends, many=True)
     return Response(serializer.data, status=200)
 
 
 @extend_schema(
     summary="Display current user's block list",
     description="Gives you a list of all current user's blocked users",
-    responses={200: UserFriendsSerializer(many=True),}
+    responses={200: UserPublicProfileSerializer(many=True),}
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_user_blocked(request):
     user = request.user
     blocked = user.blocked.all()
-    serializer = UserFriendsSerializer(blocked, many=True)
+    serializer = UserPublicProfileSerializer(blocked, many=True)
     return Response(serializer.data, status=200)
 
 
