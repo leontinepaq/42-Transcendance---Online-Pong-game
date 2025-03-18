@@ -1,7 +1,7 @@
 import random
 import math
 
-TOLERANCE = 0.5
+SCORE_MAX = 3
 
 def symetric(x):
     return 100 - x
@@ -98,6 +98,7 @@ class Pong:
         self.score = [0, 0]
         self.use_ai = use_ai
         self.paused = True
+        self.over = False
         self.reset()
 
     def reset(self):
@@ -113,13 +114,15 @@ class Pong:
             self.right.move(delta)
 
     def update_ai_paddle(self):
-        # if self.use_ai and self.ball.x > 50:  # AI moves only when the ball is on its side
-        reaction_chance = 0.5  # 80% chance to react to ball movement
+        # if self.use_ai and self.ball.x > 50:  
+        # AI moves only when the ball is on its side
+        if self.ball.x < 60:
+                return
+        reaction_chance = 0.7  # 80% chance to react to ball movement
         if random.random() < reaction_chance:
             # AI aims slightly off
-            target_y = self.ball.y + random.uniform(-7, 7)
-            move_amount = self.ai_speed * \
-                random.uniform(0.8, 1.2)  # Imperfect speed
+            target_y = self.ball.y + random.uniform(-10, 10)
+            move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
             if self.right.y < target_y:
                 self.right.move(move_amount)
             elif self.right.y > target_y:
@@ -136,6 +139,8 @@ class Pong:
             else:
                 self.score[1] += 1
             self.reset()
+        if self.score[0] >= SCORE_MAX or self.score[1] >= SCORE_MAX:
+            self.over = True
 
     def get_state(self, sym=False):
         score=[self.score[0], self.score[1]]
@@ -146,7 +151,8 @@ class Pong:
             "right": self.right.get_state(sym),
             "ball": self.ball.get_state(sym),
             "paused": self.paused,
-            "score": score
+            "score": score,
+            "over": self.over
         }
 
     def toggle_pause(self):
@@ -159,7 +165,7 @@ class Pong:
         return self.paused
 
     def update(self):
-        if self.paused:
+        if self.paused or self.over:
             return
         self.update_ball()
         if self.use_ai:

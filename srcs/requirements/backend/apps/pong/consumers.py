@@ -10,18 +10,7 @@ from django.core.cache import cache
 
 User = get_user_model()
 
-class PongSoloGameConsumer(AsyncWebsocketConsumer):
-    async def init(self):
-        self.game = Pong(use_ai=True)
-    
-    async def connect(self):
-        self.user = await sync_to_async(self.get_user)()
-        self.game_running=True
-        await self.init()
-        await self.accept()
-        await self.update()
-        asyncio.create_task(self.loop())
-    
+class UserConsumer(AsyncWebsocketConsumer):
     def get_token_from_cookies(self):
         cookie_header = dict(self.scope["headers"]).get(b"cookie", b"").decode()
         cookies = dict(cookie.split("=", 1)
@@ -39,6 +28,18 @@ class PongSoloGameConsumer(AsyncWebsocketConsumer):
             return AnonymousUser()
         except:            
             return AnonymousUser()
+
+class PongSoloGameConsumer(UserConsumer):
+    async def init(self):
+        self.game = Pong(use_ai=True)
+    
+    async def connect(self):
+        self.user = await sync_to_async(self.get_user)()
+        self.game_running=True
+        await self.init()
+        await self.accept()
+        await self.update()
+        asyncio.create_task(self.loop())
         
     async def end(self):
         return 
@@ -61,7 +62,7 @@ class PongSoloGameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps(self.game.get_state()))
         
     async def loop(self):
-        while self.game_running:
+        while self.game_running and not self.game.over:
             if not self.game.is_paused():
                 self.game.update()
                 await self.update()
@@ -87,11 +88,14 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
         self.game = Pong(use_ai=False)
         self.group_name = f"pong_{self.game_id}"
         self.master = self.get_connected_players() == 0
+        self.player1 = self.master
+        self.player2 = self.get_connected_players() == 1
+        self.spectator = not self.player1 and not self.player2
         if not self.master:
             self.game_running=False
         if self.get_connected_players() < 2:
             await self.channel_layer.group_add(self.group_name,
-                                            self.channel_name)
+                                               self.channel_name)
             self.incr_connected_players()
         else:
             self.close(4001)
