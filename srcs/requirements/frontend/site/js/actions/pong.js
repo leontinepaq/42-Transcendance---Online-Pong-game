@@ -181,7 +181,9 @@ async function handleEndGame(name) // handle la creation des games ici
 function checkScore(state) {
   document.getElementById("leftScore").textContent = state.score[0];
   document.getElementById("rightScore").textContent = state.score[1];
-  if (state.score[0] == 1 || state.score[1] == 1) {
+  if (state.over) {
+    // console.log(state.score[0])
+    // console.log(state.score[1])
     document.removeEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
     closeSocket();
