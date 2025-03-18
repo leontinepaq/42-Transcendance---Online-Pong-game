@@ -4,14 +4,6 @@
   --chart-text-color: var(--color-light);
 }
 
-.custom-border {
-  border: 0.2rem solid var(--color-light);
-  border-radius: 0.4rem;
-  padding: 1rem;
-  background-color: var(--color-dark-transparent);
-  height: 100%;
-}
-
 /* Pour fixer la largeur des lignes et les centrer dans le container 
 todo @leontinepaq : regarder si utile ou supprimer / renommer */ 
 .fixed-width-row {
@@ -19,6 +11,14 @@ todo @leontinepaq : regarder si utile ou supprimer / renommer */
   min-height: 20rem;
 }
 
+.dashboard-border {
+  border: 0.2rem solid var(--color-light);
+  /* box-shadow: 0px 0px 10px 4px var(--color-accent), inset 0px 0px 2px 2px var(--color-accent); */
+  border-radius: 0.4rem;
+  padding: 1rem;
+  background-color: var(--color-dark-transparent);
+  height: 100%;
+}
 
 .container .dashboard-block > .row:first-child > [class*="col"] {
   margin-top: calc(var(--bs-gutter-y) * 0.5);

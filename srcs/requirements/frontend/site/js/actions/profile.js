@@ -29,8 +29,7 @@ export async function loadUserProfile() {
   const usernameElem = document.getElementById("display-username");
   const emailElem = document.getElementById("display-email");
 
-  usernameElem.textContent = "**charging username**"; //todo @leontinepaq a changer ?
-  emailElem.textContent = "**charging email**";
+  for (const el of document.getElementsByClassName("edit-btn")) el.disabled = true;
   try {
     const user = await authFetchJson("api/profile/", { method: "GET" });
     usernameElem.textContent = user.username;
@@ -38,6 +37,7 @@ export async function loadUserProfile() {
     if (user.avatarUrl)
       document.getElementById("profile-avatar").src = user.avatarUrl;
     display2fa(user);
+    for (const el of document.getElementsByClassName("edit-btn")) el.disabled = false;
   } catch (error) {
     handleError(error, "Load user profile error");
   }
@@ -50,7 +50,8 @@ async function switchToEditMode(button, valueDisplay, input, confirmInput) {
   }
   show(input.parentElement); //todo @leontinepaq a checker si pas plutot par le parent 
   if (confirmInput) show(confirmInput);
-  button.textContent = "SAVE";
+  button.textContent = button.dataset.saveText;
+  button.dataset.mode = "save"
 }
 
 async function switchToDisplayMode(
@@ -70,8 +71,9 @@ async function switchToDisplayMode(
     show(valueDisplay);
   }
   hide(input.parentElement);
-  if (confirmInput) hide(confirmInput);
-  button.textContent = "EDIT " + field.toUpperCase();
+  if (confirmInput) hide (confirmInput);
+  button.textContent = button.dataset.editText;
+  button.dataset.mode = "edit";
 }
 
 const PROFILE_FIELDS = {
@@ -108,18 +110,15 @@ async function updateProfileField(field, input, confirmInput) {
 }
 
 async function toggleEdit(element, event) {
-  const field = element.getAttribute("data-field");
+  const field = element.dataset.field;
   const valueDisplay = document.getElementById(`display-${field}`);
   const input = document.getElementById(`edit-${field}`);
   const confirmInput = document.getElementById(`confirm-${field}`) || null;
   const button = element;
 
-  if (button.textContent.trim() === "EDIT " + field.toUpperCase())
+  if (element.dataset.mode === "edit")
     switchToEditMode(button, valueDisplay, input, confirmInput);
-  else if (
-    button.textContent.trim() === "SAVE" ||
-    button.textContent.trim() === "UPDATE PASSWORD"
-  ) {
+  else{
     button.disabled = true;
     if (await updateProfileField(field, input, confirmInput))
       switchToDisplayMode(button, valueDisplay, input, confirmInput, field);

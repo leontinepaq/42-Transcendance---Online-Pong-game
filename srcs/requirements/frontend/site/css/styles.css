@@ -266,7 +266,7 @@ form {
 }
 
 .card-user {
-  background-color: var(--color-background);
+  background-color: var(--color-dark-transparent);
   color: white;
   margin-top: 1rem;
   margin-bottom: 1rem;

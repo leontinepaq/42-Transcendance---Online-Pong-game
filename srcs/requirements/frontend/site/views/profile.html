@@ -56,16 +56,21 @@
                 <div class="col-12 col-md-8">
                   <div
                     id="display-username"
-                    class="username text-break text-center text-lg-start"></div>
+                    class="username text-break text-center text-lg-start">
+                    Loading username...
+                  </div>
                   <div id="edit-username-div" class="d-none">
                     <input type="text" id="edit-username" class="form-control" />
                   </div>
                 </div>
                 <div class="col-12 col-md-8 col-lg-4 mt-2 mt-lg-0">
                   <button
+                    data-mode="edit"
+                    data-edit-text="EDIT USERNAME"
+                    data-save-text="SAVE"
                     data-action="toggle-edit"
                     data-field="username"
-                    class="btn btn-sm w-100">
+                    class="edit-btn btn btn-sm w-100">
                     EDIT USERNAME
                   </button>
                 </div>
@@ -76,7 +81,9 @@
                 <div class="col-12 col-md-8">
                   <div
                     id="display-email"
-                    class="mail text-break text-center text-lg-start"></div>
+                    class="mail text-break text-center text-lg-start">
+                    Loading email...
+                  </div>
                   <!-- todo @leontinepaq passer par le parent plutot que l'input ?-->
                   <div id="edit-email-div" class="d-none">
                     <input type="text" id="edit-email" class="form-control" />
@@ -84,9 +91,12 @@
                 </div>
                 <div class="col-12 col-md-8 col-lg-4 mt-2 mt-lg-0">
                   <button
+                    data-mode="edit"
+                    data-edit-text="EDIT EMAIL"
+                    data-save-text="SAVE"
                     data-action="toggle-edit"
                     data-field="email"
-                    class="btn btn-sm w-100">
+                    class="edit-btn btn btn-sm w-100">
                     EDIT EMAIL
                   </button>
                 </div>
@@ -102,7 +112,6 @@
         id="security"
         role="tabpanel"
         aria-labelledby="security-tab">
-
         <!-- Password-->
         <div class="card card-user neon-border p-3">
           <div
@@ -119,9 +128,11 @@
               class="form-control my-2"
               placeholder="Confirm password" />
             <button
+              data-mode="save"
+              data-save-text="UPDATE PASSWORD"
               data-action="toggle-edit"
               data-field="password"
-              class="btn btn-sm w-100 mt-3">
+              class="edit-btn btn btn-sm w-100">
               UPDATE PASSWORD
             </button>
           </div>
@@ -130,7 +141,6 @@
         <!-- 2FA -->
         <div class="card card-user neon-border p-3 mt-4">
           <div class="card-body text-center">
-
             <!-- Si 2FA est activé -->
             <div class="mb-2 d-none" id="display-disable-2fa">
               <span id="span-2fa-mail" class="fs-5 d-none"
@@ -140,7 +150,9 @@
                 >Two-factor authentication by app is required</span
               >
               <div class="mt-2">
-                <button data-action="disable-2fa" class="btn btn-outline-secondary w-100">
+                <button
+                  data-action="disable-2fa"
+                  class="btn btn-outline-secondary w-100">
                   DISABLE 2FA
                 </button>
               </div>
@@ -152,10 +164,16 @@
                 <span class="fs-5">Enable Two-Factor Authentication</span>
               </div>
               <div class="d-flex flex-column flex-md-row gap-3 mt-3 w-100">
-                <a data-action="navigate" href="validation2faEmail" class="btn btn-outline-secondary flex-grow-1">
+                <a
+                  data-action="navigate"
+                  href="validation2faEmail"
+                  class="btn btn-outline-secondary flex-grow-1">
                   ENABLE 2FA BY EMAIL
                 </a>
-                <a data-action="navigate" href="validation2faApp" class="btn btn-outline-secondary flex-grow-1">
+                <a
+                  data-action="navigate"
+                  href="validation2faApp"
+                  class="btn btn-outline-secondary flex-grow-1">
                   ENABLE 2FA BY APP
                 </a>
               </div>

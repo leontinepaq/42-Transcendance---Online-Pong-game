@@ -34,75 +34,82 @@
       </li>
     </ul>
 
-    <div class="container dashboard-block custom-border mt-2 mb-4">
-      <!-- ROW 1 -->
-      <div class="row g-5 align-items-stretch fixed-width-row">
-        <div class="col-md-3 d-none d-md-block">
-          <div
-            id="lottie-animation"
-            class="p-3 h-100 d-flex align-items-center justify-content-center">
-            <dotlottie-wc
-              src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie"
-              loop
-              autoplay
-              style="width: 100%; aspect-ratio: 1 / 1"></dotlottie-wc>
-          </div>
-        </div>
+    <div class="tab-content mt-4">
+      <!-- STATISTICS-->
+      <div class="tab-pane fade show active" id="profile-info" role="tabpanel">
+        <div class="card card-user neon-border p-3 text-center">
+          <div class="card-body">
+            <!-- ROW 1 -->
+            <div class="row g-5 align-items-stretch fixed-width-row">
+              <div class="col-md-3 d-none d-md-block">
+                <div
+                  id="lottie-animation"
+                  class="p-3 h-100 d-flex align-items-center justify-content-center">
+                  <dotlottie-wc
+                    src="https://lottie.host/9b701824-c561-4fb2-a404-2b60b5e0c6a9/eU2X6820ry.lottie"
+                    loop
+                    autoplay
+                    style="width: 100%; aspect-ratio: 1 / 1"></dotlottie-wc>
+                </div>
+              </div>
 
-        <div class="col-md-5 d-flex flex-column gap-4">
-          <div
-            class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-            <h4>Matches Won</h4>
-            <h4 class="stat-value mb-0" id="matches-won">-10</h4>
-          </div>
-          <div
-            class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center mt-3">
-            <h4>Winning Streak</h4>
-            <h4 class="stat-value mb-0" id="win-streak">-10</h4>
-          </div>
-        </div>
+              <div class="col-md-5 d-flex flex-column gap-4">
+                <div
+                  class="p-3 dashboard-border flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+                  <h4>Matches Won</h4>
+                  <h4 class="stat-value mb-0" id="matches-won">-10</h4>
+                </div>
+                <div
+                  class="p-3 dashboard-border flex-grow-1 d-flex flex-column align-items-center justify-content-center mt-3">
+                  <h4>Winning Streak</h4>
+                  <h4 class="stat-value mb-0" id="win-streak">-10</h4>
+                </div>
+              </div>
 
-        <div class="col-md-4">
-          <div
-            class="p-3 custom-border h-100 d-flex flex-column align-items-center justify-content-center position-relative">
-            <canvas class="chart" id="win-rate-chart"></canvas>
-            <div class="chart-text">
-              <h4 id="win-rate-percentage" class="chart-percentage">0%</h4>
-              <h4 class="chart-label">Win Rate</h4>
+              <div class="col-md-4">
+                <div
+                  class="p-3 dashboard-border h-100 d-flex flex-column align-items-center justify-content-center position-relative">
+                  <canvas class="chart" id="win-rate-chart"></canvas>
+                  <div class="chart-text">
+                    <h4 id="win-rate-percentage" class="chart-percentage">0%</h4>
+                    <h4 class="chart-label">Win Rate</h4>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- ROW 2 -->
-      <div class="row g-5 align-items-stretch fixed-width-row">
-        <div class="col-md-6">
-          <div
-            class="p-3 custom-border h-100 d-flex flex-column align-items-center justify-content-center position-relative">
-            <canvas class="chart" id="games-played"></canvas>
-          </div>
-        </div>
+            <!-- ROW 2 -->
+            <div class="row g-5 align-items-stretch fixed-width-row">
+              <div class="col-md-6">
+                <div
+                  class="p-3 dashboard-border h-100 d-flex flex-column align-items-center justify-content-center position-relative">
+                  <canvas class="chart" id="games-played"></canvas>
+                </div>
+              </div>
 
-        <div class="col-md-6 d-flex flex-column gap-4">
-          <div
-            class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-            <h4>Total Time Played</h4>
-            <h4 class="stat-value mb-0" id="total-time">00:00:00</h4>
-          </div>
-          <div
-            class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center mt-3">
-            <h4>Online Opponents Played</h4>
-            <h4 class="stat-value mb-0" id="online-opponents">-10</h4>
-          </div>
-        </div>
-      </div>
+              <div class="col-md-6 d-flex flex-column gap-4">
+                <div
+                  class="p-3 dashboard-border flex-grow-1 d-flex flex-column align-items-center justify-content-center">
+                  <h4>Total Time Played</h4>
+                  <h4 class="stat-value mb-0" id="total-time">00:00:00</h4>
+                </div>
+                <div
+                  class="p-3 dashboard-border flex-grow-1 d-flex flex-column align-items-center justify-content-center mt-3">
+                  <h4>Online Opponents Played</h4>
+                  <h4 class="stat-value mb-0" id="online-opponents">-10</h4>
+                </div>
+              </div>
+            </div>
 
-      <!-- ROW 3 -->
-      <div class="row g-5 align-items-stretch fixed-width-row">
-        <div class="col">
-          <div
-            class="p-3 custom-border h-100 d-flex flex-column align-items-center justify-content-center position-relative">
-            <canvas class="chart"   id="match-histogram"></canvas>
+            <!-- ROW 3 -->
+            <div class="row g-5 align-items-stretch fixed-width-row">
+              <div class="col">
+                <div
+                  class="p-3 dashboard-border h-100 d-flex flex-column align-items-center justify-content-center position-relative">
+                  <canvas class="chart" id="match-histogram"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
