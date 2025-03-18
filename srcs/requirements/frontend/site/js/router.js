@@ -1,6 +1,7 @@
 import checkAuth from "./api.js";
 import loadView from "./views.js";
 import closeSocket from "./actions/pong.js";
+import connect_socket_users from "./chat.js"
 
 window.addEventListener("popstate", async (event) => {
   if (event.state) {
@@ -13,10 +14,11 @@ window.addEventListener("popstate", async (event) => {
 });
 
 const publicRoutes = new Set(["login", "signup"]);
+let socket_users = null;
 
 export async function authRedirector(route) {
   const isAuthenticated = await checkAuth();
-  console.log({ isAuthenticated });
+  if (isAuthenticated) connect_socket_users();
   if (isAuthenticated && publicRoutes.has(route)) return "home";
   else if (!isAuthenticated && !publicRoutes.has(route)) return "login";
   return route;
