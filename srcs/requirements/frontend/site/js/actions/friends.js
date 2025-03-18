@@ -22,14 +22,10 @@ const PENDINGTAB = 2;
 const BLOCKEDTAB = 3;
 const ALLTAB = 4;
 
-//UTILS
-
 function initTabs() {
-  console.log("Initializing tabs...");
   const tabs = document.querySelectorAll('.nav-link');
   tabs.forEach((button) => {
     button.addEventListener('shown.bs.tab', (event) => {
-      console.log("Tab clicked: ", button.innerHTML);
 
       const tabId = event.target.id;
 
@@ -46,13 +42,9 @@ function initTabs() {
   });
 }
 
-
-//Va chercher les users de la tab correspondante, cree une card user pour chacun. 
 async function showTabUsers(tabNbr) {
   let userData = [];
   let userList;
-
-  console.log("SHOWTABUSERS", tabNbr)
 
   if (tabNbr === FRIENDSTAB) {
     userList = document.getElementById("pills-friends");
@@ -79,20 +71,20 @@ async function showTabUsers(tabNbr) {
   });
 }
 
-//create card user
 function appendUser(user, userList, tab) {
   const userCard = document.createElement("div");
   userCard.classList.add("col-md-4");
   userCard.dataset.userId = user.id;
-  console.log("appenduser id = ", user.id)
 
+  //COUCOU LEON LE BOUTON PROFILE EST LIGNE 97, 129, etc.. 
+  // (oui c'est degueu et ca fait 10000 lignes pas mon dos hihi)
   if (tab === FRIENDSTAB) {
     userCard.innerHTML = `
       <div class="card card-user neon-border gap-3">
         <div class="card-body">
           <div class="d-flex justify-content-between" style="align-items: center">
             <div class="d-flex justify-content-start">
-              <div class="avatar-container position-relative" style="cursor: pointer">
+              <div class="avatar-container position-relative" style="cursor: pointer">    
                 <img src="${user.avatar}" alt="Avatar" class="img-fluid rounded-circle neon-border view-profile-btn" data-user-id="${user.id}" style="max-width: 100px" />
               </div>
               <div class="infos ms-3">
@@ -238,11 +230,8 @@ function appendUser(user, userList, tab) {
   useButton(userCard, user);
 }
 
-//Active les boutons profile (stats) et add/remove 
 function useButton(userCard, user) {
-
-  console.log("userId == ", user.id)
-
+  //COUCOU LEON C'EST ICI QU'ON GERE LE BOUTON VIEWPROFILE QUI MARCHE PO
   const viewProfileBtn = userCard.querySelector(".view-profile-btn");
   if (viewProfileBtn) {
     viewProfileBtn.addEventListener("click", async () => {
@@ -262,6 +251,7 @@ function useButton(userCard, user) {
     });
   }
 
+  //COUCOU LEON CA CA MARCHE BIEN FAUT PAS TOUCHER
   function attachEventListener(buttonClass, handler) {
     const button = userCard.querySelector(`.${buttonClass}`);
     if (button) {
@@ -279,7 +269,6 @@ function useButton(userCard, user) {
   attachEventListener("removeb-btn", unblockUser);
 }
 
-//retourne un tableau avec tous les amis du user
 async function showFriends() {
   let tab = [];
   try {
@@ -292,7 +281,6 @@ async function showFriends() {
   }
 }
 
-// Show pending friend requests
 async function showPendingRequests() {
   try {
     const pendingRequests = await authFetchJson(`api/friends/pending-requests/`);
@@ -304,7 +292,6 @@ async function showPendingRequests() {
   }
 }
 
-// Show blocked users
 async function showBlockedUsers() {
   let tab = [];
   try {
@@ -317,12 +304,10 @@ async function showBlockedUsers() {
   }
 }
 
-// Show all users
 async function showAllUsers() {
   let tab = [];
   try {
     tab = await authFetchJson(`api/profile/all/`);
-    console.log("All users:", tab);
     return tab;
   } catch (error) {
     console.error("Error fetching all users:", error);
@@ -330,8 +315,8 @@ async function showAllUsers() {
   }
 }
 
-//va chercher les stats d'un user identifie par id
 async function getUserStatistics(id) {
+  // coucou leon Je t'ai laisse un console log ici pq chu sympa
   console.log("get user stats called ", user.id)
   let data;
   try {
@@ -345,7 +330,6 @@ async function getUserStatistics(id) {
   return data;
 }
 
-// Send friend request
 async function sendFriendRequest(userId) {
   try {
     const response = await authFetchJson(`api/friends/send-request/${userId}/`, {
@@ -357,7 +341,6 @@ async function sendFriendRequest(userId) {
   }
 }
 
-// Accept friend request
 async function acceptFriendRequest(userId) {
   try {
     const response = await authFetchJson(`api/friends/accept-request/${userId}/`, {
@@ -370,7 +353,6 @@ async function acceptFriendRequest(userId) {
   showTabUsers(PENDINGTAB);
 }
 
-// Reject friend request
 async function declineFriendRequest(userId) {
   try {
     const response = await authFetchJson(`api/friends/decline-request/${userId}/`, {
@@ -383,7 +365,6 @@ async function declineFriendRequest(userId) {
   showTabUsers(PENDINGTAB);
 }
 
-// Remove friend
 async function removeFriend(userId) {
   try {
     const response = await authFetchJson(`api/friends/delete-friend/${userId}/`, {
@@ -396,7 +377,6 @@ async function removeFriend(userId) {
   showTabUsers(FRIENDSTAB);
 }
 
-// Block user
 async function blockUser(userId) {
   try {
     const response = await authFetchJson(`api/friends/block-user/${userId}/`, {
@@ -409,7 +389,6 @@ async function blockUser(userId) {
   showTabUsers(ALLTAB);
 }
 
-// Unblock user
 async function unblockUser(userId) {
   try {
     const response = await authFetchJson(`api/friends/unblock-user/${userId}/`, {
