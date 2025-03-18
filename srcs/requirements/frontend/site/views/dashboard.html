@@ -3,13 +3,14 @@
   style="min-height: inherit">
   <!-- <h1 class="text-center mb-5">DASHBOARD</h1> -->
 
-  <a data-action="navigate" href="dashboard" class="btn mb-5">REFRESH</a>
+  <a data-i18n="refresh" data-action="navigate" href="dashboard" class="btn mb-5">REFRESH</a>
 
   <div class="col-10">
     <!-- Navigation Tabs -->
     <ul class="nav nav-pills nav-justified" role="tablist">
       <li class="nav-item">
         <button
+          data-i18n="statistics"
           class="nav-link active"
           id="statistics-tab"
           data-bs-toggle="pill"
@@ -22,6 +23,7 @@
       </li>
       <li class="nav-item">
         <button
+          data-i18n="matchHistory"
           class="nav-link"
           id="match-history-tab"
           data-bs-toggle="pill"
@@ -52,12 +54,12 @@
         <div class="col-md-5 d-flex flex-column gap-4">
           <div
             class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-            <h4>Matches Won</h4>
+            <h4 data-i18n="matchWon">Matches Won</h4>
             <h4 class="stat-value mb-0" id="matches-won">-10</h4>
           </div>
           <div
             class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center mt-3">
-            <h4>Winning Streak</h4>
+            <h4 data-i18n="winningStreak">Winning Streak</h4>
             <h4 class="stat-value mb-0" id="win-streak">-10</h4>
           </div>
         </div>
@@ -68,7 +70,7 @@
             <canvas class="chart" id="win-rate-chart"></canvas>
             <div class="chart-text">
               <h4 id="win-rate-percentage" class="chart-percentage">0%</h4>
-              <h4 class="chart-label">Win Rate</h4>
+              <h4 data-i18n="winRate" class="chart-label">Win Rate</h4>
             </div>
           </div>
         </div>
@@ -86,12 +88,12 @@
         <div class="col-md-6 d-flex flex-column gap-4">
           <div
             class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center">
-            <h4>Total Time Played</h4>
+            <h4 data-i18n="totalTime">Total Time Played</h4>
             <h4 class="stat-value mb-0" id="total-time">00:00:00</h4>
           </div>
           <div
             class="p-3 custom-border flex-grow-1 d-flex flex-column align-items-center justify-content-center mt-3">
-            <h4>Online Opponents Played</h4>
+            <h4 data-i18n="onlineOpponents">Online Opponents Played</h4>
             <h4 class="stat-value mb-0" id="online-opponents">-10</h4>
           </div>
         </div>

@@ -1,13 +1,14 @@
 <div
   class="container d-flex flex-column align-items-center"
   style="min-height: inherit">
-  <h1 class="text-center mb-5">Edit my profile</h1>
+  <h1 data-i18n="editProfile" class="text-center mb-5">Edit my profile</h1>
 
   <div class="col-12 col-md-8">
     <!-- Navigation Tabs -->
     <ul class="nav nav-pills nav-justified" role="tablist">
       <li class="nav-item">
         <button
+          data-i18n="infoProfil"
           class="nav-link active"
           id="profile-info-tab"
           data-bs-toggle="pill"
@@ -20,6 +21,7 @@
       </li>
       <li class="nav-item">
         <button
+          data-i18n="security"
           class="nav-link"
           id="security-tab"
           data-bs-toggle="pill"
@@ -45,7 +47,7 @@
                 alt="Avatar"
                 class="img-fluid rounded-circle"
                 style="max-width: 120px" />
-              <button class="btn btn-sm col-12 col-md-8 col-lg-4 mt-3">
+              <button data-i18n="editAvatar" class="btn btn-sm col-12 col-md-8 col-lg-4 mt-3">
                 EDIT AVATAR
               </button>
             </div>
@@ -63,6 +65,7 @@
                 </div>
                 <div class="col-12 col-md-8 col-lg-4 mt-2 mt-lg-0">
                   <button
+                    data-i18n="editUsername"
                     data-action="toggle-edit"
                     data-field="username"
                     class="btn btn-sm w-100">
@@ -84,6 +87,7 @@
                 </div>
                 <div class="col-12 col-md-8 col-lg-4 mt-2 mt-lg-0">
                   <button
+                    data-i18n="editEmail"
                     data-action="toggle-edit"
                     data-field="email"
                     class="btn btn-sm w-100">
@@ -107,7 +111,7 @@
         <div class="card card-user neon-border p-3">
           <div
             class="card-body align-items-center d-flex flex-column align-items-center">
-            <h5>Change Password</h5>
+            <h5 data-i18n="changePwd">Change Password</h5>
             <input
               type="password"
               id="edit-password"
@@ -119,6 +123,7 @@
               class="form-control my-2"
               placeholder="Confirm password" />
             <button
+              data-i18n="updatePwd"
               data-action="toggle-edit"
               data-field="password"
               class="btn btn-sm w-100 mt-3">
@@ -133,14 +138,14 @@
 
             <!-- Si 2FA est activé -->
             <div class="mb-2 d-none" id="display-disable-2fa">
-              <span id="span-2fa-mail" class="fs-5 d-none"
+              <span id="span-2fa-mail" class="fs-5 d-none" data-i18n="2faEmail"
                 >Two-factor authentication by mail is required</span
               >
-              <span id="span-2fa-app" class="fs-5 d-none"
+              <span id="span-2fa-app" class="fs-5 d-none" data-i18n="2faApp"
                 >Two-factor authentication by app is required</span
               >
               <div class="mt-2">
-                <button data-action="disable-2fa" class="btn btn-outline-secondary w-100">
+                <button data-i18n="disable2fa" data-action="disable-2fa" class="btn btn-outline-secondary w-100">
                   DISABLE 2FA
                 </button>
               </div>
@@ -149,13 +154,13 @@
             <!-- Si 2FA est désactivé -->
             <div class="mb-2 d-none" id="display-enable-2fa">
               <div class="mt-2">
-                <span class="fs-5">Enable Two-Factor Authentication</span>
+                <span data-i18n="enable2fa" class="fs-5">Enable Two-Factor Authentication</span>
               </div>
               <div class="d-flex flex-column flex-md-row gap-3 mt-3 w-100">
-                <a data-action="navigate" href="validation2faEmail" class="btn btn-outline-secondary flex-grow-1">
+                <a data-i18n="enableByMail" data-action="navigate" href="validation2faEmail" class="btn btn-outline-secondary flex-grow-1">
                   ENABLE 2FA BY EMAIL
                 </a>
-                <a data-action="navigate" href="validation2faApp" class="btn btn-outline-secondary flex-grow-1">
+                <a data-i18n="enableByApp" data-action="navigate" href="validation2faApp" class="btn btn-outline-secondary flex-grow-1">
                   ENABLE 2FA BY APP
                 </a>
               </div>
