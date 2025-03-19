@@ -2,17 +2,16 @@ export function loadTranslations(language) {
   fetch(`../language/${language}.json`)
     .then(response => response.json())
     .then(translations => {
-      updateTextContent(translations); // Met à jour le texte des éléments
+      updateTextContent(translations);
     })
     .catch(err => console.error('Erreur de chargement des traductions :', err));
 }
 
-// Fonction pour mettre à jour le contenu du texte avec les traductions
 function updateTextContent(translations) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
-    const key = element.getAttribute('data-i18n');  // Récupère la clé de traduction
+    const key = element.getAttribute('data-i18n');
     if (translations[key]) {
-      element.textContent = translations[key];  // Remplace le texte avec la traduction
+      element.textContent = translations[key];
     }
   });
 }
@@ -28,8 +27,7 @@ function getUserId() {
     localStorage.setItem('userId', userId);
     return (userId)
   }
-  return userId;
-  // return window.loggedInUserId || 'user-' + Math.random().toString(36).substr(2, 9);
+  return (userId)
 }
 
 function changeLanguage(language) {
@@ -40,9 +38,9 @@ function changeLanguage(language) {
 
 function applySavedLanguage() {
   const userId = getUserId();
-  console.log("userID ==  ", userId)
+  // console.log("userID ==  ", userId)
   let savedLanguage = localStorage.getItem(`${userId}_language`);
-  console.log("langue == ", savedLanguage);
+  // console.log("langue == ", savedLanguage);
   if (!savedLanguage) {
     savedLanguage = 'en';
     localStorage.setItem(`${userId}_language`, savedLanguage);
@@ -67,7 +65,5 @@ export function doLanguage()
     espagnol.addEventListener("click", () => changeLanguage('es'));
   }
 }
-
-
 
 export default doLanguage
