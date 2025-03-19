@@ -4,5 +4,5 @@ from .consumers import PongSoloGameConsumer, PongMultiGameConsumer, PongOnlineGa
 websocket_urlpatterns = [
     path("ws/pong/solo/", PongSoloGameConsumer.as_asgi()),
     path("ws/pong/multi/", PongMultiGameConsumer.as_asgi()),
-    re_path("ws/pong/online/(?P<game_id>\w+)/$", PongOnlineGameConsumer.as_asgi()),
+    path("ws/pong/online/", PongOnlineGameConsumer.as_asgi()),
 ]

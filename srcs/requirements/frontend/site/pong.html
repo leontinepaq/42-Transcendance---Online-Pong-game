@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game 🎾</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #222;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 2px solid white;
+            background-color: black;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .scoreboard {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Ping Pong Game 🎾</h1>
+    <div class="scoreboard">
+        <span id="leftScore">0</span> - <span id="rightScore">0</span>
+    </div>
+    <canvas id="gameCanvas" width="500" height="300"></canvas>
+    
+    <div class="controls">
+        <p>Use <strong>Arrow Up</strong> and <strong>Arrow Down</strong> to move your paddle.</p>
+        <p>Use <strong>Space</strong> to pause.</p>
+    </div>
+
+    <div class="scoreboard">
+        <span>Message: </span><span id="message"></span>
+    </div>
+
+    <script>
+        const socket = new WebSocket("/ws/pong/online/");
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        socket.onopen = function ()
+        {
+            console.log("✅ WebSocket connected!");
+        };
+        
+        socket.onerror = function (error)
+        {
+            console.error("❌ WebSocket error:", error);
+        };
+        
+        socket.onclose = function ()
+        {
+            console.log("🔴 WebSocket closed.");
+        };
+
+        function drawBall(x, y, r)
+        {
+            ctx.beginPath();
+            ctx.arc(
+                x * canvas.width / 100,  // X coordinate of the ball
+                y * canvas.height / 100, // Y coordinate of the ball
+                r * canvas.width / 100,  // radius of the ball
+                0,                       // Starting angle
+                Math.PI * 2              // Ending angle -> 360 for complete circle
+            );
+            ctx.fill();
+        };
+
+        socket.onmessage = function(event)
+        {
+            console.log("Received: ", event.data);
+            const state = JSON.parse(event.data);
+            console.log(state);
+
+            if (state.message)
+            {
+                document.getElementById("message").textContent = state.message;
+                return;
+            }
+            document.getElementById("message").textContent = "";
+
+            //Score
+            document.getElementById("leftScore").textContent = state.score[0];
+            document.getElementById("rightScore").textContent = state.score[1];
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height); 
+            ctx.fillStyle = "white";
+        
+            // Draw ball
+            drawBall(state.ball.x, state.ball.y, state.ball.r);
+            // Draw paddles
+            ctx.fillRect(
+                state.left.top_left_corner.x * canvas.width / 100,  // X coordinate of top left corner of the rectangle
+                state.left.top_left_corner.y * canvas.height / 100, // Y coordinate of top left corner of the rectangle
+                state.left.width * canvas.width / 100,              // Width of the rectangle
+                state.left.height * canvas.height / 100             // Length of the rectangle
+            );
+            ctx.fillRect(
+                state.right.top_left_corner.x * canvas.width / 100,  // X coordinate of top left corner of the rectangle
+                state.right.top_left_corner.y * canvas.height / 100, // Y coordinate of top left corner of the rectangle
+                state.right.width * canvas.width / 100,              // Width of the rectangle
+                state.right.height * canvas.height / 100             // Length of the rectangle
+            );
+
+            // Draw PAUSED text if the game is paused
+            if (state.paused) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
+                ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
+        
+                ctx.fillStyle = "white";
+                ctx.font = "50px Arial";
+                ctx.textAlign = "center";
+        
+                // Draw two vertical bars for the pause sign
+                const barWidth = 20; // Width of the pause bars
+                const barHeight = 100; // Height of the pause bars
+                const pauseX = canvas.width / 2 - 40; // X position for the first bar
+                const pauseY = canvas.height / 2 - barHeight / 2; // Y position for the bars
+        
+                // Left bar
+                ctx.fillRect(pauseX, pauseY, barWidth, barHeight);
+                
+                // Right bar
+                ctx.fillRect(pauseX + 40, pauseY, barWidth, barHeight);
+            }
+        };
+
+        // Send paddle movement when pressing arrow keys
+        document.addEventListener("keydown", (event) => {
+            const keyActions = {
+                "ArrowUp": { side: "right", paddle: -5 },
+                "ArrowDown": { side: "right", paddle: 5 },
+                "q": { side: "left", paddle: -5 },
+                "a": { side: "left", paddle: 5 },
+                " ": { toggle_pause: true}
+            };
+        
+            if (keyActions[event.key]) {
+                event.preventDefault();
+                socket.send(JSON.stringify({
+                    toggle_pause: keyActions[event.key].toggle_pause || false,
+                    side: keyActions[event.key].side || "left",
+                    paddle: keyActions[event.key].paddle || 0
+                }));
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -82,6 +82,24 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
             [self.email],
             fail_silently=False,
         )
+        
+    @staticmethod
+    def get_unknown_user():
+        """Retrieve or create a default 'Unknown' user."""
+        user, created = UserProfile.objects.get_or_create(
+            username="Unknown",
+            defaults={"email": None, "is_active": False}
+        )
+        return user
+
+    @staticmethod
+    def get_ai_user():
+        """Retrieve or create a default AI user."""
+        user, created = UserProfile.objects.get_or_create(
+            username="AI",
+            defaults={"email": None, "is_active": False}
+        )
+        return user
 
     def __str__(self):
         return self.username

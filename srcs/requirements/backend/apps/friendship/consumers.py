@@ -11,19 +11,18 @@ from .serializers import UserFriendsSerializer
 class CommonConsumer(UserConsumer):
     
     async def init(self):
-        print("User is")
         self.user = await sync_to_async(self.get_user)()
         if self.user == AnonymousUser():
             self.close()
         self.set_online()
-        self.toggle_update()
         await self.channel_layer.group_add("common_channel",
                                            self.channel_name)
+        asyncio.create_task(self.toggle_update())
         
     def set_online(self):
         cache.set(self.user.id, True)
         
-    async def disconnect(self):
+    async def disconnect(self, close_code):
         cache.set(self.user.id, False)
         self.toggle_update()
         
@@ -34,5 +33,3 @@ class CommonConsumer(UserConsumer):
             friend.online = cache.get(friend.id, False)
         print(friends.data)
         await self.send(text_data=json.dumps(friends.data))
-        
-    
