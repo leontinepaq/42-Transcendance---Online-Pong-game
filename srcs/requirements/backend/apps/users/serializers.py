@@ -32,6 +32,7 @@ class UserPublicProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model=UserProfile
         fields=['id',
+                'email',
                 'username',
                 'avatar_url']
         read_only_fields=['id',
