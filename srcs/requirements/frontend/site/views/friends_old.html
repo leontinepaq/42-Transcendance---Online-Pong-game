@@ -1,0 +1,160 @@
+
+<div class="col-12 col-md-8 col-lg-8" style="min-height: inherit">
+  <ul class="nav nav-pills nav-justified" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button data-i18n="friends" class="nav-link active" id="pills-friends-tab" data-bs-toggle="pill" data-bs-target="#pills-friends" type="button" role="tab" aria-controls="pills-friends" aria-selected="true">
+        FRIENDS
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button data-i18n="pending" class="nav-link" id="pills-pending-tab" data-bs-toggle="pill" data-bs-target="#pills-pending" type="button" role="tab" aria-controls="pills-pending" aria-selected="false">
+        PENDING
+        <span class="badge">5</span>
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button data-i18n="blocked" class="nav-link" id="pills-blocked-tab" data-bs-toggle="pill" data-bs-target="#pills-blocked" type="button" role="tab" aria-controls="pills-blocked" aria-selected="false">
+        BLOCKED
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button data-i18n="all" class="nav-link" id="pills-all-users-tab" data-bs-toggle="pill" data-bs-target="#pills-all-users" type="button" role="tab" aria-controls="pills-all-users" aria-selected="false">
+        ALL
+      </button>
+    </li>
+  </ul>
+  <div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-friends" role="tabpanel" aria-labelledby="pills-friends-tab" tabindex="0">
+      <!-- CARD FRIEND = BUTTON REMOVE -->
+      <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle" style="max-width: 100px" />
+              <div class="infos">
+                <div class="username">USERNAME</div>
+                <div class="mail">ceci-est-mon-mail@email.com</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green d-none">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button type="button" class="btn btn-red d-none">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+              <button type="button" class="btn d-none">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+              <button type="button" class="btn btn-red d-none">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab" tabindex="0">
+      <!-- CARD PENDING = BUTTON ADD AND CLOSE -->
+      <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle" style="max-width: 100px" />
+              <div class="infos">
+                <div class="username">USERNAME</div>
+                <div class="mail">ceci-est-mon-mail@email.com</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button type="button" class="btn btn-red">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+              <button type="button" class="btn d-none">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+              <button type="button" class="btn btn-red d-none">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn d-none">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="pills-blocked" role="tabpanel" aria-labelledby="pills-blocked-tab" tabindex="0">
+      <!-- CARD BLOCKED = BUTTON REMOVE -->
+      <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle" style="max-width: 100px" />
+              <div class="infos">
+                <div class="username">USERNAME</div>
+                <div class="mail">ceci-est-mon-mail@email.com</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green d-none">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button type="button" class="btn btn-red d-none">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+              <button type="button" class="btn d-none">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+              <button type="button" class="btn btn-red d-none">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-pane fade" id="pills-all-users" role="tabpanel" aria-labelledby="pills-all-users-tab" tabindex="0">
+      <!-- CARD ALL = BUTTON BLOCK AND ADD -->
+      <div class="card card-user neon-border gap-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between" style="align-items: center">
+            <div class="d-flex justify-content-start">
+              <img id="profile-avatar" src="assets/nyancat.jpeg" alt="Avatar" class="img-fluid rounded-circle" style="max-width: 100px" />
+              <div class="infos">
+                <div class="username">USERNAME</div>
+                <div class="mail">ceci-est-mon-mail@email.com</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn btn-green d-none">
+                <span class="material-symbols-outlined">check</span>
+              </button>
+              <button type="button" class="btn btn-red d-none">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+              <button type="button" class="btn">
+                <span class="material-symbols-outlined">add</span>
+              </button>
+              <button type="button" class="btn btn-red">
+                <span class="material-symbols-outlined">block</span>
+              </button>
+              <button type="button" class="btn d-none">
+                <span class="material-symbols-outlined">remove</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
