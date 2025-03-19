@@ -12,6 +12,9 @@
     "friends": "FRIENDS",
     "profile": "PROFILE",
     "logout": "LOGOUT",
+    "solo": "SOLO",
+    "multiplayer": "MULTIPLAYER",
+    "online": "ONLINE",
     "refresh": "REFRESH",
     "matchHistory": "MATCH HISTORY",
     "matchWon": "Matches Won",
@@ -40,5 +43,16 @@
     "scanQR": "Scan the QR code with your authenticator app",
     "codeApp": "Enter the code from your authenticator app",
     "verifyApp": "VERIFY",
-    "backProfil": "BACK TO PROFILE"
+    "backProfil": "BACK TO PROFILE",
+    "EmailVerification": "Email verification required to enable two-factor authentification",
+    "codeEmail": "Confirm your email address with the code you received:",
+    "newCode": "SEND NEW CODE",
+    "pause": "PAUSE",
+    "congratulations": "Congratulations !",
+    "winnerIs": "Winner is : ",
+    "amazingVictory": "What an amazing victory !",
+    "close": "CLOSE",
+    "playAgain": "PLAY AGAIN",
+    "endgame": "ENDGAME",
+    "startTournament": "START TOURNAMENT"
 }

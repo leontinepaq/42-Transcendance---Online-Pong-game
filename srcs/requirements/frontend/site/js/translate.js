@@ -11,11 +11,6 @@ export function loadTranslations(language) {
 
 // Fonction pour mettre à jour le contenu du texte avec les traductions
 function updateTextContent(translations) {
-//   console.log(translations);
-//   const test = document.querySelector('[data-i18n="welcome"]');
-//   console.log("test == ", test);
-//   const test1 = document.getElementById("login-page-title");
-//   console.log("test1 == ", test1);
   document.querySelectorAll('[data-i18n]').forEach(element => {
     console.log("elem == ", element);
     const key = element.getAttribute('data-i18n');  // Récupère la clé de traduction
@@ -25,7 +20,6 @@ function updateTextContent(translations) {
   });
 }
 
-// Fonction pour changer la langue
 function changeLanguage(language) {
   localStorage.setItem('language', language);  // Sauvegarde la langue dans localStorage
   loadTranslations(language);  // Applique les traductions pour la nouvelle langue
@@ -33,14 +27,11 @@ function changeLanguage(language) {
 
 export function doLanguage()
 {
-    const savedLanguage = localStorage.getItem('language') || 'es';  // Langue par défaut : anglais
-    console.log("language : ", savedLanguage);
+    const savedLanguage = localStorage.getItem('language') || 'fr';  // Langue par défaut : anglais
     loadTranslations(savedLanguage);
+    const french = document.getElementById('french').addEventListener("click", () => changeLanguage('fr'));
+    const english = document.getElementById('english').addEventListener("click", () => changeLanguage('en'));
+    const espagnol = document.getElementById('espagnol').addEventListener("click", () => changeLanguage('es'));
 }
-
-// Ajouter des événements pour changer la langue
-// document.querySelector("#change-to-fr").addEventListener("click", () => changeLanguage('fr'));
-// document.querySelector("#change-to-en").addEventListener("click", () => changeLanguage('en'));
-// document.querySelector("#change-to-en").addEventListener("click", () => changeLanguage('es'));
 
 export default doLanguage

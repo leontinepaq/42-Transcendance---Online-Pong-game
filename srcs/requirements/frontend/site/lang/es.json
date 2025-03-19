@@ -12,6 +12,9 @@
     "friends": "AMIGOS",
     "profile": "PERFIL",
     "logout": "CERRAR SESIÓN",
+    "solo": "SOLO",
+    "multiplayer": "MULTIJUGADOR",
+    "online": "EN LÍNEA",
     "refresh": "REFRESCAR",
     "matchHistory": "HISTORIAL DE PARTIDOS",
     "matchWon": "VICTORIAS",
@@ -40,5 +43,16 @@
     "scanQR": "Escanee el código QR con su aplicación de autenticación",
     "codeApp": "Ingrese el código de su aplicación de autenticación",
     "verifyApp": "VERIFICAR",
-    "backProfil": "Volver al perfil"
+    "backProfil": "Volver al perfil",
+    "EmailVerification": "Verificación de correo electrónico requerida para habilitar la autenticación de dos factores",
+    "codeEmail": "Confirma tu dirección de correo electrónico con el código que recibiste:",
+    "newCode": "ENVIAR NUEVO CÓDIGO",
+    "pause": "PAUSA",
+    "congratulations": "Felicidades !",
+    "winnerIs": "El/la ganador(a) es : ",
+    "amazingVictory": "¡Qué victoria increíble!",
+    "close": "CERRAR",
+    "playAgain": "JUGAR DE NUEVO",
+    "endgame": "FIN DEL JUEGO",
+    "startTournament": "EMPEZAR TORNEO"
 }
