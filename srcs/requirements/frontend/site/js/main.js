@@ -1,12 +1,18 @@
 import { initEventDelegation } from "./eventDelegator.js";
 import { navigate } from "./router.js";
 import { SkyAnimation } from "./background/SkyAnimation.js";
+import { doLanguage } from "./translate.js"
 
 document.addEventListener("DOMContentLoaded", () => {
   console.log("Initializing app");
   initEventDelegation();
   SkyAnimation.launch();
   navigate("home");
+
+  // mise en place de la traduction 
+  setTimeout(function () {
+    doLanguage();
+  }, 200);
 });
 
 //todo @leontinepaq a revoir..?

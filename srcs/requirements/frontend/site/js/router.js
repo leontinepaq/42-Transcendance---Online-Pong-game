@@ -2,6 +2,7 @@ import checkAuth from "./api.js";
 import loadView from "./views.js";
 import closeSocket from "./actions/pong.js";
 import connect_socket_users from "./chat.js"
+import { doLanguage } from "./translate.js"
 
 window.addEventListener("popstate", async (event) => {
   if (event.state) {
@@ -10,6 +11,7 @@ window.addEventListener("popstate", async (event) => {
     console.log("new route is ", newRoute);
     closeSocket(); // si socket pong open on va la fermer
     loadView(newRoute);
+    doLanguage();
   }
 });
 
@@ -36,6 +38,7 @@ export async function navigate(route, ...params) {
     const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
     history.pushState(state, title, `/${route}`);
     await loadView(route);
+    doLanguage();
   } catch (error) {
     console.error("Navigation error:", error);
   }
