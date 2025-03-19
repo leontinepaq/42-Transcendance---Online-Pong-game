@@ -54,5 +54,14 @@
     "close": "CERRAR",
     "playAgain": "JUGAR DE NUEVO",
     "endgame": "FIN DEL JUEGO",
-    "startTournament": "EMPEZAR TORNEO"
+    "startTournament": "EMPEZAR TORNEO",
+    "username": "Nombre de usuario",
+    "password": "Contraseña",
+    "newpassword": "Nueva contraseña",
+    "confirmpassword": "Confirmar contraseña",
+    "player1": "Jugador 1",
+    "player2": "Jugador 2",
+    "player3": "Jugador 3",
+    "player4": "Jugador 4",
+    "verificationCode": "Código de verificación"
 }

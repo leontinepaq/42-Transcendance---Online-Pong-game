@@ -11,7 +11,11 @@ function updateTextContent(translations) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
     if (translations[key]) {
-      element.textContent = translations[key];
+      if (element.placeholder !== undefined) {
+        element.placeholder = translations[key];
+      } else {
+        element.textContent = translations[key];
+      }
     }
   });
 }
