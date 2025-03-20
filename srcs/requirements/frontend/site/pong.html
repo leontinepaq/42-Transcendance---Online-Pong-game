@@ -32,6 +32,9 @@
 <body>
     <h1>Ping Pong Game 🎾</h1>
     <div class="scoreboard">
+        <span>Me</span> - <span id="opponent">0</span>
+    </div>
+    <div class="scoreboard">
         <span id="leftScore">0</span> - <span id="rightScore">0</span>
     </div>
     <canvas id="gameCanvas" width="500" height="300"></canvas>
@@ -84,16 +87,33 @@
             const state = JSON.parse(event.data);
             console.log(state);
 
-            if (state.message)
+            if (state.info)
             {
-                document.getElementById("message").textContent = state.message;
-                return;
+                document.getElementById("opponent").textContent = state.opponent
+                if (!state.start || !state.run)
+                    document.getElementById("message").textContent = state.message;
+                return ;
             }
-            document.getElementById("message").textContent = "";
+
+            document.getElementById("message").textContent = ""
 
             //Score
             document.getElementById("leftScore").textContent = state.score[0];
             document.getElementById("rightScore").textContent = state.score[1];
+
+            if (state.over)
+            {
+                if (state.score[0] == 3)
+                {
+                    document.getElementById("message").textContent = "You won, psahtek wallah";
+                }
+                else
+                {
+                    document.getElementById("message").textContent = "You lost, you fucking looser";
+                }
+                return;
+            }
+
 
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height); 

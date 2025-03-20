@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from django.contrib.auth.models import AnonymousUser
 from asgiref.sync import sync_to_async
 from django.core.cache import cache
+from dashboards.models import Game
 
 User = get_user_model()
 
@@ -61,9 +62,11 @@ class PongSoloGameConsumer(UserConsumer):
 
     async def update(self):
         await self.send(text_data=json.dumps(self.game.get_state()))
-        
-    async def save(self):
-        t = 5
+
+    async def save_game(self):
+        await sync_to_async(Game.create_ai)(id_player=self.user.id,
+                                            score_player=self.game.score[0],
+                                            score_ai=self.game.score[1])
 
     async def loop(self):
         while not self.start:
@@ -75,7 +78,7 @@ class PongSoloGameConsumer(UserConsumer):
                 await self.update()
             await asyncio.sleep(0.02)
         if self.game.over and self.save:
-            await self.save()
+            await self.save_game()
 
 
 class PongMultiGameConsumer(PongSoloGameConsumer):
@@ -93,7 +96,7 @@ class PongMultiGameConsumer(PongSoloGameConsumer):
             return
         if "paddle" in data and "side" in data:
             self.game.move_paddle(data["side"], data["paddle"])
-            
+
     async def disconnect(self, close_code):
         self.run = False
 
@@ -108,30 +111,42 @@ def incr_last_game_id():
 
 class PongOnlineGameConsumer(PongSoloGameConsumer):
     async def init(self):
-        self.save = True
         self.start = False
         self.over = False
-        self.game = Pong(use_ai=False)
         self.message = ""
+        self.opponent_id = 0
+        self.opponent_username = "Unknown"
+        self.game = Pong(use_ai=False)
         self.set_group()
         self.master = self.get_connected_players() == 0
         await self.channel_layer.group_add(self.group_name,
                                            self.channel_name)
         self.incr_connected_players()
+        await self.init_master()
+        await self.init_slave()
+
+    async def init_master(self):
         if self.master:
-            asyncio.create_task(self.send_info_group("message", 
+            asyncio.create_task(self.send_info_group("message",
                                                      "Looking for 2nd player"))
             asyncio.create_task(self.loop())
-        else:
-            incr_last_game_id()
-            asyncio.create_task(self.send_info_group("start", True))
-            asyncio.create_task(self.send_info_group("message", ""))
+
+    async def init_slave(self):
+        if self.master:
+            return
+        incr_last_game_id()
+        asyncio.create_task(self.send_info_group("message", ""))
+        asyncio.create_task(self.send_info_group("start", True))
+        asyncio.create_task(self.send_info_group("opponent_id",
+                                                 self.user.id))
+        asyncio.create_task(self.send_info_group("opponent_username",
+                                                 self.user.username))
 
     def set_group(self):
         self.group_name = f"pong_{get_last_game_id()}"
-        if self.get_connected_players() >= 2:
-            incr_last_game_id()
-            self.set_group()
+        # if self.get_connected_players() >= 2:
+        #     incr_last_game_id()
+        #     self.set_group()
 
     def get_connected_players(self):
         return cache.get(self.group_name, 0)
@@ -139,7 +154,6 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
     def incr_connected_players(self):
         cache.set(self.group_name,
                   self.get_connected_players() + 1)
-        self.get_connected_players()
 
     def decr_connected_players(self):
         cache.set(self.group_name,
@@ -153,9 +167,14 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
 
     async def receive_info(self, event):
         setattr(self, event["key"], event["value"])
-        if self.message != "":
-            await self.send(text_data=json.dumps({"message": self.message
-                                                  }))
+        print("UPDATING ", event["key"])
+        await self.send(text_data=json.dumps({"info": True,
+                                              "message": self.message,
+                                              "start": self.start,
+                                              "run": self.run,
+                                              "opponent": self.user.id
+                                              if self.master
+                                              else self.opponent_username}))
 
     async def receive(self, text_data):
         if self.over:
@@ -166,18 +185,6 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
                                             {"type": "receive.slave",
                                              "text_data": text_data})
 
-    async def disconnect(self, close_code):
-        self.run = False
-        if self.start \
-                and not self.over \
-                and self.get_connected_players() == 2:
-            await self.send_info_group("run", False)
-            await self.send_info_group("message", "Player got disconnected")
-            await self.send_info_group("over", True)
-        self.channel_layer.group_send(self.group_name,
-                                      {"type": "receive.alert"})
-        self.decr_connected_players()
-
     async def receive_slave(self, event):
         if self.master:
             await self.process(event["text_data"], "right")
@@ -185,7 +192,8 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
     async def process(self, text_data, side):
         data = json.loads(text_data)
 
-        if "toggle_pause" in data and data["toggle_pause"] and self.start and self.run and not self.over:
+        if "toggle_pause" in data and data["toggle_pause"] \
+                and self.start and self.run and not self.over:
             self.game.toggle_pause()
             await self.update()
             return
@@ -198,13 +206,33 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
         if self.game.over and not self.over:
             await self.send_info_group("over", True)
             await self.send_info_group("run", False)
-        await self.channel_layer.group_send(self.group_name,
-                                            {"type": "send.update",
-                                             "state": self.game.get_state(),
-                                             "state_symetric": self.game.get_state(sym=True)})
+        await self.channel_layer.group_send(
+            self.group_name,
+            {"type": "send.update",
+             "state": self.game.get_state(),
+             "state_symetric": self.game.get_state(sym=True)})
 
     async def send_update(self, event):
         data = event["state"]
         if not self.master:
             data = event["state_symetric"]
         await self.send(text_data=json.dumps(data))
+
+    async def disconnect(self, close_code):
+        self.run = False
+        print("DISCONNECTING")
+        if self.start \
+                and not self.over \
+                and self.get_connected_players() == 2:
+            await self.send_info_group("run", False)
+            await self.send_info_group("message", "Player got disconnected")
+            await self.send_info_group("over", True)
+        self.channel_layer.group_send(self.group_name,
+                                      {"type": "receive.alert"})
+        self.decr_connected_players()
+
+    async def save_game(self):
+        await sync_to_async(Game.create)(id1=self.user.id,
+                                         id2=self.opponent_id,
+                                         score_1=self.game.score[0],
+                                         score_2=self.game.score[1])
