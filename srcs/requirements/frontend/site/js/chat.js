@@ -1,6 +1,6 @@
 let socket_users = null;
 
-async function connect_socket_users() {
+export async function connect_socket_users() {
   if (socket_users != null) return;
   socket_users = new WebSocket("/ws/users/");
 
@@ -20,6 +20,11 @@ async function connect_socket_users() {
   socket_users.onmessage = function (event) {
     console.log("Received: ", event);
   };
+}
+
+export async function disconnect_socket_users() {
+  socket_users.close();
+  socket_users = null;
 }
 
 export default connect_socket_users;
