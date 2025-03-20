@@ -167,7 +167,6 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
 
     async def receive_info(self, event):
         setattr(self, event["key"], event["value"])
-        print("UPDATING ", event["key"])
         await self.send(text_data=json.dumps({"info": True,
                                               "message": self.message,
                                               "start": self.start,
