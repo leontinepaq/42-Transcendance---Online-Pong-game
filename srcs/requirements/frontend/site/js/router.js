@@ -38,7 +38,7 @@ export async function navigate(route, ...params) {
     const state = { route, params };
     const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
     history.pushState(state, title, `/${route}`);
-    await loadView(route);
+    await loadView(route, ...params);
     doLanguage();
   } catch (error) {
     console.error("Navigation error:", error);

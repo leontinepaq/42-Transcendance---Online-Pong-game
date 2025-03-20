@@ -66,7 +66,9 @@ async function plotGamesPlayed(data) {
     onResize: (chart, size) => {
       const isSmallScreen = window.innerWidth < 1200;
       chart.options.plugins.legend.position = isSmallScreen ? "bottom" : "right";
-      chart.options.plugins.legend.labels.font.size = isSmallScreen ? chartTheme.fontSize * 1.2 : chartTheme.fontSize * 1.4;
+      chart.options.plugins.legend.labels.font.size = isSmallScreen
+        ? chartTheme.fontSize * 1.2
+        : chartTheme.fontSize * 1.4;
       chart.options.plugins.legend.labels.padding = isSmallScreen ? 10 : 30;
       chart.update();
     },
@@ -104,17 +106,23 @@ async function plotGameHistory(data) {
   createHistogram(ctx, labels, datasets);
 }
 
-export async function loadUserStats() {
+export async function loadUserStats(userId = null) {
   try {
-    const data = await authFetchJson("api/dashboards/display-user-stats/", {
-      method: "GET",
-    });
+    const endpoint = userId
+      ? `api/dashboards/display-user-stats/?userId=${userId}` //todo @leontinepaq verifier request
+      : `api/dashboards/display-user-stats/`;
+
+    const data = await authFetchJson(endpoint, { method: "GET" });
+    document.getElementById("dashboard-title").textContent = userId
+      ? `User ${userId} Dashboard` //todo @leontinepaq  mettre le nom
+      : "Your Dashboard"; //todo @leontinepaq a modifier
     updateStatValues(data);
     initChartJS();
     window.dashboardCharts = [];
     plotWinRate(data);
     plotGamesPlayed(data);
     plotGameHistory(data);
+    
   } catch (error) {
     handleError(error, "Load user stats error");
   }
