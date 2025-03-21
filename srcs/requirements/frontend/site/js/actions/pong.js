@@ -17,7 +17,7 @@ export const pongActions = [
   },
 ];
 
-let isPaused = true;
+let state = true;
 let mode;
 let socket;
 let interval;
@@ -58,6 +58,14 @@ function initGameOnline()
   }, 500)
 }
 
+function resetKey()
+{
+  keysPressed["w"] = false;
+  keysPressed["s"] = false;
+  keysPressed["ArrowUp"] = false;
+  keysPressed["ArrowDown"] = false;
+}
+
 function handleSocket() {
   socket.onopen = function () {
     console.log("✅ WebSocket connected!");
@@ -89,7 +97,6 @@ function statePause() {
     const barHeight = 100;
     const pauseX = canvas.width / 2 - 40;
     const pauseY = canvas.height / 2 - barHeight / 2;
-
     ctx.fillRect(pauseX + 10, pauseY, barWidth, barHeight);
     ctx.fillRect(pauseX + 50, pauseY, barWidth, barHeight);
   }
@@ -172,7 +179,6 @@ async function handleEndGame(name) // handle la creation des games ici
   const rejouer = document.getElementById("rejouer");
   if (mode === "solo" || mode === "multi")
   {
-    // evenement boutton rejouer du modal
     if (rejouer)
     {
       rejouer.addEventListener("click", function () {
@@ -201,18 +207,25 @@ function checkScore(state) {
 
 function messageSocket() {
   socket.onmessage = function (event) {
-    const state = JSON.parse(event.data);
+    state = JSON.parse(event.data);
     if (state.alert)
       handleError(state.alert, "handle game error");
     if (state.info)
     {
-        document.getElementById("rightScore").textContent = state.opponent
         if (!state.start || !state.run)
-            document.getElementById("message").textContent = state.message;
+        {
+          const modalBody = document.querySelector("#waitingModal .modal-body");
+          console.log(state.message)
+          modalBody.textContent = state.message;
+          console.log(modalBody.textContent)
+          const waitingModal = new bootstrap.Modal(document.getElementById("waitingModal"));
+          waitingModal.show();
+        }
         return ;
     }
-      
+    
     document.getElementById("message").textContent = ""
+    document.getElementById("waitingModal").style.display = "none";
     checkScore(state);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -221,7 +234,7 @@ function messageSocket() {
     drawBall(state.ball.x, state.ball.y, state.ball.r);
     drawPaddle(state);
 
-    if (isPaused)
+    if (state.paused)
       statePause();
   };
 }
@@ -232,8 +245,7 @@ function keyDownHandler(event) {
     event.preventDefault();
   }
   event.preventDefault();
-  if (event.key === " " && !isPaused) {
-    isPaused = true;
+  if (event.key === " " && !state.paused) {
     socket.send(
       JSON.stringify({
         toggle_pause: true,
@@ -241,8 +253,7 @@ function keyDownHandler(event) {
         paddle: 0,
       })
     );
-  } else if (event.key === " " && isPaused) {
-    isPaused = false;
+  } else if (event.key === " " && state.paused) {
     socket.send(
       JSON.stringify({
         toggle_pause: true,
@@ -261,7 +272,7 @@ function keyUpHandler(event) {
 }
 
 function playGameMulti() {
-  if (!isPaused) {
+  if (!state.paused) {
     if (keysPressed["w"]) {
       socket.send(
         JSON.stringify({
@@ -302,7 +313,6 @@ function playGameMulti() {
 }
 
 function pauseButton() {
-  isPaused = !isPaused;
   socket.send(
     JSON.stringify({
       toggle_pause: true,
@@ -321,8 +331,6 @@ function endgameButton() {
 
 function setupGame(mode)
 {
-  // if (mode === "solo" || mode === "multi" || mode === "online")
-  // {
     // evenement touches paddle bitch
     document.removeEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
@@ -354,14 +362,12 @@ function setupGame(mode)
       endgame.removeEventListener("click", endgameButton);
       endgame.addEventListener("click", endgameButton);
     }
-  // }
 }
 
 function playGame(mode)
 {
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
-  isPaused = true;
 
   resetKey();
   handleSocket();
@@ -369,11 +375,4 @@ function playGame(mode)
   setupGame(mode);
 }
 
-function resetKey()
-{
-  keysPressed["w"] = false;
-  keysPressed["s"] = false;
-  keysPressed["ArrowUp"] = false;
-  keysPressed["ArrowDown"] = false;
-}
 export default closeSocket;
