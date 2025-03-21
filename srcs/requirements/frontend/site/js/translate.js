@@ -1,3 +1,8 @@
+import { authFetchJson } from "./api.js"
+
+let userId;
+let user;
+
 export function loadTranslations(language) {
   fetch(`../language/${language}.json`)
     .then(response => response.json())
@@ -20,42 +25,58 @@ function updateTextContent(translations) {
   });
 }
 
-function generateUniqueSessionID() {
-  return `user-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function getUserId() {
-  let userId = localStorage.getItem('userId');
-  if (!userId) {
-    userId = generateUniqueSessionID();
-    localStorage.setItem('userId', userId);
-    return (userId)
+// Fonction pour récupérer l'ID de l'utilisateur connecté via l'API
+async function getUserId() {
+  try {
+    const user = await authFetchJson("api/profile/", { method: "GET" });
+    return user.id;  // Récupérer l'ID réel de l'utilisateur connecté
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'utilisateur", error);
+    return null;
   }
-  return (userId)
 }
 
-function changeLanguage(language) {
-  const userId = getUserId();
-  localStorage.setItem(`${userId}_language`, language);
+// Fonction pour stocker la langue dans un cookie avec l'ID de l'utilisateur
+function setLanguageInCookie(language, userId) {
+  document.cookie = `language_${userId}=${language}; path=/; max-age=31536000`;
   loadTranslations(language);
 }
 
-function applySavedLanguage() {
-  const userId = getUserId();
-  // console.log("userID ==  ", userId)
-  let savedLanguage = localStorage.getItem(`${userId}_language`);
-  // console.log("langue == ", savedLanguage);
-  if (!savedLanguage) {
-    savedLanguage = 'en';
-    localStorage.setItem(`${userId}_language`, savedLanguage);
+// Fonction pour obtenir la langue à partir du cookie spécifique à l'utilisateur
+function getLanguageFromCookie(userId) {
+  let cookies = document.cookie.split('; ');
+  for (let cookie of cookies) {
+    let [name, value] = cookie.split('=');
+    if (name === `language_${userId}`) {
+      return value;
+    }
   }
-
-  loadTranslations(savedLanguage); 
+  return 'en';
 }
 
-export function doLanguage()
+// Fonction pour changer la langue
+async function changeLanguage(language) {
+  const userId = await getUserId();
+  if (userId) {
+    setLanguageInCookie(language, userId);
+  }
+}
+
+// Fonction pour appliquer la langue sauvegardée au chargement de la page
+async function applySavedLanguage() {
+  const userId = await getUserId();
+  if (userId) {
+    let savedLanguage = getLanguageFromCookie(userId);
+    if (!savedLanguage) {
+      savedLanguage = 'en';
+    }
+    setLanguageInCookie(savedLanguage, userId);
+    loadTranslations(savedLanguage);
+  }
+}
+
+function addButton()
 {
-  applySavedLanguage();
   const french = document.getElementById('french');
   if (french) {
     french.addEventListener("click", () => changeLanguage('fr'));
@@ -68,6 +89,12 @@ export function doLanguage()
   if (espagnol) {
     espagnol.addEventListener("click", () => changeLanguage('es'));
   }
+}
+
+export async function doLanguage()
+{
+  applySavedLanguage();
+  addButton();
 }
 
 export default doLanguage
