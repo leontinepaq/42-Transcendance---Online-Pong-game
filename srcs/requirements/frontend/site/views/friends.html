@@ -6,9 +6,10 @@
       </button>
     </li>
     <li class="nav-item" role="presentation">
+      <!-- todo @shelal : a traduire sans enlever le badge -->
       <button data-i18n="pending" class="nav-link" id="pills-pending-tab" data-bs-toggle="pill" data-bs-target="#pills-pending" data-tab="pending" type="button" role="tab" aria-controls="pills-pending" aria-selected="false">
         PENDING
-        <span class="badge">5</span>
+        <span id="pending-count" class="badge"></span>
       </button>
     </li>
     <li class="nav-item" role="presentation">
@@ -25,16 +26,16 @@
   </ul>
   <div class="tab-content" id="pills-tabContent">
     <div class="tab-pane fade show active" id="pills-friends" role="tabpanel" aria-labelledby="pills-friends-tab" tabindex="0">
-      <!-- CARD FRIEND = BUTTON REMOVE -->  
+      <!-- CARDS FRIEND -->  
     </div>
     <div class="tab-pane fade" id="pills-pending" role="tabpanel" aria-labelledby="pills-pending-tab" tabindex="0">
-      <!-- CARD PENDING = BUTTON ADD AND CLOSE -->
+      <!-- CARDS PENDING -->
     </div>
     <div class="tab-pane fade" id="pills-blocked" role="tabpanel" aria-labelledby="pills-blocked-tab" tabindex="0">
-      <!-- CARD BLOCKED = BUTTON REMOVE -->
+      <!-- CARDS BLOCKED -->
     </div>
     <div class="tab-pane fade" id="pills-all" role="tabpanel" aria-labelledby="pills-all-tab" tabindex="0">
-      <!-- CARD ALL = BUTTON BLOCK AND ADD -->
+      <!-- CARDS ALL -->
     </div>
   </div>
 </div>

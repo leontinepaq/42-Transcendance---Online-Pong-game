@@ -83,6 +83,7 @@ function createUserCard(user, tabKey) {
 }
 
 async function fetchAndDisplayUsers(tab) {
+  updatePendingCount();
   try {
     const apiPath = TABS[tab];
     if (!apiPath) return;
@@ -93,6 +94,26 @@ async function fetchAndDisplayUsers(tab) {
     container.innerHTML = users.map((user) => createUserCard(user, tab)).join("");
   } catch (error) {
     handleError(error, `Error fetching ${tab}:`);
+  }
+}
+
+async function updatePendingCount() {
+  try {
+    // const data = await authfetchJson("api/friends/pending-count/");
+    const data = await authFetchJson("api/friends/pending-requests/");
+    data.pending_count = 2; //todo @leontinepaq a supp
+    const count = data.pending_count;
+
+    const badge = document.getElementById("pending-count");
+    
+    if (count > 0) {
+      badge.textContent = count;
+      badge.classList.remove("hidden");
+    } else {
+      badge.classList.add("hidden");
+    }
+  } catch (error) {
+    console.error("Error fetching pending count:", error);
   }
 }
 
