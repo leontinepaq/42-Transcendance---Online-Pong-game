@@ -12,8 +12,8 @@ export const pongActions = [
     handler: initGameMulti,
   },
   {
-      selector: '[data-action="playGameOnline"]',
-      handler: initGameOnline
+    selector: '[data-action="playGameOnline"]',
+    handler: initGameOnline
   },
 ];
 
@@ -50,12 +50,12 @@ function initGameMulti() {
 
 function initGameOnline()
 {
-    navigate('pong');
-    setTimeout(function() {
-        socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
-        mode = "online";
-        playGame(mode);
-    }, 500)
+  navigate('pong');
+  setTimeout(function() {
+    socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
+    mode = "online";
+    playGame(mode);
+  }, 500)
 }
 
 function handleSocket() {
@@ -79,20 +79,20 @@ export function closeSocket() {
 }
 
 function statePause() {
-  // ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; // Light overlay
-  // ctx.fillRect(0, 0, canvas.width, canvas.height); // Transparent overlay
+  if (ctx)
+  {
+    ctx.fillStyle = "white";
+    ctx.font = "50px Arial";
+    ctx.textAlign = "center";
 
-  ctx.fillStyle = "white";
-  ctx.font = "50px Arial";
-  ctx.textAlign = "center";
+    const barWidth = 20;
+    const barHeight = 100;
+    const pauseX = canvas.width / 2 - 40;
+    const pauseY = canvas.height / 2 - barHeight / 2;
 
-  const barWidth = 20;
-  const barHeight = 100;
-  const pauseX = canvas.width / 2 - 40;
-  const pauseY = canvas.height / 2 - barHeight / 2;
-
-  ctx.fillRect(pauseX + 10, pauseY, barWidth, barHeight);
-  ctx.fillRect(pauseX + 50, pauseY, barWidth, barHeight);
+    ctx.fillRect(pauseX + 10, pauseY, barWidth, barHeight);
+    ctx.fillRect(pauseX + 50, pauseY, barWidth, barHeight);
+  }
 }
 
 function drawBall(x, y, r) {
@@ -145,8 +145,10 @@ async function handleEndGame(name) // handle la creation des games ici
 {
   const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
   const winnerName = document.getElementById("winner-name");
-  if (name === "one") winnerName.textContent = "player 1";
-  else winnerName.textContent = "player 2";
+  if (name === "one")
+    winnerName.textContent = "player 1";
+  else
+    winnerName.textContent = "player 2";
   winnerModal.show();
 
   // evenement croix du modal pour close
@@ -167,36 +169,50 @@ async function handleEndGame(name) // handle la creation des games ici
     });
   }
 
-  // evenement boutton rejouer du modal
   const rejouer = document.getElementById("rejouer");
-  if (rejouer)
+  if (mode === "solo" || mode === "multi")
   {
-    rejouer.addEventListener("click", function () {
-      if (mode == "solo") initGameSolo();
-      else if (mode == "multi") initGameMulti();
-    });
+    // evenement boutton rejouer du modal
+    if (rejouer)
+    {
+      rejouer.addEventListener("click", function () {
+        if (mode == "solo") initGameSolo();
+        else if (mode == "multi") initGameMulti();
+      });
+    }
   }
+  else
+    rejouer.remove();
 }
 
 function checkScore(state) {
   document.getElementById("leftScore").textContent = state.score[0];
   document.getElementById("rightScore").textContent = state.score[1];
   if (state.over) {
-    // console.log(state.score[0])
-    // console.log(state.score[1])
     document.removeEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
     closeSocket();
-    if (state.score[0] == 1) handleEndGame("one");
-    else handleEndGame("two");
+    if (state.score[0] == 3)
+      handleEndGame("one");
+    else
+      handleEndGame("two");
   }
 }
 
 function messageSocket() {
   socket.onmessage = function (event) {
     const state = JSON.parse(event.data);
-    if (state.alert) handleError(state.alert, "handle game error");
-
+    if (state.alert)
+      handleError(state.alert, "handle game error");
+    if (state.info)
+    {
+        document.getElementById("rightScore").textContent = state.opponent
+        if (!state.start || !state.run)
+            document.getElementById("message").textContent = state.message;
+        return ;
+    }
+      
+    document.getElementById("message").textContent = ""
     checkScore(state);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -205,8 +221,7 @@ function messageSocket() {
     drawBall(state.ball.x, state.ball.y, state.ball.r);
     drawPaddle(state);
 
-    if (state.paused)
-      // si bouton pause on affiche lecran de pause
+    if (isPaused)
       statePause();
   };
 }
@@ -306,8 +321,8 @@ function endgameButton() {
 
 function setupGame(mode)
 {
-  if (mode === "solo" || mode === "multi")
-  {
+  // if (mode === "solo" || mode === "multi" || mode === "online")
+  // {
     // evenement touches paddle bitch
     document.removeEventListener("keydown", keyDownHandler);
     document.removeEventListener("keyup", keyUpHandler);
@@ -317,7 +332,6 @@ function setupGame(mode)
     // clearinterval pour repetition des frames
     clearInterval(interval);
     interval = setInterval(playGameMulti, 16);
-    console.log("interval == ", interval);
   
     // utiliser ces events listener pour tous les modals --> permet de continuer a scroller
     document.addEventListener("shown.bs.modal", function () {
@@ -334,25 +348,13 @@ function setupGame(mode)
       boutton.removeEventListener("click", pauseButton);
       boutton.addEventListener("click", pauseButton);
     }
-  
-    // boutton endgame / fin de jeu rho --> maybe rajouter un modal ?
     const endgame = document.getElementById("endgame");
     if (endgame)
     {
       endgame.removeEventListener("click", endgameButton);
       endgame.addEventListener("click", endgameButton);
     }
-  }
-  else if (mode === "online")
-  {
-    document.removeEventListener("keydown", keyDownHandler);
-    document.removeEventListener("keyup", keyUpHandler);
-    document.addEventListener("keydown", keyDownHandler);
-    document.addEventListener("keyup", keyUpHandler);
-    clearInterval(interval);
-    interval = setInterval(playGameMulti, 16);
-    // console.log("interval == ", interval);
-  }
+  // }
 }
 
 function playGame(mode)
@@ -375,7 +377,3 @@ function resetKey()
   keysPressed["ArrowDown"] = false;
 }
 export default closeSocket;
-
-/*
-  - detruire les evenements qd on quitte
-*/
