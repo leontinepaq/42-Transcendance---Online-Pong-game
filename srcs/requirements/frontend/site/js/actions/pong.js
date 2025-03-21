@@ -11,10 +11,10 @@ export const pongActions = [
     selector: '[data-action="playGameMultiplayer"]',
     handler: initGameMulti,
   },
-  // {
-  //     selector: '[data-action="playGameOnline"]',
-  //     handler: initGameOnline
-  // },
+  {
+      selector: '[data-action="playGameOnline"]',
+      handler: initGameOnline
+  },
 ];
 
 let isPaused = true;
@@ -48,15 +48,15 @@ function initGameMulti() {
   }, 500);
 }
 
-// function initGameOnline()
-// {
-//     navigate('pong');
-//     setTimeout(function() {
-//         socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
-//         mode = "online";
-//         playGame(mode);
-//     }, 500)
-// }
+function initGameOnline()
+{
+    navigate('pong');
+    setTimeout(function() {
+        socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
+        mode = "online";
+        playGame(mode);
+    }, 500)
+}
 
 function handleSocket() {
   socket.onopen = function () {
@@ -343,11 +343,16 @@ function setupGame(mode)
       endgame.addEventListener("click", endgameButton);
     }
   }
-  // else if (mode === "online")
-  // {
-  //     document.removeEventListener("keydown", playGameOnline);
-  //     document.addEventListener("keydown", playGameOnline);
-  // }
+  else if (mode === "online")
+  {
+    document.removeEventListener("keydown", keyDownHandler);
+    document.removeEventListener("keyup", keyUpHandler);
+    document.addEventListener("keydown", keyDownHandler);
+    document.addEventListener("keyup", keyUpHandler);
+    clearInterval(interval);
+    interval = setInterval(playGameMulti, 16);
+    // console.log("interval == ", interval);
+  }
 }
 
 function playGame(mode)
