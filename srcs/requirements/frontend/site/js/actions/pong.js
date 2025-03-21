@@ -148,17 +148,38 @@ function drawPaddle(state) {
   );
 }
 
-async function handleEndGame(name) // handle la creation des games ici 
+function showWinnerGame(name)
 {
-  const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
-  const winnerName = document.getElementById("winner-name");
-  if (name === "one")
-    winnerName.textContent = "player 1";
+  if (mode === "solo" || mode === "multi")
+  {
+    const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
+    const winnerName = document.getElementById("winner-name");
+    if (name === "one")
+      winnerName.textContent = "player 1";
+    else
+      winnerName.textContent = "player 2";
+    winnerModal.show();
+  }
   else
-    winnerName.textContent = "player 2";
-  winnerModal.show();
+  {
+    const modalBody = document.querySelector("#waitingModal .modal-body");
+    if (state.score[0] == 3)
+    {
+      modalBody.textContent = "You won, psahtek wallah";
+      const waitingModal = new bootstrap.Modal(document.getElementById("waitingModal"));
+      waitingModal.show();
+    }
+    else
+    {
+      modalBody.textContent = "You lose, fucking loser";
+      const waitingModal = new bootstrap.Modal(document.getElementById("waitingModal"));
+      waitingModal.show();
+    }
+  }
+}
 
-  // evenement croix du modal pour close
+function eventClose()
+{
   const closeendgame = document.getElementById("closeendgame");
   if (closeendgame)
   {
@@ -166,8 +187,7 @@ async function handleEndGame(name) // handle la creation des games ici
       navigate("playerMode");
     });
   }
-  
-  // evenement boutton fermer du modal
+
   const closeendgame1 = document.getElementById("closeendgame1");
   if (closeendgame1)
   {
@@ -175,7 +195,18 @@ async function handleEndGame(name) // handle la creation des games ici
       navigate("playerMode");
     });
   }
+  
+  const closeendgame2 = document.getElementById("closeendgame2");
+  if (closeendgame2)
+  {
+    closeendgame2.addEventListener("click", function () {
+      navigate("playerMode");
+    });
+  }
+}
 
+function eventPlayAgain()
+{
   const rejouer = document.getElementById("rejouer");
   if (mode === "solo" || mode === "multi")
   {
@@ -191,12 +222,29 @@ async function handleEndGame(name) // handle la creation des games ici
     rejouer.remove();
 }
 
+async function handleEndGame(name)
+{
+  showWinnerGame(name);
+  eventPlayAgain();
+}
+
+function addKey()
+{
+  document.addEventListener("keydown", keyDownHandler);
+  document.addEventListener("keyup", keyUpHandler);
+}
+
+function rmKey()
+{
+  document.removeEventListener("keydown", keyDownHandler);
+  document.removeEventListener("keyup", keyUpHandler);
+}
+
 function checkScore(state) {
   document.getElementById("leftScore").textContent = state.score[0];
   document.getElementById("rightScore").textContent = state.score[1];
   if (state.over) {
-    document.removeEventListener("keydown", keyDownHandler);
-    document.removeEventListener("keyup", keyUpHandler);
+    rmKey();
     closeSocket();
     if (state.score[0] == 3)
       handleEndGame("one");
@@ -215,16 +263,13 @@ function messageSocket() {
         if (!state.start || !state.run)
         {
           const modalBody = document.querySelector("#waitingModal .modal-body");
-          console.log(state.message)
           modalBody.textContent = state.message;
-          console.log(modalBody.textContent)
           const waitingModal = new bootstrap.Modal(document.getElementById("waitingModal"));
           waitingModal.show();
         }
         return ;
     }
     
-    document.getElementById("message").textContent = ""
     document.getElementById("waitingModal").style.display = "none";
     checkScore(state);
 
@@ -324,44 +369,50 @@ function pauseButton() {
 
 function endgameButton() {
   closeSocket();
-  document.removeEventListener("keydown", keyDownHandler);
-  document.removeEventListener("keyup", keyUpHandler);
+  rmKey();
   navigate("playerMode");
+}
+
+function eventHandleButton()
+{
+  // boutton pause en plus du space
+  const boutton = document.getElementById("pause");
+  if (boutton)
+  {
+    boutton.removeEventListener("click", pauseButton);
+    boutton.addEventListener("click", pauseButton);
+  }
+  const endgame = document.getElementById("endgame");
+  if (endgame)
+  {
+    endgame.removeEventListener("click", endgameButton);
+    endgame.addEventListener("click", endgameButton);
+  }
+}
+
+function scrollModal()
+{
+  // utiliser ces events listener pour tous les modals --> permet de continuer a scroller
+  document.addEventListener("shown.bs.modal", function () {
+    document.body.style.overflow = "auto";
+  });
+  document.addEventListener("hidden.bs.modal", function () {
+      document.body.style.overflow = "";
+  });
 }
 
 function setupGame(mode)
 {
-    // evenement touches paddle bitch
-    document.removeEventListener("keydown", keyDownHandler);
-    document.removeEventListener("keyup", keyUpHandler);
-    document.addEventListener("keydown", keyDownHandler);
-    document.addEventListener("keyup", keyUpHandler);
+  // evenement touches paddle bitch
+  rmKey();
+  addKey();
   
-    // clearinterval pour repetition des frames
-    clearInterval(interval);
-    interval = setInterval(playGameMulti, 16);
+  // clearinterval pour repetition des frames
+  clearInterval(interval);
+  interval = setInterval(playGameMulti, 16);
   
-    // utiliser ces events listener pour tous les modals --> permet de continuer a scroller
-    document.addEventListener("shown.bs.modal", function () {
-        document.body.style.overflow = "auto";
-    });
-    document.addEventListener("hidden.bs.modal", function () {
-        document.body.style.overflow = "";
-    });
-  
-    // boutton pause en plus du space
-    const boutton = document.getElementById("pause");
-    if (boutton)
-    {
-      boutton.removeEventListener("click", pauseButton);
-      boutton.addEventListener("click", pauseButton);
-    }
-    const endgame = document.getElementById("endgame");
-    if (endgame)
-    {
-      endgame.removeEventListener("click", endgameButton);
-      endgame.addEventListener("click", endgameButton);
-    }
+  scrollModal();
+  eventHandleButton();
 }
 
 function playGame(mode)
@@ -369,6 +420,8 @@ function playGame(mode)
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
 
+  statePause();
+  eventClose();
   resetKey();
   handleSocket();
   messageSocket();
