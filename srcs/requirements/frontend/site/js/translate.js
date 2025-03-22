@@ -4,17 +4,28 @@ export function loadTranslations(language) {
   fetch(`../language/${language}.json`)
     .then(response => response.json())
     .then(translations => {
-      updateTextContent(translations);
+      updateTextContent(translations, language);
     })
     .catch(err => console.error('Erreur de chargement des traductions :', err));
 }
 
-function updateTextContent(translations) {
+function updateTextContent(translations, language) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
-    if (translations[key])
+    
+    if (translations[key] || key === "pending")
     {
-      if (element.placeholder !== undefined)
+      if (key === "pending")
+      {
+        const variable = document.getElementById("pending1");
+        if (language === "fr")
+          variable.firstChild.textContent = 'EN ATTENTE';        
+        else if (language === "es")
+          variable.firstChild.textContent = 'EN ESPERA';        
+        else if (language === "en")
+          variable.firstChild.textContent = 'PENDING';        
+      }
+      else if (element.placeholder !== undefined)
       {
         element.placeholder = translations[key];
       }
