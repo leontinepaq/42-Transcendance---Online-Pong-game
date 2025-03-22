@@ -1,6 +1,7 @@
 import { navigate } from "../router.js";
 import { handleError } from "../api.js";
 import { authFetchJson } from "../api.js";
+import doLanguage from "../translate.js";
 
 export const pongActions = [
   {
@@ -150,7 +151,7 @@ function drawPaddle(state) {
 
 function showWinnerGame(name)
 {
-  if (mode === "solo" || mode === "multi")
+  if (mode === "multi")
   {
     const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
     const winnerName = document.getElementById("winner-name");
@@ -165,16 +166,17 @@ function showWinnerGame(name)
     const modalBody = document.querySelector("#waitingModal .modal-body");
     if (state.score[0] == 3)
     {
-      modalBody.textContent = "You won, psahtek wallah";
+      modalBody.textContent = "You won, what an amazing victory !";
       const waitingModal = new bootstrap.Modal(document.getElementById("waitingModal"));
       waitingModal.show();
     }
     else
     {
-      modalBody.textContent = "You lose, fucking loser";
+      modalBody.textContent = "You lost, you'll do better next time !";
       const waitingModal = new bootstrap.Modal(document.getElementById("waitingModal"));
       waitingModal.show();
     }
+    doLanguage();
   }
 }
 
