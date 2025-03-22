@@ -1,8 +1,5 @@
 import { authFetchJson } from "./api.js"
 
-let userId;
-let user;
-
 export function loadTranslations(language) {
   fetch(`../language/${language}.json`)
     .then(response => response.json())
@@ -25,25 +22,22 @@ function updateTextContent(translations) {
   });
 }
 
-// Fonction pour récupérer l'ID de l'utilisateur connecté via l'API
 async function getUserId() {
   try {
     const user = await authFetchJson("api/profile/", { method: "GET" });
-    return user.id;  // Récupérer l'ID réel de l'utilisateur connecté
+    return user.id;
   } catch (error) {
     console.error("Erreur lors de la récupération de l'utilisateur", error);
     return null;
   }
 }
 
-// Fonction pour stocker la langue dans un cookie avec l'ID de l'utilisateur
 function setLanguageInCookie(language, userId) {
   console.log(userId);
   document.cookie = `language_${userId}=${language}; path=/; max-age=31536000`;
   loadTranslations(language);
 }
 
-// Fonction pour obtenir la langue à partir du cookie spécifique à l'utilisateur
 function getLanguageFromCookie(userId) {
   let cookies = document.cookie.split('; ');
   for (let cookie of cookies) {
@@ -55,7 +49,6 @@ function getLanguageFromCookie(userId) {
   return 'en';
 }
 
-// Fonction pour changer la langue
 async function changeLanguage(language) {
   const userId = await getUserId();
   if (userId) {
@@ -63,7 +56,6 @@ async function changeLanguage(language) {
   }
 }
 
-// Fonction pour appliquer la langue sauvegardée au chargement de la page
 async function applySavedLanguage() {
   const userId = await getUserId();
   if (userId) {
