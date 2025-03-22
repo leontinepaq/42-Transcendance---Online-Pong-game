@@ -1,3 +1,5 @@
+import { authFetchJson } from "./api.js"
+
 export function loadTranslations(language) {
   fetch(`../language/${language}.json`)
     .then(response => response.json())
@@ -20,42 +22,54 @@ function updateTextContent(translations) {
   });
 }
 
-function generateUniqueSessionID() {
-  return `user-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function getUserId() {
-  let userId = localStorage.getItem('userId');
-  if (!userId) {
-    userId = generateUniqueSessionID();
-    localStorage.setItem('userId', userId);
-    return (userId)
+async function getUserId() {
+  try {
+    const user = await authFetchJson("api/profile/", { method: "GET" });
+    return user.id;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de l'utilisateur", error);
+    return null;
   }
-  return (userId)
 }
 
-function changeLanguage(language) {
-  const userId = getUserId();
-  localStorage.setItem(`${userId}_language`, language);
+function setLanguageInCookie(language, userId) {
+  console.log(userId);
+  document.cookie = `language_${userId}=${language}; path=/; max-age=31536000`;
   loadTranslations(language);
 }
 
-function applySavedLanguage() {
-  const userId = getUserId();
-  // console.log("userID ==  ", userId)
-  let savedLanguage = localStorage.getItem(`${userId}_language`);
-  // console.log("langue == ", savedLanguage);
-  if (!savedLanguage) {
-    savedLanguage = 'en';
-    localStorage.setItem(`${userId}_language`, savedLanguage);
+function getLanguageFromCookie(userId) {
+  let cookies = document.cookie.split('; ');
+  for (let cookie of cookies) {
+    let [name, value] = cookie.split('=');
+    if (name === `language_${userId}`) {
+      return value;
+    }
   }
-
-  loadTranslations(savedLanguage); 
+  return 'en';
 }
 
-export function doLanguage()
+async function changeLanguage(language) {
+  const userId = await getUserId();
+  if (userId) {
+    setLanguageInCookie(language, userId);
+  }
+}
+
+async function applySavedLanguage() {
+  const userId = await getUserId();
+  if (userId) {
+    let savedLanguage = getLanguageFromCookie(userId);
+    if (!savedLanguage) {
+      savedLanguage = 'en';
+    }
+    setLanguageInCookie(savedLanguage, userId);
+    loadTranslations(savedLanguage);
+  }
+}
+
+function addButton()
 {
-  applySavedLanguage();
   const french = document.getElementById('french');
   if (french) {
     french.addEventListener("click", () => changeLanguage('fr'));
@@ -68,6 +82,12 @@ export function doLanguage()
   if (espagnol) {
     espagnol.addEventListener("click", () => changeLanguage('es'));
   }
+}
+
+export async function doLanguage()
+{
+  applySavedLanguage();
+  addButton();
 }
 
 export default doLanguage
