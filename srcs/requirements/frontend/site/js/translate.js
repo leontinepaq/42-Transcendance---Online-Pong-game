@@ -12,10 +12,14 @@ export function loadTranslations(language) {
 function updateTextContent(translations) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
-    if (translations[key]) {
-      if (element.placeholder !== undefined) {
+    if (translations[key])
+    {
+      if (element.placeholder !== undefined)
+      {
         element.placeholder = translations[key];
-      } else {
+      }
+      else
+      {
         element.textContent = translations[key];
       }
     }
@@ -23,11 +27,14 @@ function updateTextContent(translations) {
 }
 
 async function getUserId() {
-  try {
+  try
+  {
     const user = await authFetchJson("api/profile/", { method: "GET" });
     return user.id;
-  } catch (error) {
-    console.error("Erreur lors de la récupération de l'utilisateur", error);
+  }
+  catch (error)
+  {
+    // console.error("Erreur lors de la récupération de l'utilisateur", error);
     return null;
   }
 }
@@ -40,9 +47,11 @@ function setLanguageInCookie(language, userId) {
 
 function getLanguageFromCookie(userId) {
   let cookies = document.cookie.split('; ');
-  for (let cookie of cookies) {
+  for (let cookie of cookies)
+  {
     let [name, value] = cookie.split('=');
-    if (name === `language_${userId}`) {
+    if (name === `language_${userId}`)
+    {
       return value;
     }
   }
@@ -51,16 +60,23 @@ function getLanguageFromCookie(userId) {
 
 async function changeLanguage(language) {
   const userId = await getUserId();
-  if (userId) {
+  if (userId)
+  {
     setLanguageInCookie(language, userId);
+  }
+  else
+  {
+    loadTranslations(language);
   }
 }
 
 async function applySavedLanguage() {
   const userId = await getUserId();
-  if (userId) {
+  if (userId)
+  {
     let savedLanguage = getLanguageFromCookie(userId);
-    if (!savedLanguage) {
+    if (!savedLanguage)
+    {
       savedLanguage = 'en';
     }
     setLanguageInCookie(savedLanguage, userId);
