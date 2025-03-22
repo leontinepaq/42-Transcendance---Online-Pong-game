@@ -38,6 +38,7 @@ async function getUserId() {
 
 // Fonction pour stocker la langue dans un cookie avec l'ID de l'utilisateur
 function setLanguageInCookie(language, userId) {
+  console.log(userId);
   document.cookie = `language_${userId}=${language}; path=/; max-age=31536000`;
   loadTranslations(language);
 }
