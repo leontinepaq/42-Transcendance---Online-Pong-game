@@ -261,7 +261,7 @@ form {
   background-color: red;
 }
 
-.card-user {
+.card {
   background-color: var(--color-dark-transparent);
   color: white;
   margin-top: 1rem;

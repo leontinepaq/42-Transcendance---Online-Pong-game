@@ -5,7 +5,7 @@
 }
 
 /* Pour fixer la largeur des lignes et les centrer dans le container 
-todo @leontinepaq : regarder si utile ou supprimer / renommer */ 
+todo @leontinepaq : regarder si utile ou supprimer / renommer */
 .fixed-width-row {
   margin: 0 auto;
   min-height: 20rem;
@@ -60,3 +60,71 @@ todo @leontinepaq : regarder si utile ou supprimer / renommer */
   display: block;
 }
 
+/* Styles généraux */
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  color: var(--color-light);
+}
+
+.player-info.winner {
+  font-weight: bold;
+  color: var(--color-accent-light);
+  text-shadow: 0 0 10px var(--color-accent), 0 0 30px var(--color-accent);
+  filter: drop-shadow(0 0 15px var(--color-accent));
+}
+
+.player-info.winner .avatar {
+  border: 3px solid var(--color-accent-light);
+  box-shadow: 0 0 10px var(--color-accent), 0 0 30px var(--color-accent);
+}
+
+.trophy-icon {
+  font-size: 24px;
+  color: var(--color-accent-light);
+  text-shadow: 0 0 10px var(--color-accent), 0 0 20px var(--color-accent);
+}
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.username {
+  font-size: 1.2rem;
+}
+
+.score {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.vs {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-accent-secondary);
+}
+
+.match-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  gap: 5px;
+}
+
+.match-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 16px;
+  color: var(--color-accent-light);
+}
+
+.match-info .material-symbols-outlined {
+  font-size: 20px;
+  color: var(--color-accent-secondary);
+}
