@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import (api_view,
                                        permission_classes,
                                        parser_classes)
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import (MultiPartParser,
                                     FormParser)
 from rest_framework.permissions import IsAuthenticated
@@ -192,12 +193,13 @@ def deactivate_2FA(request):
                                                                           "format": "binary"}},
                                                 "required": ["avatar"]}}
                )
+@csrf_exempt
+@api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
-@api_view(["POST"])
 def update_avatar(request):
     user = request.user
-
+    print("called")
     if "avatar" not in request.FILES:
         return GenericResponse({"details": "No file uploaded"}).response(400)
 

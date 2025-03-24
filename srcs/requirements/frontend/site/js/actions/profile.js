@@ -11,7 +11,17 @@ export const profileActions = [
     selector: '[data-action="disable-2fa"]',
     handler: disable2fa,
   },
+  {
+    selector: '[data-i18n="editAvatar"]',
+    handler: updateAvatar,
+  }
 ];
+
+export function initProfile() {
+  setTimeout(function () {
+    loadUserProfile();
+  }, 150);
+}
 
 function display2fa(user) {
   if (!user.is_two_factor_mail && !user.is_two_factor_auth) {
@@ -34,8 +44,8 @@ export async function loadUserProfile() {
     const user = await authFetchJson("api/profile/", { method: "GET" });
     usernameElem.textContent = user.username;
     emailElem.textContent = user.email;
-    if (user.avatarUrl)
-      document.getElementById("profile-avatar").src = user.avatarUrl;
+    if (user.avatar_url)
+      document.getElementById("profile-avatar").src = user.avatar_url;
     display2fa(user);
     for (const el of document.getElementsByClassName("edit-btn")) el.disabled = false;
   } catch (error) {
@@ -137,4 +147,56 @@ async function disable2fa(element, event) {
   } catch (error) {
     handleError(error, "Disable 2fa error");
   }
+}
+
+async function updateAvatar() {
+  const input = document.getElementById('avatar-upload');
+  
+  const newInput = input.cloneNode(true);
+  input.parentNode.replaceChild(newInput, input);
+  
+  const refreshedInput = document.getElementById('avatar-upload');
+  
+  refreshedInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    
+    if (!file) {
+      alert("No file selected.");
+      return;
+    }
+
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      alert("Invalid file type. Please upload a JPG or PNG image.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert("File is too large. Max size is 10MB.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('avatar', file);
+
+    try {
+      const response = await authFetchJson("/api/profile/update/avatar/", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (response.avatar_url) {
+        document.getElementById("profile-avatar").src = response.avatar_url;
+        alert("Avatar updated successfully!");
+      } else {
+        console.log("missed");
+        alert("Avatar update failed: " + response.details);
+      }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      alert("Failed to upload avatar.");
+    }
+  });
+  
+  refreshedInput.click();
 }
