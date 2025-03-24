@@ -189,7 +189,6 @@ async function updateAvatar() {
         document.getElementById("profile-avatar").src = response.avatar_url;
         alert("Avatar updated successfully!");
       } else {
-        console.log("missed");
         alert("Avatar update failed: " + response.details);
       }
     } catch (error) {
