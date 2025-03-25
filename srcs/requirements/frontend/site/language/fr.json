@@ -63,5 +63,11 @@
     "player2": "Joueur 2",
     "player3": "Joueur 3",
     "player4": "Joueur 4",
-    "verificationCode": "Code de verification"
+    "verificationCode": "Code de verification",
+    "avatarUpdateYes": "Avatar change avec succes !",
+    "avatarUpdateNo": "Echec du chargement d'avatar.",
+    "avatarUpdateFailed": "Echec du telechargement de l'avatar.",
+    "maxSizeAvatar": "Taille de fichier trop grande. Taille max : 10MB.",
+    "invalidTypeAvatar": "Type de fichier invalide. Image JPG ou PNG requise.",
+    "noFileAvatar": "Aucun fichier selectionne."
 }

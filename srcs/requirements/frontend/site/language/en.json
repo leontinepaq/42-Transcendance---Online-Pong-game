@@ -63,5 +63,11 @@
     "player2": "Player 2",
     "player3": "Player 3",
     "player4": "Player 4",
-    "verificationCode": "Verification code"
+    "verificationCode": "Verification code",
+    "avatarUpdateYes": "Avatar updated successfully !",
+    "avatarUpdateNo": "Avatar update failed.",
+    "avatarUpdateFailed": "Failed to upload avatar.",
+    "maxSizeAvatar": "File is too large. Max size is 10MB.",
+    "invalidTypeAvatar": "Invalid file type. Please upload a JPG or PNG image.",
+    "noFileAvatar": "No file selected."
 }
