@@ -51,7 +51,6 @@ async function getUserId() {
 }
 
 function setLanguageInCookie(language, userId) {
-  console.log(userId);
   document.cookie = `language_${userId}=${language}; path=/; max-age=31536000`;
   loadTranslations(language);
 }
@@ -89,7 +88,7 @@ async function applySavedLanguage() {
     if (!savedLanguage)
     {
       savedLanguage = 'en';
-    }
+    }  
     setLanguageInCookie(savedLanguage, userId);
     loadTranslations(savedLanguage);
   }
