@@ -1,6 +1,7 @@
 import { authFetchJson, handleError } from "../api.js";
 import { show, hide } from "../utils.js";
 import { navigate } from "../router.js";
+import { doLanguage } from "../translate.js"
 
 export const profileActions = [
   {
@@ -151,7 +152,7 @@ async function disable2fa(element, event) {
 
 async function updateAvatar() {
   const input = document.getElementById('avatar-upload');
-  
+  const modalBody = document.querySelector("#profilModal .modal-body");
   const newInput = input.cloneNode(true);
   input.parentNode.replaceChild(newInput, input);
   
@@ -161,17 +162,17 @@ async function updateAvatar() {
     const file = event.target.files[0];
     
     if (!file) {
-      alert("No file selected.");
+      modalBody.textContent = "No file selected.";
       return;
     }
 
     if (!["image/jpeg", "image/png"].includes(file.type)) {
-      alert("Invalid file type. Please upload a JPG or PNG image.");
+      modalBody.textContent = "Invalid file type. Please upload a JPG or PNG image.";
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert("File is too large. Max size is 10MB.");
+      modalBody.textContent = "File is too large. Max size is 10MB.";
       return;
     }
 
@@ -187,14 +188,17 @@ async function updateAvatar() {
 
       if (response.avatar_url) {
         document.getElementById("profile-avatar").src = response.avatar_url;
-        alert("Avatar updated successfully!");
+        modalBody.textContent = "Avatar updated successfully!";
       } else {
-        alert("Avatar update failed: " + response.details);
+        modalBody.textContent = "Avatar update failed: " + response.details;
       }
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      alert("Failed to upload avatar.");
+      modalBody.textContent = "Failed to upload avatar.";
     }
+    const profilModal = new bootstrap.Modal(document.getElementById("profilModal"));
+    profilModal.show();
+    // doLanguage();
   });
   
   refreshedInput.click();

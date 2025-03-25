@@ -23,7 +23,7 @@ function updateTextContent(translations, language) {
         else if (language === "es")
           variable.firstChild.textContent = 'EN ESPERA';        
         else if (language === "en")
-          variable.firstChild.textContent = 'PENDING';        
+          variable.firstChild.textContent = 'PENDING';
       }
       else if (element.placeholder !== undefined)
       {
