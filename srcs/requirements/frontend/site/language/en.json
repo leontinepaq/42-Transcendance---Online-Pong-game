@@ -30,9 +30,14 @@
     "security": "SECURITY",
     "editAvatar": "EDIT AVATAR",
     "editUsername": "EDIT USERNAME",
+    "editUsername_save": "SAVE",
     "editEmail": " EDIT EMAIL",
+    
+    
+    
     "changePwd": "Change Password",
     "updatePwd": "UPDATE PASSWORD",
+    "updatePwd_save": "UPDATE PASSWORD",
     "2faEmail": "Two-factor authentication by mail is required",
     "2faApp": "Two-factor authentication by app is required",
     "disable2fa": "DISABLE 2FA",

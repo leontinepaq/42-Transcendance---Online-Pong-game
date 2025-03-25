@@ -9,10 +9,18 @@ export function loadTranslations(language) {
     .catch(err => console.error('Erreur de chargement des traductions :', err));
 }
 
+
+function updateButtonTranslations(button, translations, editKey) {
+  button.dataset.editText = translations[editKey];       // Mise à jour de "EDIT"
+  button.dataset.saveText = translations[editKey + "_save"]; // On utilise une clé commune "saveGeneral"
+}
+
 function updateTextContent(translations, language) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
-    
+    if (element.hasAttribute("data-edit-text") && element.hasAttribute("data-save-text")) {
+      updateButtonTranslations(element, translations, key);
+    }
     if (translations[key] || key === "pending")
     {
       if (key === "pending")
@@ -34,6 +42,9 @@ function updateTextContent(translations, language) {
         element.textContent = translations[key];
       }
     }
+  });
+  document.querySelectorAll("[data-edit-text][data-save-text]").forEach(button => {
+    updateButtonAttributes(button, translations);
   });
 }
 
