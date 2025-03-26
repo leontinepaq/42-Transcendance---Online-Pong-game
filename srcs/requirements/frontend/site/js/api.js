@@ -47,21 +47,21 @@ export async function authFetchJson(url, options = {}) {
     ...options,
     credentials: "include",
   });
-  if (response.status === 401) {
-    //todo @leontinepaq ou @Jean-Antoine > a checker : n'est jamais appelee..? (j'ai limpression) + je crois que ca ne fonctionnerait meme pas
-    // si error 401 et changement de langue, refresh en boucle ?? // enlever ce trucccc
-    console.log("refhresh token")
-    const refreshSuccess = await refreshToken();
-    if (refreshSuccess) {
-      response = await fetch(url, {
-        ...options,
-        credentials: "include",
-      });
-    } else {
-      navigate("login");
-      throw new Error("Authentication failed");
-    }
-  }
+  // if (response.status === 401) {
+  //   //todo @leontinepaq ou @Jean-Antoine > a checker : n'est jamais appelee..? (j'ai limpression) + je crois que ca ne fonctionnerait meme pas
+  //   // si error 401 et changement de langue, refresh en boucle ?? // enlever ce trucccc
+  //   console.log("refhresh token")
+  //   const refreshSuccess = await refreshToken();
+  //   if (refreshSuccess) {
+  //     response = await fetch(url, {
+  //       ...options,
+  //       credentials: "include",
+  //     });
+  //   } else {
+  //     navigate("login");
+  //     throw new Error("Authentication failed");
+  //   }
+  // }
   return parseJsonResponse(response);
 }
 
@@ -80,7 +80,7 @@ async function parseJsonResponse(response) {
       // console.log(data.details);
       details = data.details;
     } catch (error) {
-      // console.warn("Failed to parse error response:", error);
+      console.warn("Failed to parse error response:", error);
     }
     throw new Error(details);
   }

@@ -1,4 +1,4 @@
-import { authFetchJson } from "./api.js"
+import { authFetchJson, fetchJson } from "./api.js"
 
 export function loadTranslations(language) {
   fetch(`../language/${language}.json`)
