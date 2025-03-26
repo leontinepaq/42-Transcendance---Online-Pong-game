@@ -152,8 +152,8 @@ async function disable2fa(element, event) {
 }
 
 async function updateAvatar() {
-  const profilModal = new bootstrap.Modal(document.getElementById("profilModal"));
-  let modalBody = document.getElementById("test")
+  const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
+  let modalBody = document.getElementById("bodyModal")
   const input = document.getElementById('avatar-upload');
   
   const newInput = input.cloneNode(true);
