@@ -128,3 +128,7 @@ todo @leontinepaq : regarder si utile ou supprimer / renommer */
   font-size: 20px;
   color: var(--color-accent-secondary);
 }
+
+.dashboard-icon {
+  color: var(--color-accent-secondary);
+}

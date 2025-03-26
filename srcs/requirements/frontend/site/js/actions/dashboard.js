@@ -15,11 +15,11 @@ function createMatchCard(match) {
           <div class="player-info ${isPlayer1Winner ? "winner" : ""}">
             <img src="${match.player1.avatar_url}" class="avatar" alt="${match.player1.username}" />
             <div class="text-center">
-              <div class="username">
-                ${isPlayer1Winner ? '<span class="material-symbols-outlined trophy-icon">emoji_events</span>' : ""}
-                ${match.player1.username}
-              </div>
-              <div class="score">${match.score_player1}</div>
+            <div class="username">
+            ${isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
+            ${match.player1.username}
+            </div>
+            <div class="score">${match.score_player1}</div>
             </div>
           </div>
           <div class="vs">VS</div>
@@ -27,7 +27,7 @@ function createMatchCard(match) {
             <img src="${match.player2.avatar_url}" class="avatar" alt="${match.player2.username}" />
             <div class="text-center">
               <div class="username">
-                ${!isPlayer1Winner ? '<span class="material-symbols-outlined trophy-icon">emoji_events</span>' : ""}
+                ${!isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
                 ${match.player2.username}
               </div>
               <div class="score">${match.score_player2}</div>
@@ -36,12 +36,12 @@ function createMatchCard(match) {
         </div>
         <div class="match-details">
           <div class="match-info">
-          <span class="material-symbols-outlined">timer</span>
+          <i class="bi bi-stopwatch-fill dashboard-icon"></i>
           <span> Match duration: </span>
             <span>${match.duration}</span>
           </div>
           <div class="match-info">
-          <span class="material-symbols-outlined">mode_heat</span>
+          <i class="bi bi-fire dashboard-icon"></i>
           <span>Longuest exchange: </span>
             <span>${match.longest_exchange}</span>
           </div>
@@ -210,14 +210,14 @@ async function plotWinRate(data) {
 
 async function plotGamesPlayed(data) {
   data.solo_games = 10; //todo @leontinepaq a changer quand fonctionne
-  data.multiplayer_games = 7;
+  data.multiplayer_games = 0;
   data.online_games = 6;
   //
 
   const ctx = document.getElementById("games-played").getContext("2d");
-  const labels = ["SOLO", "MULTIPLAYER", "ONLINE"];
-  const dataChart = [data.solo_games, data.multiplayer_games, data.online_games];
-  const colorsChart = [colors.accentSecondary, colors.accentTertiary, colors.accent];
+  const labels = ["SOLO", "ONLINE"];
+  const dataChart = [data.solo_games, data.online_games];
+  const colorsChart = [colors.accentSecondary, colors.accent];
   const options = {
     responsive: true,
     maintainAspectRatio: false,
