@@ -157,6 +157,7 @@ function drawPaddle(state) {
 function addModalGameSoloMulti()
 {
     // HEADER
+    let existingButton = document.querySelector('#closeendgame')
     modalHeader = document.querySelector('.modal-header');
 
     const modalTitle = document.createElement('h5');
@@ -164,16 +165,7 @@ function addModalGameSoloMulti()
     modalTitle.setAttribute('class', 'modal-title');
     modalTitle.setAttribute('id', 'winnerModalLabel');
     modalTitle.textContent = 'Congratulations !';
-
-    closeButton = document.createElement('button');
-    closeButton.setAttribute('type', 'button');
-    closeButton.setAttribute('class', 'btn-close btn-close-white');
-    closeButton.setAttribute('data-bs-dismiss', 'modal');
-    closeButton.setAttribute('id', 'closeendgame');
-    closeButton.setAttribute('aria-label', 'Close');
-
-    modalHeader.appendChild(modalTitle);
-    modalHeader.appendChild(closeButton);
+    modalHeader.insertBefore(modalTitle, existingButton);
 
     // BODY
     modalBody = document.querySelector('.modal-body');
@@ -218,24 +210,23 @@ function addModalGameSoloMulti()
 
 function addModalGameOnline()
 {
-  modalHeader = document.querySelector('.modal-header');
+  // modalHeader = document.querySelector('.modal-header');
 
-  closeButton = document.createElement('button');
-  closeButton.setAttribute('type', 'button');
-  closeButton.setAttribute('class', 'btn-close btn-close-white');
-  closeButton.setAttribute('data-bs-dismiss', 'modal');
-  closeButton.setAttribute('id', 'closeendgame');
-  closeButton.setAttribute('aria-label', 'Close');
+  // closeButton = document.createElement('button');
+  // closeButton.setAttribute('type', 'button');
+  // closeButton.setAttribute('class', 'btn-close btn-close-white');
+  // closeButton.setAttribute('data-bs-dismiss', 'modal');
+  // closeButton.setAttribute('id', 'closeendgame');
+  // closeButton.setAttribute('aria-label', 'Close');
 
-  modalHeader.appendChild(closeButton);
+  // modalHeader.appendChild(closeButton);
 }
 
 function rmModalParam()
 {
-    var remove1 = document.querySelector('.modal-header');
-    while (remove1.firstChild) {
-        remove1.removeChild(remove1.firstChild);
-    }
+    const test = document.getElementById('winnerModalLabel');
+    if (test)
+        test.remove();
     var remove2 = document.querySelector('.modal-body');
     while (remove2.firstChild) {
         remove2.removeChild(remove2.firstChild);
@@ -290,7 +281,7 @@ function eventClose()
   {
     closeendgame.addEventListener("click", function () {
       rmModalParam();
-      navigate("playerMode");
+      navigate("home");
     });
   }
 

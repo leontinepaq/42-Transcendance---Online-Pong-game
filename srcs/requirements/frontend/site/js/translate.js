@@ -44,7 +44,7 @@ function updateTextContent(translations, language) {
     }
   });
   document.querySelectorAll("[data-edit-text][data-save-text]").forEach(button => {
-    updateButtonAttributes(button, translations);
+    updateButtonAttributes(button, translations); // cette fonction existe ? @leontine
   });
 }
 
