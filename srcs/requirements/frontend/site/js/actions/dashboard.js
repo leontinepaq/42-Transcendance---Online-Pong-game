@@ -177,7 +177,7 @@ function displayGameCards(data) {
 
 async function updateStatValues(data) {
   //todo @leontinepaq a changer quand fonctionne
-  data.wins = 60;
+  data.wins = 30;
   data.winstreak = 1;
   data.total_time_played = "0:25:12";
   data.unique_opponents_count = 2;
@@ -192,10 +192,14 @@ async function updateStatValues(data) {
 
 async function plotWinRate(data) {
   data.winRate = 60; //todo @leontinepaq a changer quand fonctionne
+  data.wins = 30;
+  data.losses = 20;
+  // //
+
 
   const ctx = document.getElementById("win-rate-chart").getContext("2d");
   const labels = ["winning", "losing"];
-  const dataChart = [data.winRate, 100 - data.winRate];
+  const dataChart = [data.wins, data.losses];
   const colorsChart = [colors.accent, colors.accentLight];
   const options = {
     responsive: true,
@@ -210,7 +214,6 @@ async function plotWinRate(data) {
 
 async function plotGamesPlayed(data) {
   data.solo_games = 10; //todo @leontinepaq a changer quand fonctionne
-  data.multiplayer_games = 0;
   data.online_games = 6;
   //
 
@@ -249,7 +252,7 @@ async function plotGamesPlayed(data) {
 
 async function plotGameHistory(data) {
   //todo @leontinepaq a changer quand fonctionne
-  data.games = [
+  data.daily_results = [
     { date: "2025-03-01", wins: 2, losses: 1 },
     { date: "2025-03-02", wins: 3, losses: 2 },
     { date: "2025-03-03", wins: 1, losses: 1 },
@@ -259,9 +262,9 @@ async function plotGameHistory(data) {
   //
 
   const ctx = document.getElementById("match-histogram").getContext("2d");
-  const labels = data.games.map((item) => item.date);
-  const wins = data.games.map((item) => item.wins);
-  const losses = data.games.map((item) => item.losses);
+  const labels = data.daily_results.map((item) => item.date);
+  const wins = data.daily_results.map((item) => item.wins);
+  const losses = data.daily_results.map((item) => item.losses);
   const datasets = [
     {
       label: "Wins",

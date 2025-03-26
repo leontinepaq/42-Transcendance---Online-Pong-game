@@ -68,6 +68,10 @@ class UserNotFoundErrorSerializer(GenericResponse):
     details=serializers.CharField(default="User does not exist")
     error_code=404
 
+class InvalidUserIDErrorSerializer(serializers.Serializer):
+    DEFAULT={"details": "Invalid user_id"}
+    details = serializers.CharField(default="Invalid user_id")
+    error_code = serializers.IntegerField(default=400)
         
 # PRE-LOGIN
 
