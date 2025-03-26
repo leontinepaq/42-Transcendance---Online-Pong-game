@@ -10,7 +10,8 @@ class Participant(models.Model):
                              null=True,
                              blank=True)
     name = models.CharField(max_length=30,
-                            unique=True)
+                            default="unknown",
+                            null=False)
     is_ai = models.BooleanField(default=False)
 
     @classmethod
@@ -103,3 +104,4 @@ class Tournament(models.Model):
                                related_name="winner_of_tournament")
     created_at = models.DateTimeField(auto_now_add=True)
     finished = models.BooleanField(default=False)
+ 

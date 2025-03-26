@@ -27,9 +27,9 @@ function updateTextContent(translations, language) {
       {
         const variable = document.getElementById("pending1");
         if (language === "fr")
-          variable.firstChild.textContent = 'EN ATTENTE';        
+          variable.firstChild.textContent = 'EN ATTENTE';
         else if (language === "es")
-          variable.firstChild.textContent = 'EN ESPERA';        
+          variable.firstChild.textContent = 'EN ESPERA';
         else if (language === "en")
           variable.firstChild.textContent = 'PENDING';
       }
