@@ -66,5 +66,11 @@
     "player2": "Jugador 2",
     "player3": "Jugador 3",
     "player4": "Jugador 4",
-    "verificationCode": "Código de verificación"
+    "verificationCode": "Código de verificación",
+    "avatarUpdateYes": "¡Avatar actualizado con éxito!",
+    "avatarUpdateNo": "Error al actualizar el avatar.",
+    "avatarUpdateFailed": "Error al cargar el avatar.",
+    "maxSizeAvatar": "El archivo es demasiado grande. El tamaño máximo es 10MB.",
+    "invalidTypeAvatar": "Tipo de archivo no válido. Por favor, sube una imagen JPG o PNG.",
+    "noFileAvatar": "No se ha seleccionado ningún archivo."
 }

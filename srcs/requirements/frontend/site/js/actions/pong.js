@@ -151,7 +151,7 @@ function drawPaddle(state) {
 
 function showWinnerGame(name)
 {
-  if (mode === "multi")
+  if (mode === "solo" || mode === "multi")
   {
     const winnerModal = new bootstrap.Modal(document.getElementById("winnerModal"));
     const winnerName = document.getElementById("winner-name");
@@ -338,7 +338,7 @@ function playGameMulti() {
         })
       );
     }
-    if (keysPressed["ArrowUp"]) {
+    if (keysPressed["ArrowUp"] && mode === "multi") {
       socket.send(
         JSON.stringify({
           toggle_pause: false,
@@ -347,7 +347,7 @@ function playGameMulti() {
         })
       );
     }
-    if (keysPressed["ArrowDown"]) {
+    if (keysPressed["ArrowDown"] && mode === "multi") {
       socket.send(
         JSON.stringify({
           toggle_pause: false,

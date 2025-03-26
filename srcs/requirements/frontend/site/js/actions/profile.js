@@ -1,7 +1,8 @@
 import { authFetchJson, handleError } from "../api.js";
 import { show, hide } from "../utils.js";
 import { navigate } from "../router.js";
-import { doLanguage } from "../translate.js"
+import { showModal } from "./modals.js";
+import doLanguage from "../translate.js";
 
 export const profileActions = [
   {
@@ -151,8 +152,10 @@ async function disable2fa(element, event) {
 }
 
 async function updateAvatar() {
+  const profilModal = new bootstrap.Modal(document.getElementById("profilModal"));
+  let modalBody = document.getElementById("test")
   const input = document.getElementById('avatar-upload');
-  const modalBody = document.querySelector("#profilModal .modal-body");
+  
   const newInput = input.cloneNode(true);
   input.parentNode.replaceChild(newInput, input);
   
@@ -162,17 +165,20 @@ async function updateAvatar() {
     const file = event.target.files[0];
     
     if (!file) {
-      modalBody.textContent = "No file selected.";
+      modalBody.setAttribute('data-i18n', 'noFileAvatar');
+      profilModal.show();
       return;
     }
 
     if (!["image/jpeg", "image/png"].includes(file.type)) {
-      modalBody.textContent = "Invalid file type. Please upload a JPG or PNG image.";
+      modalBody.setAttribute('data-i18n', 'invalidTypeAvatar');
+      profilModal.show();
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      modalBody.textContent = "File is too large. Max size is 10MB.";
+      modalBody.setAttribute('data-i18n', 'maxSizeAvatar');
+      profilModal.show();
       return;
     }
 
@@ -188,17 +194,15 @@ async function updateAvatar() {
 
       if (response.avatar_url) {
         document.getElementById("profile-avatar").src = response.avatar_url;
-        modalBody.textContent = "Avatar updated successfully!";
+        modalBody.setAttribute('data-i18n', 'avatarUpdateYes');
       } else {
-        modalBody.textContent = "Avatar update failed: " + response.details;
+        modalBody.setAttribute('data-i18n', 'avatarUpdateNo');
       }
     } catch (error) {
-      console.error("Error uploading avatar:", error);
-      modalBody.textContent = "Failed to upload avatar.";
+      modalBody.setAttribute('data-i18n', 'avatarUpdateFailed');
     }
-    const profilModal = new bootstrap.Modal(document.getElementById("profilModal"));
     profilModal.show();
-    // doLanguage();
+    doLanguage();
   });
   
   refreshedInput.click();
