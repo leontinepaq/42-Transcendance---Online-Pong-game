@@ -77,14 +77,12 @@ async function parseJsonResponse(response) {
     let details = "Unknown error";
     try {
       const data = await response.json();
-      // console.log(data.details);
       details = data.details;
     } catch (error) {
-      console.warn("Failed to parse error response:", error);
+      // console.warn("Failed to parse error response:", error);
     }
     throw new Error(details);
   }
-  // console.log("cest  moiii")
   return response.json();
 }
 

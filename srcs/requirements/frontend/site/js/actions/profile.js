@@ -51,7 +51,29 @@ export async function loadUserProfile() {
     display2fa(user);
     for (const el of document.getElementsByClassName("edit-btn")) el.disabled = false;
   } catch (error) {
-    handleError(error, "Load user profile error");
+    // handleError(error, "Load user profile error");
+    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
+    let modalBody = document.getElementById("bodyModal")
+    if (error.message === "Invalid email format")
+      modalBody.setAttribute('data-i18n', "invalidEmail")
+    else if (error.message === "Email already in use")
+      modalBody.setAttribute('data-i18n', "profile1")
+    else if (error.message === "Missing email field")
+      modalBody.setAttribute('data-i18n', "profile2")
+    else if (error.message === "username already in use")
+      modalBody.setAttribute('data-i18n', "profile3")
+    else if (error.message === "username too long")
+      modalBody.setAttribute('data-i18n', "profile4")
+    else if (error.message === "Missing username field")
+      modalBody.setAttribute('data-i18n', "profile5")
+    else if (error.message === "Passwords do not match")
+      modalBody.setAttribute('data-i18n', "profile6")
+    else if (error.message === "Both fields required")
+      modalBody.setAttribute('data-i18n', "bothFields")
+    else
+      modalBody.setAttribute('data-i18n', "errorUnknow")
+    profilModal.show();
+    doLanguage();
   }
 }
 
@@ -116,7 +138,29 @@ async function updateProfileField(field, input, confirmInput) {
     console.log("Update profile: " + response.details);
     return true;
   } catch (error) {
-    handleError(error, "Update profile error");
+    // handleError(error, "Update profile error");
+    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
+    let modalBody = document.getElementById("bodyModal")
+    if (error.message === "Invalid email format")
+      modalBody.setAttribute('data-i18n', "invalidEmail")
+    else if (error.message === "Email already in use")
+      modalBody.setAttribute('data-i18n', "profile1")
+    else if (error.message === "Missing email field")
+      modalBody.setAttribute('data-i18n', "profile2")
+    else if (error.message === "username already in use")
+      modalBody.setAttribute('data-i18n', "profile3")
+    else if (error.message === "username too long")
+      modalBody.setAttribute('data-i18n', "profile4")
+    else if (error.message === "Missing username field")
+      modalBody.setAttribute('data-i18n', "profile5")
+    else if (error.message === "Passwords do not match")
+      modalBody.setAttribute('data-i18n', "profile6")
+    else if (error.message === "Both fields required")
+      modalBody.setAttribute('data-i18n', "bothFields")
+    else
+      modalBody.setAttribute('data-i18n', "errorUnknow")
+    profilModal.show();
+    doLanguage();
     return false;
   }
 }
@@ -147,7 +191,29 @@ async function disable2fa(element, event) {
     console.log("Disable 2fa successful");
     navigate("profile");
   } catch (error) {
-    handleError(error, "Disable 2fa error");
+    // handleError(error, "Disable 2fa error");
+    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
+    let modalBody = document.getElementById("bodyModal")
+    if (error.message === "Invalid email format")
+      modalBody.setAttribute('data-i18n', "invalidEmail")
+    else if (error.message === "Email already in use")
+      modalBody.setAttribute('data-i18n', "profile1")
+    else if (error.message === "Missing email field")
+      modalBody.setAttribute('data-i18n', "profile2")
+    else if (error.message === "username already in use")
+      modalBody.setAttribute('data-i18n', "profile3")
+    else if (error.message === "username too long")
+      modalBody.setAttribute('data-i18n', "profile4")
+    else if (error.message === "Missing username field")
+      modalBody.setAttribute('data-i18n', "profile5")
+    else if (error.message === "Passwords do not match")
+      modalBody.setAttribute('data-i18n', "profile6")
+    else if (error.message === "Both fields required")
+      modalBody.setAttribute('data-i18n', "bothFields")
+    else
+      modalBody.setAttribute('data-i18n', "errorUnknow")
+    profilModal.show();
+    doLanguage();
   }
 }
 
@@ -196,7 +262,7 @@ async function updateAvatar() {
         document.getElementById("profile-avatar").src = response.avatar_url;
         modalBody.setAttribute('data-i18n', 'avatarUpdateYes');
       } else {
-        modalBody.setAttribute('data-i18n', 'avatarUpdateNo');
+        modalBody.setAttribute('data-i18n', 'avatarUpdateNo'); 
       }
     } catch (error) {
       modalBody.setAttribute('data-i18n', 'avatarUpdateFailed');

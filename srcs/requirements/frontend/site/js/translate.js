@@ -49,13 +49,10 @@ function updateTextContent(translations, language) {
 }
 
 async function getUserId() {
-  try
-  {
+  try {
     const user = await authFetchJson("api/profile/", { method: "GET" });
     return user.id;
-  }
-  catch (error)
-  {
+  } catch (error) {
     // console.error("Erreur lors de la récupération de l'utilisateur", error);
     return null;
   }
@@ -88,6 +85,7 @@ async function changeLanguage(language) {
   else
   {
     loadTranslations(language);
+    localStorage.setItem('lang', language);
   }
 }
 
@@ -102,6 +100,12 @@ async function applySavedLanguage() {
     }  
     setLanguageInCookie(savedLanguage, userId);
     loadTranslations(savedLanguage);
+  }
+  else
+  {
+    const savedLang = localStorage.getItem('lang');
+    if (savedLang)
+      loadTranslations(savedLang);
   }
 }
 

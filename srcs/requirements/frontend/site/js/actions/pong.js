@@ -208,20 +208,6 @@ function addModalGameSoloMulti()
     modalFooter.appendChild(rejouerButton);
 }
 
-function addModalGameOnline()
-{
-  // modalHeader = document.querySelector('.modal-header');
-
-  // closeButton = document.createElement('button');
-  // closeButton.setAttribute('type', 'button');
-  // closeButton.setAttribute('class', 'btn-close btn-close-white');
-  // closeButton.setAttribute('data-bs-dismiss', 'modal');
-  // closeButton.setAttribute('id', 'closeendgame');
-  // closeButton.setAttribute('aria-label', 'Close');
-
-  // modalHeader.appendChild(closeButton);
-}
-
 function rmModalParam()
 {
     const test = document.getElementById('winnerModalLabel');
@@ -255,7 +241,6 @@ function showWinnerGame(name)
   else // online
   {
     rmModalParam();
-    addModalGameOnline();
     eventClose();
     const modalBody = document.querySelector("#myModal .modal-body");
     if (state.score[0] == 3)
@@ -353,7 +338,6 @@ function messageSocket() {
         if (!state.start || !state.run)
         {
           rmModalParam();
-          addModalGameOnline();
           eventClose();
           const modalBody = document.querySelector("#myModal .modal-body");
           modalBody.textContent = state.message;
