@@ -1,4 +1,4 @@
-import { authFetchJson, handleError } from "../api.js";
+import { authFetchJson } from "../api.js";
 import { show, hide } from "../utils.js";
 import { navigate } from "../router.js";
 import { showModal } from "./modals.js";
