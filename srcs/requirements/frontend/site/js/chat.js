@@ -107,7 +107,7 @@ function createMessageUi(msg, sent=true)
 
 function addMessageUi(id, msg, sent=true)
 {
-  const bubble = createChatBubbleById(id);
+  const bubble = createChatBubbleById(id, false);
   const msgArea = getMessageArea(id);
   msgArea.prepend(createMessageUi(msg, sent));
   msgArea.scrollTop = msgArea.scrollHeight;
@@ -125,13 +125,14 @@ function lastMsgNotReceived(id, msg)
   msgArea.prepend(offlineMsg);
 }
 
-export function createChatBubble(element, event) {
+export function createChatBubble(element, event, open=true) {
   const user_id = element.dataset.id;
   const username = element.dataset.username;
   var bubble = getChatBubble(user_id);
 
   if (bubble) {
-    setTimeout(() => {openDropDown(user_id);}, 50);    
+    if (open)
+      setTimeout(() => {openDropDown(user_id);}, 50);    
     return bubble
   };
 
@@ -142,7 +143,8 @@ export function createChatBubble(element, event) {
   bubble.addEventListener("click", setFlickering);
   getFooter().appendChild(bubble);
   getChatInput(user_id).addEventListener("keydown", sendChatMessage);
-  setTimeout(() => {openDropDown(user_id);}, 50);
+  if (open)
+    setTimeout(() => {openDropDown(user_id);}, 50);
   return bubble;
 }
 
@@ -151,10 +153,10 @@ function setFlickering(event)
   event.target.classList.remove("flickering");
 }
 
-export function createChatBubbleById(id)
+export function createChatBubbleById(id, open)
 {
   const element = document.querySelector(`[data-id="` + id + `"`);
-  return createChatBubble(element, null);
+  return createChatBubble(element, null, open);
 }
 
 function getChatBubble(id)
