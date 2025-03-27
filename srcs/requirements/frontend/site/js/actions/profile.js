@@ -62,7 +62,6 @@ export async function loadUserProfile() {
     display2fa(user);
     for (const el of document.getElementsByClassName("edit-btn")) el.disabled = false;
   } catch (error) {
-    // handleError(error, "Load user profile error");
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
@@ -132,7 +131,6 @@ async function updateProfileField(field, input, confirmInput) {
     console.log("Update profile: " + response.details);
     return true;
   } catch (error) {
-    // handleError(error, "Update profile error");
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
@@ -168,7 +166,6 @@ async function disable2fa(element, event) {
     console.log("Disable 2fa successful");
     navigate("profile");
   } catch (error) {
-    // handleError(error, "Disable 2fa error");
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
