@@ -1,5 +1,6 @@
 import { navigate } from "../router.js";
-import { authFetchJson, handleError } from "../api.js";
+import { authFetchJson } from "../api.js";
+import { doLanguage } from "../translate.js";
 
 export const signupActions = [
   {
@@ -21,6 +22,20 @@ async function handleSignup(element, event) {
     }); //todo @leontinepaq demander a @Jean-Antoine si peut login en meme temmps
     navigate("home");
   } catch (error) {
-    handleError(error, "Signup error");
+    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
+    let modalBody = document.getElementById("bodyModal")
+    console.log(error.message);
+    if (error.message === "Invalid email format")
+        modalBody.setAttribute('data-i18n', 'invalidEmail');
+    else if (error.message === "Both fields required")
+      modalBody.setAttribute('data-i18n', 'bothFields');
+    else if (error.message === "Passwords dot not match")
+      modalBody.setAttribute('data-i18n', 'passwordNotMatch');
+    else if (error.message === "Username or email already exists")
+      modalBody.setAttribute('data-i18n', "sameEmail")
+    else
+      modalBody.setAttribute('data-i18n', "errorUnknow")
+    profilModal.show();
+    doLanguage();
   }
 }
