@@ -42,13 +42,14 @@ export async function handleSignin(element, event) {
     });
     displayAuthSection(data, username);
   } catch (error) {
+    console.log("cest ici")
     console.log(error.message)
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     if (error.message === "User does not exist")
       modalBody.setAttribute('data-i18n', "login1")
     else
-      modalBody.setAttribute('dataa-i18n', "errorUnknow")
+      modalBody.setAttribute('data-i18n', "errorUnknow")
     profilModal.show();
     doLanguage();
   }
@@ -69,12 +70,13 @@ export async function handleAuth(element, event) {
     console.log("Login successful");
     navigate("home");
   } catch (error) {
+    console.log(error.message)
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     if (error.message === "Wrong password")
       modalBody.setAttribute('data-i18n', "login2")
     else
-      modalBody.setAttribute('dataa-i18n', "errorUnknow")
+      modalBody.setAttribute('data-i18n', "errorUnknow")
     profilModal.show();
     doLanguage();
   }

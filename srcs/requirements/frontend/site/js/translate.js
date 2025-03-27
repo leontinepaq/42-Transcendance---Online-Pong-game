@@ -101,8 +101,11 @@ async function applySavedLanguage() {
   else
   {
     const savedLang = localStorage.getItem('lang');
+    console.log(savedLang)
     if (savedLang)
       loadTranslations(savedLang);
+    else
+      loadTranslations('en')
   }
 }
 
