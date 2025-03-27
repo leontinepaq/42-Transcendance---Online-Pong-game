@@ -19,9 +19,12 @@ export const loginActions = [
 ];
 
 export async function displayAuthSection(data, username) {
-  document.getElementById("login-page-title").textContent =
-    "Nice to see you again " + username + " !";
-  if (data.two_factor_mail == true)
+  const log = document.getElementById('login-page-title');
+  log.setAttribute('data-i18n', "welcome2")
+  doLanguage();
+  log.textContent = log.textContent + username + " !";
+  
+    if (data.two_factor_mail == true)
     document.getElementById("auth-label").textContent = "2FA code received by mail";
   if (data.two_factor_auth == true)
     document.getElementById("auth-label").textContent =
@@ -42,8 +45,6 @@ export async function handleSignin(element, event) {
     });
     displayAuthSection(data, username);
   } catch (error) {
-    console.log("cest ici")
-    console.log(error.message)
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     if (error.message === "User does not exist")
@@ -59,7 +60,7 @@ export async function handleAuth(element, event) {
   const username = document.getElementById("username").value;
   const password = document.getElementById("pwd-input").value;
   const two_factor_code = document.getElementById("auth-input").value;
-
+  
   try {
     await fetchJson("/api/user/login/", {
       method: "POST",
@@ -70,7 +71,6 @@ export async function handleAuth(element, event) {
     console.log("Login successful");
     navigate("home");
   } catch (error) {
-    console.log(error.message)
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
     if (error.message === "Wrong password")
