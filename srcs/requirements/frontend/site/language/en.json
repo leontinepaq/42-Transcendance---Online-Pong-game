@@ -98,5 +98,7 @@
     "profile3": "Erreur: Username already in use.",
     "profile4": "Erreur: Username too long.",
     "profile5": "Erreur: Missing username field.",
-    "profile6": "Erreur: Passwords do not match."
+    "profile6": "Erreur: Passwords do not match.",
+    "onlineVictory": "You won, what an amazing victory !",
+    "onlineLose": "You lost, you'll do better next time !"
 }

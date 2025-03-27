@@ -96,5 +96,7 @@
     "profile3": "Erreur: Nom d'utilisateur deja utilise.",
     "profile4": "Erreur: Nom d'utilisateur trop long.",
     "profile5": "Erreur: Champ de nom d'utilisateur requis.",
-    "profile6": "Erreur: Les mots de passe ne correspondent pas."
+    "profile6": "Erreur: Les mots de passe ne correspondent pas.",
+    "onlineVictory": "Vous avez gagne, quelle victoire incroyable !",
+    "onlineLose": "Vous avez perdu, vous ferez mieux la prochaine fois !"
 }
