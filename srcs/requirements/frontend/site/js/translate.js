@@ -103,28 +103,48 @@ async function applySavedLanguage() {
     const savedLang = localStorage.getItem('lang');
     if (savedLang)
       loadTranslations(savedLang);
+    else
+      loadTranslations('en')
   }
 }
 
-function addButton()
-{
-  const french = document.getElementById('french');
-  if (french) {
-    french.addEventListener("click", () => changeLanguage('fr'));
-  }
-  const english = document.getElementById('english');
-  if (english) {
-    english.addEventListener("click", () => changeLanguage('en'));
-  }
-  const espagnol = document.getElementById('espagnol');
-  if (espagnol) {
-    espagnol.addEventListener("click", () => changeLanguage('es'));
-  }
+function handleFrench() {
+  changeLanguage('fr');
 }
+
+function handleEnglish() {
+  changeLanguage('en');
+}
+
+function handleEspagnol() {
+  changeLanguage('es');
+}
+
+function rmButton() {
+  const french = document.getElementById('french');
+  const english = document.getElementById('english');
+  const espagnol = document.getElementById('espagnol');
+
+  if (french) french.removeEventListener("click", handleFrench);
+  if (english) english.removeEventListener("click", handleEnglish);
+  if (espagnol) espagnol.removeEventListener("click", handleEspagnol);
+}
+
+function addButton() {
+  const french = document.getElementById('french');
+  const english = document.getElementById('english');
+  const espagnol = document.getElementById('espagnol');
+
+  if (french) french.addEventListener("click", handleFrench);
+  if (english) english.addEventListener("click", handleEnglish);
+  if (espagnol) espagnol.addEventListener("click", handleEspagnol);
+}
+
 
 export async function doLanguage()
 {
   applySavedLanguage();
+  rmButton();
   addButton();
 }
 

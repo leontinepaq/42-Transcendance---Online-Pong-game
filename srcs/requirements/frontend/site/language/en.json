@@ -1,5 +1,6 @@
 {
-    "welcome": "Welcome in space !",
+    "welcome1": "Welcome in space !",
+    "welcome2": "Nice to see you again ",
     "signIn": "SIGN IN",
     "logIn": "LOG IN",
     "forgotPwd": "FORGOT PASSWORD ?",
@@ -32,9 +33,6 @@
     "editUsername": "EDIT USERNAME",
     "editUsername_save": "SAVE",
     "editEmail": " EDIT EMAIL",
-    
-    
-    
     "changePwd": "Change Password",
     "updatePwd": "UPDATE PASSWORD",
     "updatePwd_save": "UPDATE PASSWORD",

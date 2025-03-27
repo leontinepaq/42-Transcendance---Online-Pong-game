@@ -9,6 +9,13 @@ export const signupActions = [
   },
 ];
 
+const errorSignup = {
+  "Invalid email format": "invalidEmail",
+  "Both fields required": "bothFields",
+  "Passwords do not match": "passwordNotMatch",
+  "Username or email already exists": "sameEmail",
+};
+
 async function handleSignup(element, event) {
   const username = document.getElementById("new-username").value;
   const password = document.getElementById("new-password").value;
@@ -24,17 +31,7 @@ async function handleSignup(element, event) {
   } catch (error) {
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
-    console.log(error.message);
-    if (error.message === "Invalid email format")
-        modalBody.setAttribute('data-i18n', 'invalidEmail');
-    else if (error.message === "Both fields required")
-      modalBody.setAttribute('data-i18n', 'bothFields');
-    else if (error.message === "Passwords dot not match")
-      modalBody.setAttribute('data-i18n', 'passwordNotMatch');
-    else if (error.message === "Username or email already exists")
-      modalBody.setAttribute('data-i18n', "sameEmail")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
+    modalBody.setAttribute('data-i18n', errorSignup[error.message] || "errorUnknow");
     profilModal.show();
     doLanguage();
   }
