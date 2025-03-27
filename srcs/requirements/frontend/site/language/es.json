@@ -96,5 +96,7 @@
     "profile3": "Error: El nombre de usuario ya está en uso.",
     "profile4": "Error: El nombre de usuario es demasiado largo.",
     "profile5": "Error: El campo de nombre de usuario es requerido.",
-    "profile6": "Error: Las contraseñas no coinciden."
+    "profile6": "Error: Las contraseñas no coinciden.",
+    "onlineVictory": "¡Ganaste, qué victoria tan increíble!",
+    "onlineLose": "Perdiste, ¡lo harás mejor la próxima vez!"
 }

@@ -155,8 +155,9 @@ function drawPaddle(state) {
 }
 
 function addModalGameSoloMulti()
-{
+{    
     // HEADER
+
     let existingButton = document.querySelector('#closeendgame')
     modalHeader = document.querySelector('.modal-header');
 
@@ -225,6 +226,9 @@ function rmModalParam()
 
 function showWinnerGame(name)
 {
+  // reset attribut du modal
+  let reboot = document.getElementById('bodyModal');
+  reboot.setAttribute('data-i18n', 'modal')
   if (mode === "solo" || mode === "multi") // solo et multi 
   {
     addModalGameSoloMulti();
@@ -246,12 +250,14 @@ function showWinnerGame(name)
     if (state.score[0] == 3)
     {
       modalBody.textContent = "You won, what an amazing victory !";
+      reboot.setAttribute('data-i18n', "onlineVictory");
       const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
       waitingModal.show();
     }
     else
     {
       modalBody.textContent = "You lost, you'll do better next time !";
+      reboot.setAttribute('data-i18n', 'onlineLose');
       const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
       waitingModal.show();
     }
