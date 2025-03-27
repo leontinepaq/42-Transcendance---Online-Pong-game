@@ -37,6 +37,17 @@ function display2fa(user) {
   else show(document.getElementById("span-2fa-app"));
 }
 
+const errorProfile = {
+  "Invalid email format": "invalidEmail",
+  "Email already in use": "profile1",
+  "Missing email field": "profile2",
+  "username already in use": "profile3",
+  "username too long": "profile4",
+  "Missing username field": "profile5",
+  "Passwords do not match": "profile6",
+  "Both fields required": "bothFields",
+};
+
 export async function loadUserProfile() {
   const usernameElem = document.getElementById("display-username");
   const emailElem = document.getElementById("display-email");
@@ -54,24 +65,7 @@ export async function loadUserProfile() {
     // handleError(error, "Load user profile error");
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
-    if (error.message === "Invalid email format")
-      modalBody.setAttribute('data-i18n', "invalidEmail")
-    else if (error.message === "Email already in use")
-      modalBody.setAttribute('data-i18n', "profile1")
-    else if (error.message === "Missing email field")
-      modalBody.setAttribute('data-i18n', "profile2")
-    else if (error.message === "username already in use")
-      modalBody.setAttribute('data-i18n', "profile3")
-    else if (error.message === "username too long")
-      modalBody.setAttribute('data-i18n', "profile4")
-    else if (error.message === "Missing username field")
-      modalBody.setAttribute('data-i18n', "profile5")
-    else if (error.message === "Passwords do not match")
-      modalBody.setAttribute('data-i18n', "profile6")
-    else if (error.message === "Both fields required")
-      modalBody.setAttribute('data-i18n', "bothFields")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
+    modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
     profilModal.show();
     doLanguage();
   }
@@ -141,24 +135,7 @@ async function updateProfileField(field, input, confirmInput) {
     // handleError(error, "Update profile error");
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
-    if (error.message === "Invalid email format")
-      modalBody.setAttribute('data-i18n', "invalidEmail")
-    else if (error.message === "Email already in use")
-      modalBody.setAttribute('data-i18n', "profile1")
-    else if (error.message === "Missing email field")
-      modalBody.setAttribute('data-i18n', "profile2")
-    else if (error.message === "username already in use")
-      modalBody.setAttribute('data-i18n', "profile3")
-    else if (error.message === "username too long")
-      modalBody.setAttribute('data-i18n', "profile4")
-    else if (error.message === "Missing username field")
-      modalBody.setAttribute('data-i18n', "profile5")
-    else if (error.message === "Passwords do not match")
-      modalBody.setAttribute('data-i18n', "profile6")
-    else if (error.message === "Both fields required")
-      modalBody.setAttribute('data-i18n', "bothFields")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
+    modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
     profilModal.show();
     doLanguage();
     return false;
@@ -194,24 +171,7 @@ async function disable2fa(element, event) {
     // handleError(error, "Disable 2fa error");
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
-    if (error.message === "Invalid email format")
-      modalBody.setAttribute('data-i18n', "invalidEmail")
-    else if (error.message === "Email already in use")
-      modalBody.setAttribute('data-i18n', "profile1")
-    else if (error.message === "Missing email field")
-      modalBody.setAttribute('data-i18n', "profile2")
-    else if (error.message === "username already in use")
-      modalBody.setAttribute('data-i18n', "profile3")
-    else if (error.message === "username too long")
-      modalBody.setAttribute('data-i18n', "profile4")
-    else if (error.message === "Missing username field")
-      modalBody.setAttribute('data-i18n', "profile5")
-    else if (error.message === "Passwords do not match")
-      modalBody.setAttribute('data-i18n', "profile6")
-    else if (error.message === "Both fields required")
-      modalBody.setAttribute('data-i18n', "bothFields")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
+    modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
     profilModal.show();
     doLanguage();
   }

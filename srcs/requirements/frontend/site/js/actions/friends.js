@@ -83,6 +83,20 @@ function createUserCard(user, tabKey) {
   `;
 }
 
+const errorFriends = {
+  "You cannot send a friend request to yourself": "friend1",
+  "You are already friends with this user": "friend2",
+  "This user blocked you": "friend3",
+  "You cannot send a friend request to a user you blocked": "friend4",
+  "Friend request already sent": "friend5",
+  "You have a pending friend request from this user": "friend6",
+  "No pending friend request found": "friend7",
+  "You are not friends with this user": "friend8",
+  "User already blocked": "friend9",
+  "User not blocked": "friend10",
+  "User not found": "friend11",
+};
+
 async function fetchAndDisplayUsers(tab) {
   updatePendingCount();
   try {
@@ -94,33 +108,9 @@ async function fetchAndDisplayUsers(tab) {
     const container = document.getElementById(`pills-${tab}`);
     container.innerHTML = users.map((user) => createUserCard(user, tab)).join("");
   } catch (error) {
-    console.log(error.message);
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
-    if (error.message === "You cannot send a friend request to yourself")
-      modalBody.setAttribute('data-i18n', "friend1")
-    else if (error.message === "You are already friends with this user")
-      modalBody.setAttribute('data-i18n', "friend2")
-    else if (error.message === "This user blocked you")
-      modalBody.setAttribute('data-i18n', "friend3")
-    else if (error.message === "You cannot send a friend request to a user you blocked")
-      modalBody.setAttribute('data-i18n', "friend4")
-    else if (error.message === "Friend request already sent")
-      modalBody.setAttribute('data-i18n', "friend5")
-    else if (error.message === "You have a pending friend request from this user")
-      modalBody.setAttribute('data-i18n', "friend6")
-    else if (error.message === "No pending friend request found")
-      modalBody.setAttribute('data-i18n', "friend7")
-    else if (error.message === "You are not friends with this user")
-      modalBody.setAttribute('data-i18n', "friend8")
-    else if (error.message === "User already blocked")
-      modalBody.setAttribute('data-i18n', "friend9")
-    else if (error.message === "User not blocked")
-      modalBody.setAttribute('data-i18n', "friend10")
-    else if (error.message === "User not found")
-      modalBody.setAttribute('data-i18n', "friend11")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
+    modalBody.setAttribute('data-i18n', errorFriends[error.message] || "errorUnknow");
     profilModal.show();
     doLanguage();
   }
@@ -206,33 +196,9 @@ async function handleDynamicFriendAction(element) {
     console.log(message + ": ", response);
     await fetchAndDisplayUsers(tab);
   } catch (error) {
-    console.log(error.message);
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")
-    if (error.message === "You cannot send a friend request to yourself")
-      modalBody.setAttribute('data-i18n', "friend1")
-    else if (error.message === "You are already friends with this user")
-      modalBody.setAttribute('data-i18n', "friend2")
-    else if (error.message === "This user blocked you")
-      modalBody.setAttribute('data-i18n', "friend3")
-    else if (error.message === "You cannot send a friend request to a user you blocked")
-      modalBody.setAttribute('data-i18n', "friend4")
-    else if (error.message === "Friend request already sent")
-      modalBody.setAttribute('data-i18n', "friend5")
-    else if (error.message === "You have a pending friend request from this user")
-      modalBody.setAttribute('data-i18n', "friend6")
-    else if (error.message === "No pending friend request found")
-      modalBody.setAttribute('data-i18n', "friend7")
-    else if (error.message === "You are not friends with this user")
-      modalBody.setAttribute('data-i18n', "friend8")
-    else if (error.message === "User already blocked")
-      modalBody.setAttribute('data-i18n', "friend9")
-    else if (error.message === "User not blocked")
-      modalBody.setAttribute('data-i18n', "friend10")
-    else if (error.message === "User not found")
-      modalBody.setAttribute('data-i18n', "friend11")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
+    modalBody.setAttribute('data-i18n', errorFriends[error.message] || "errorUnknow");
     profilModal.show();
     doLanguage();
   }
