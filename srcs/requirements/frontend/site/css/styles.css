@@ -390,6 +390,14 @@ form {
   background-color: grey; /* Grey ball for offline users */
 }
 
+.chat-users:empty::before {
+  content: "No friends yet.";
+  color: gray;
+  font-style: italic;
+  display: block;
+  text-align: left;
+}
+
 .msg {
   background: var(--color-accent);
   width: fit-content;
