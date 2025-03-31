@@ -1,7 +1,7 @@
 import { authFetchJson } from "../api.js";
 import navigate from "../router.js";
 import { doLanguage } from "../translate.js"
-import { sendChatUpdateRequest } from "../chat.js"
+import { sendChatUpdateRequest, hideChatById } from "../chat.js"
 
 export const friendsActions = [
   {
@@ -62,6 +62,13 @@ function createButton({ type, icon, class: btnClass }, action) {
 }
 
 function createUserCard(user, tabKey) {
+  var msgButton = "";
+  if (tabKey !== "blocked")
+    msgButton = `
+      <button type="button" class="btn chat-btn" data-action="open-chat" 
+      data-id="${user.id}" data-username="${user.username}">
+        <span class="material-symbols-outlined">chat</span>
+      </button>`;
   return `
     <div class="card card-user neon-border mt-4 gap-3" data-user-id="${user.id}">
       <div class="card-body">
@@ -76,6 +83,7 @@ function createUserCard(user, tabKey) {
             </div>
           </div>
           <div class="button-container">
+            ${msgButton}    
             ${getUserCardButtons(tabKey)}
           </div>
         </div>
@@ -197,6 +205,8 @@ async function handleDynamicFriendAction(element) {
     console.log(message + ": ", response);
     await fetchAndDisplayUsers(tab);
     await sendChatUpdateRequest();
+    if (actionType === "block-user")
+      hideChatById(userId);
   } catch (error) {
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")

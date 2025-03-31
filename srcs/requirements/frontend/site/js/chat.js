@@ -24,7 +24,7 @@ async function updateFriendList(data) {
 }
 
 export async function connectSocketUsers() {
-  if (socket_users != null) return;
+  if (socket_users !== null) return;
   socket_users = new WebSocket("/ws/users/");
 
   socket_users.onopen = function () {
@@ -33,6 +33,7 @@ export async function connectSocketUsers() {
 
   socket_users.onerror = function (error) {
     console.error("❌ WebSocket Users error:", error);
+    setTimeout(connectSocketUsers, 5000);
   };
 
   socket_users.onclose = function () {
@@ -40,6 +41,7 @@ export async function connectSocketUsers() {
     socket_users = null;
     const friendListContainer = document.getElementById("chat-users");
     friendListContainer.innerHTML = "";
+    setTimeout(connectSocketUsers, 1500);
   };
 
   socket_users.onmessage = function (event) {
@@ -48,6 +50,7 @@ export async function connectSocketUsers() {
 
     if (data.type === "update") return updateFriendList(data.data);
     if (data.type === "offline") return lastMsgNotReceived(data.receiver);
+    if (data.type === "blocked") return lastMsgNotReceived(data.receiver, true);
     if (data.type === "message") return addMessageUi(data.sender, data.message, false)
   };
 }
@@ -81,6 +84,9 @@ function chatBubbleContent(id, username)
            data-id="$id">$username</span>
           <span class="material-symbols-outlined"
           data-action="launch-pong" data-id="$id">videogame_asset</span>
+          <span class="material-symbols-outlined">remove</span>
+          <span class="material-symbols-outlined" data-action="hide-chat"
+          data-id="$id">close</span>
         </div>
         <li><hr class="dropdown-divider"></li>
         <div class="msg-area d-flex flex-column flex-fill flex-column-reverse"
@@ -133,13 +139,15 @@ function addMessageUi(id, msg, sent=true)
     bubble.firstElementChild.classList.add("flickering");
 }
 
-function lastMsgNotReceived(id, msg)
+function lastMsgNotReceived(id, blocked=false)
 {
   const msgArea = getMessageArea(id);
   msgArea.firstChild.classList.add("msg-alert");
   const offlineMsg = document.createElement("li");
   offlineMsg.classList.add("offline");
   offlineMsg.innerText = "User is offline."
+  if (blocked)
+    offlineMsg.innerText = "User blocked you."
   msgArea.prepend(offlineMsg);
 }
 
@@ -149,6 +157,7 @@ export function createChatBubble(element, event, open=true) {
   var bubble = getChatBubble(user_id);
 
   if (bubble) {
+    bubble.classList.remove("d-none");
     if (open)
       setTimeout(() => {openDropDown(user_id);}, 50);    
     return bubble
@@ -214,6 +223,20 @@ async function navigateToStatsFromChat(element) {
   navigate("dashboard", userId);
 }
 
+export function hideChat(element)
+{
+  const id = element.dataset.id;
+  const bubble = getChatBubble(id);
+  if (bubble)
+    bubble.classList.add("d-none");
+}
+
+export function hideChatById(id)
+{
+  const bubble = getChatBubble(id);
+  if (bubble)
+    bubble.classList.add("d-none");
+}
 
 export const chatActions = [
   {
@@ -227,7 +250,11 @@ export const chatActions = [
   {
     selector: '[data-action="open-profile"]',
     handler: navigateToStatsFromChat,
-  }
+  },
+  {
+    selector: '[data-action="hide-chat"]',
+    handler: hideChat,
+  },
 ];
 
 export default connectSocketUsers;

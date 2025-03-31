@@ -8,6 +8,15 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from .serializers import UserFriendsSerializer
 
+User = get_user_model()
+
+def isBlocked(blockerId, blockedId):
+    return User.objects.filter(id=blockerId).first()\
+        .blocked.filter(id=blockedId).exists()
+        
+def isOnline(id):
+    return cache.get(id, False)
+
 class CommonConsumer(UserConsumer):
     group_name = "common_channel"
 
@@ -56,8 +65,12 @@ class CommonConsumer(UserConsumer):
         data=json.loads(text_data)
         if data["type"]=="update":
             return await self.toggle_update({})
-        if not cache.get(data["receiver"], False):
+        if not isOnline(data["receiver"]):
             return await self.send(json.dumps({"type":"offline",
+                                               "receiver": data["receiver"]}))
+        if await sync_to_async(isBlocked)(data["receiver"],
+                                          self.user.id):
+            return await self.send(json.dumps({"type":"blocked",
                                                "receiver": data["receiver"]}))
         data["sender"]=self.user.id
         text_data=json.dumps(data)
@@ -69,5 +82,8 @@ class CommonConsumer(UserConsumer):
         data = json.loads(event["data"])
         data["type"]="message"
         if self.user.id != int(data["receiver"]):
+            return
+        if await sync_to_async(isBlocked)(self.user.id,
+                                          data["sender"]):
             return
         await self.send(json.dumps(data))
