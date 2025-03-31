@@ -14,34 +14,34 @@ class Participant(models.Model):
                             null=False)
     is_ai = models.BooleanField(default=False)
 
-    # @classmethod
-    # def get_unknown(cls):
-    #     unknown, created = cls.objects.get_or_create(user=None,
-    #                                                  name="Unknown",
-    #                                                  is_ai=False)
-    #     return unknown
+    @classmethod
+    def get_unknown(cls):
+        unknown, created = cls.objects.get_or_create(user=None,
+                                                     name="Unknown",
+                                                     is_ai=False)
+        return unknown
 
-    # @classmethod
-    # def get(cls, user_id):
-    #     try:
-    #         user = UserProfile.objects.get(id=user_id)
-    #         participant, created = cls.objects.get_or_create(
-    #             user=user,
-    #             name=user.username,
-    #             is_ai=False
-    #         )
-    #     except UserProfile.DoesNotExist:
-    #         participant = cls.get_unknown()
-    #     return participant
     @classmethod
     def get(cls, user_id):
-        participant, created = cls.objects.get_or_create(
-            user_id=user_id,
-            defaults={
-                "name": UserProfile.objects.get(id=user_id).username, 
-                "is_ai": False}
-        )
+        try:
+            user = UserProfile.objects.get(id=user_id)
+            participant, created = cls.objects.get_or_create(
+                user=user,
+                name=user.username,
+                is_ai=False
+            )
+        except UserProfile.DoesNotExist:
+            participant = cls.get_unknown()
         return participant
+    # @classmethod
+    # def get(cls, user_id):
+    #     participant, created = cls.objects.get_or_create(
+    #         user_id=user_id,
+    #         defaults={
+    #             "name": UserProfile.objects.get(id=user_id).username, 
+    #             "is_ai": False}
+    #     )
+    #     return participant
 
     @classmethod
     def get_ai(cls):

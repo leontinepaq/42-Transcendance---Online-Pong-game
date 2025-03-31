@@ -4,46 +4,58 @@ import { colors, chartTheme } from "../theme.js";
 
 initChartJS();
 
+function createGameCard(game) {
+  const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
+  const gameDate = new Date(game.created_at).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 
-function createMatchCard(match) {
-  const isPlayer1Winner = match.winner === match.player1.id;
-  
+  // Définition des avatars (valeurs par défaut si absents)
+  const defaultAvatar = "/media/avatars/default_avatar.png";
+  const player1Avatar = game.player1.avatar_url || defaultAvatar;
+  const player2Avatar = game.player2.avatar_url || defaultAvatar;
+
   return `
     <div class="card match-card neon-border mt-4">
+      <div class="card-header text-center match-date">
+        <i class="bi bi-calendar2-event-fill dashboard-icon"></i> ${gameDate}
+      </div>
       <div class="card-body d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center">
           <div class="player-info ${isPlayer1Winner ? "winner" : ""}">
-            <img src="${match.player1.avatar_url}" class="avatar" alt="${match.player1.username}" />
+            <img src="${player1Avatar}" class="avatar" alt="${game.player1.name}" />
             <div class="text-center">
-            <div class="username">
-            ${isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
-            ${match.player1.username}
-            </div>
-            <div class="score">${match.score_player1}</div>
+              <div class="username">
+                ${isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
+                ${game.player1.name}
+              </div>
+              <div class="score">${game.score_player1}</div>
             </div>
           </div>
           <div class="vs">VS</div>
           <div class="player-info ${!isPlayer1Winner ? "winner" : ""}">
-            <img src="${match.player2.avatar_url}" class="avatar" alt="${match.player2.username}" />
+            <img src="${player2Avatar}" class="avatar" alt="${game.player2.name}" />
             <div class="text-center">
               <div class="username">
                 ${!isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
-                ${match.player2.username}
+                ${game.player2.name}
               </div>
-              <div class="score">${match.score_player2}</div>
+              <div class="score">${game.score_player2}</div>
             </div>
           </div>
         </div>
         <div class="match-details">
           <div class="match-info">
-          <i class="bi bi-stopwatch-fill dashboard-icon"></i>
-          <span> Match duration: </span>
-            <span>${match.duration}</span>
+            <i class="bi bi-stopwatch-fill dashboard-icon"></i>
+            <span> Match duration: </span>
+            <span>${game.duration ?? "N/A"}</span>
           </div>
           <div class="match-info">
-          <i class="bi bi-fire dashboard-icon"></i>
-          <span>Longuest exchange: </span>
-            <span>${match.longest_exchange}</span>
+            <i class="bi bi-fire dashboard-icon"></i>
+            <span>Longest exchange: </span>
+            <span>${game.longest_exchange ?? "N/A"}</span>
           </div>
         </div>
       </div>
@@ -51,138 +63,13 @@ function createMatchCard(match) {
   `;
 }
 
-
-
-
-
 function displayGameCards(data) {
-  //todo @leontinepaq a changer quand fonctionne
-  data =
-  {
-    "games": [
-      {
-        "id": 1,
-        "player1": {
-          "id": 12,
-          "username": "PlayerOne",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "player2": {
-          "id": 34,
-          "username": "PlayerTwo",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "winner": 12,
-        "score_player1": 11,
-        "score_player2": 7,
-        "longest_exchange": 45,
-        "created_at": "2025-03-20T14:30:00.000Z",
-        "duration": "5:12",
-        "tournament": 3
-      },
-      {
-        "id": 2,
-        "player1": {
-          "id": 56,
-          "username": "Speedster",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "player2": {
-          "id": 78,
-          "username": "AceSmash",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "winner": 78,
-        "score_player1": 9,
-        "score_player2": 11,
-        "longest_exchange": 32,
-        "created_at": "2025-03-21T16:45:00.000Z",
-        "duration": "4:30",
-        "tournament": null
-      },
-      {
-        "id": 3,
-        "player1": {
-          "id": 90,
-          "username": "Shadow",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "player2": {
-          "id": 12,
-          "username": "PlayerOne",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "winner": 90,
-        "score_player1": 11,
-        "score_player2": 5,
-        "longest_exchange": 50,
-        "created_at": "2025-03-22T18:00:00.000Z",
-        "duration": "6:00",
-        "tournament": 2
-      },
-      {
-        "id": 4,
-        "player1": {
-          "id": 34,
-          "username": "PlayerTwo",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "player2": {
-          "id": 56,
-          "username": "Speedster",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "winner": 34,
-        "score_player1": 11,
-        "score_player2": 10,
-        "longest_exchange": 40,
-        "created_at": "2025-03-23T19:15:00.000Z",
-        "duration": "7:45",
-        "tournament": null
-      },
-      {
-        "id": 5,
-        "player1": {
-          "id": 78,
-          "username": "AceSmash",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "player2": {
-          "id": 90,
-          "username": "Shadow",
-          "avatar_url": "assets/nyancat.jpeg"
-        },
-        "winner": 78,
-        "score_player1": 11,
-        "score_player2": 9,
-        "longest_exchange": 38,
-        "created_at": "2025-03-24T20:30:00.000Z",
-        "duration": "5:50",
-        "tournament": 1
-      }
-    ]
-  }
-  
-  //
-
-  const games = data.games;
- 
- 
+  const games = data.results; // ⚠️ Correction ici
   const container = document.getElementById("game-history-container");
-
-  container.innerHTML = games.map(createMatchCard).join("");
-
+  container.innerHTML = games.map(createGameCard).join("");
 }
 
-
 async function updateStatValues(data) {
-  //todo @leontinepaq a changer quand fonctionne
-  data.wins = 30;
-  data.winstreak = 1;
-  data.total_time_played = "0:25:12";
-  data.unique_opponents_count = 2;
-  // //
-
   document.getElementById("matches-won").textContent = data.wins;
   document.getElementById("win-streak").textContent = data.winstreak;
   document.getElementById("total-time").textContent = data.total_time_played;
@@ -191,12 +78,6 @@ async function updateStatValues(data) {
 }
 
 async function plotWinRate(data) {
-  data.winRate = 60; //todo @leontinepaq a changer quand fonctionne
-  data.wins = 30;
-  data.losses = 20;
-  // //
-
-
   const ctx = document.getElementById("win-rate-chart").getContext("2d");
   const labels = ["winning", "losing"];
   const dataChart = [data.wins, data.losses];
@@ -209,14 +90,12 @@ async function plotWinRate(data) {
     },
   };
   createDoughnutChart(ctx, labels, dataChart, colorsChart, options);
-  document.getElementById("win-rate-percentage").textContent = `${data.winRate}%`;
+  document.getElementById("win-rate-percentage").textContent = `${Math.round(
+    data.winrate
+  )}%`;
 }
 
 async function plotGamesPlayed(data) {
-  data.solo_games = 10; //todo @leontinepaq a changer quand fonctionne
-  data.online_games = 6;
-  //
-
   const ctx = document.getElementById("games-played").getContext("2d");
   const labels = ["SOLO", "ONLINE"];
   const dataChart = [data.solo_games, data.online_games];
@@ -251,20 +130,11 @@ async function plotGamesPlayed(data) {
 }
 
 async function plotGameHistory(data) {
-  //todo @leontinepaq a changer quand fonctionne
-  data.daily_results = [
-    { date: "2025-03-01", wins: 2, losses: 1 },
-    { date: "2025-03-02", wins: 3, losses: 2 },
-    { date: "2025-03-03", wins: 1, losses: 1 },
-    { date: "2025-03-04", wins: 5, losses: 2 },
-    { date: "2025-03-05", wins: 3, losses: 1 },
-  ];
-  //
-
   const ctx = document.getElementById("match-histogram").getContext("2d");
-  const labels = data.daily_results.map((item) => item.date);
+  const labels = data.daily_results.map((item) => item.created_at);
   const wins = data.daily_results.map((item) => item.wins);
   const losses = data.daily_results.map((item) => item.losses);
+
   const datasets = [
     {
       label: "Wins",
@@ -280,23 +150,35 @@ async function plotGameHistory(data) {
   createHistogram(ctx, labels, datasets);
 }
 
+async function displayStatistics(userId) {
+  const endpoint = userId
+    ? `api/dashboards/display-user-stats/?user_id=${userId}`
+    : `api/dashboards/display-user-stats/`;
+
+  const data = await authFetchJson(endpoint, { method: "GET" });
+  document.getElementById("dashboard-title").textContent = userId
+  ? `${data.user}'s Dashboard`
+  : "Your Dashboard"; //todo @leontinepaq a modifier
+  updateStatValues(data);
+  initChartJS();
+  window.dashboardCharts = [];
+  plotWinRate(data);
+  plotGamesPlayed(data);
+  plotGameHistory(data);
+}
+
+async function displayGameHistory(userId) {
+  const endpoint = userId
+    ? `api/dashboards/match-history/?user_id=${userId}`
+    : `api/dashboards/match-history/`;
+  const games = await authFetchJson(endpoint, { method: "GET" });
+  displayGameCards(games);
+}
+
 export async function loadUserStats(userId = null) {
   try {
-    const endpoint = userId
-      ? `api/dashboards/display-user-stats/?userId=${userId}` //todo @leontinepaq verifier request
-      : `api/dashboards/display-user-stats/`;
-
-    const data = await authFetchJson(endpoint, { method: "GET" });
-    document.getElementById("dashboard-title").textContent = userId
-      ? `User ${userId} Dashboard` //todo @leontinepaq  mettre le nom
-      : "Your Dashboard"; //todo @leontinepaq a modifier
-    updateStatValues(data);
-    initChartJS();
-    window.dashboardCharts = [];
-    plotWinRate(data);
-    plotGamesPlayed(data);
-    plotGameHistory(data);
-    displayGameCards(data);
+    displayStatistics(userId);
+    displayGameHistory(userId);
   } catch (error) {
     handleError(error, "Load user stats error");
   }

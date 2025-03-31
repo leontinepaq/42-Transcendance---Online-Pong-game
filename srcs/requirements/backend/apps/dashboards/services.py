@@ -33,8 +33,6 @@ def get_user_stats(user):
     user_data["solo_games"], user_data["online_games"] = count_game_types(games)
     user_data["unique_opponents_count"] = count_unique_opponents(games, participant)
     user_data["daily_results"] = get_daily_results(games, participant)
-    user_data["games"] = get_game_history(games)
-
     return user_data
 
 
@@ -82,7 +80,7 @@ def get_daily_results(games, participant):
 
     for game in games:
         game_date = game.created_at.date()
-        if game.winner == participant:
+        if game.winner.id == participant.id:
             daily_results[game_date]["wins"] += 1
         else:
             daily_results[game_date]["losses"] += 1
@@ -92,30 +90,9 @@ def get_daily_results(games, participant):
         for date, result in sorted(daily_results.items())
     ]
 
-def get_game_history(games):
-    game_list = []
-    for game in games:
-        game_data = {
-            "id": game.id,
-            "player1": {
-                "is_ai": game.player1.is_ai,
-                "id": game.player1.id,
-                "username": game.player1.name,
-                "avatar_url": game.player1.user.avatar_url if game.player1.user else None
-            },
-            "player2": {
-                "is_ai": game.player2.is_ai,
-                "id": game.player2.id,
-                "username": game.player2.name,
-                "avatar_url": game.player2.user.avatar_url if game.player2.user else None
-            },
-            "winner": game.winner.id if game.winner else None,
-            "score_player1": game.score_player1,
-            "score_player2": game.score_player2,
-            "longest_exchange": game.longest_exchange,
-            "created_at": game.created_at.isoformat(),
-            "duration": str(game.duration),
-            "tournament": game.tournament.id if game.tournament else None
-        }
-        game_list.append(game_data)
-    return game_list
+def get_match_history(user):
+    participant = Participant.get(user.id)
+    games = Game.objects.filter(
+        (Q(player1=participant) | Q(player2=participant)) & Q(winner__isnull=False)
+    ).order_by("-created_at")
+    return games

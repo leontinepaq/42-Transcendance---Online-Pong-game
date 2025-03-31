@@ -1,29 +1,29 @@
 from rest_framework import serializers
 from django.db.models import Q
-from django.core.exceptions import ValidationError
-from rest_framework import status
-from rest_framework.response import Response
+from django.conf import settings
 from .models import Game, Participant, Tournament
 from users.models import UserProfile
-from drf_spectacular.utils import extend_schema_field
 
 class ParticipantSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
     class Meta:
-        model=Participant
-        fields=[
-            'user',
-            'name',
-            'is_ai',
-        ]
+        model = Participant
+        fields = ['id', 'name', 'is_ai', 'avatar_url']
+    def get_avatar_url(self, obj):
+        if obj.is_ai:
+            return settings.AI_AVATAR_URL  # Avatar spécifique pour les IA
+        return obj.user.avatar_url if obj.user else None
 
 class GameSerializer(serializers.ModelSerializer):
     player1 = ParticipantSerializer(read_only=True)
     player2 = ParticipantSerializer(read_only=True)
-    winner = ParticipantSerializer()
+    winner = ParticipantSerializer(read_only=True, allow_null=True)
+    duration = serializers.CharField(read_only=True)  # Conversion en string, puisque duration est un timedelta
+    tournament = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
-        model=Game
-        fields=[
+        model = Game
+        fields = [
             'id',
             'player1',
             'player2',
@@ -34,14 +34,14 @@ class GameSerializer(serializers.ModelSerializer):
             'created_at',
             'duration',
             'tournament',
-            'finished']
-        read_only_fields=['created_at', 'id']
+            'finished'
+        ]
+        read_only_fields = ['created_at', 'id']
 
 class TournamentSerializer(serializers.ModelSerializer):
     games = GameSerializer(many=True, read_only=True)
     creator = ParticipantSerializer(read_only=True)
     players = ParticipantSerializer(many=True, read_only=True)
-    winner = ParticipantSerializer()
 
     class Meta:
         model=Tournament
@@ -65,42 +65,20 @@ class TournamentSerializer(serializers.ModelSerializer):
 
 class UserStatisticsSerializer(serializers.Serializer):
     user = serializers.CharField()
-    total_games_played = serializers.IntegerField()
+    avatar_url = serializers.CharField()
     wins = serializers.IntegerField()
     losses = serializers.IntegerField()
     winrate = serializers.FloatField()
     winstreak = serializers.IntegerField()
-    total_time_played = serializers.DurationField()
+    total_time_played = serializers.CharField()
     solo_games = serializers.IntegerField()
-    multiplayer_games = serializers.IntegerField()
     online_games = serializers.IntegerField()
     unique_opponents_count = serializers.IntegerField()
-    games = GameSerializer(many=True)
-    tournaments = TournamentSerializer(many=True)
-
-    # def get_games(self, obj):
-    #     return GameSerializer(obj["games"], many=True).data
-
-    # def get_tournaments(self, obj):
-    #     return TournamentSerializer(obj["tournaments"], many=True).data
-    
-    @extend_schema_field(GameSerializer(many=True))
-    def get_games(self, obj):
-        try:
-            participant = Participant.objects.get(user=obj)
-            games = Game.objects.filter(Q(player1=participant) | Q(player2=participant))
-            return GameSerializer(games, many=True).data
-        except Participant.DoesNotExist:
-            return []
-
-    @extend_schema_field(TournamentSerializer(many=True))
-    def get_tournaments(self, obj):
-        try:
-            participant = Participant.objects.get(user=obj)
-            tournaments = Tournament.objects.filter(players=participant)
-            return TournamentSerializer(tournaments, many=True).data
-        except Participant.DoesNotExist:
-            return []
+    daily_results = serializers.ListField(
+        child=serializers.DictField(
+            child=serializers.CharField()
+        )
+    )
 
 class RequestCreateGameSerializer(serializers.Serializer):
     PLAYER_TYPES = ["ai", "guest", "user"]
