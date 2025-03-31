@@ -58,6 +58,14 @@ export async function disconnectSocketUsers() {
   socket_users = null;
 }
 
+export async function sendChatUpdateRequest() {
+  socket_users.send(
+    JSON.stringify({
+      type: "update"
+    })
+  );
+}
+
 function chatBubbleContent(id, username)
 {
   const content = `
@@ -93,6 +101,7 @@ function sendChatMessage(event) {
     const msg = event.target.value;
     socket_users.send(
       JSON.stringify({
+        type: "message",
         receiver: user_id,
         message: msg,
       })

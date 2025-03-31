@@ -54,6 +54,8 @@ class CommonConsumer(UserConsumer):
 
     async def receive(self, text_data):
         data=json.loads(text_data)
+        if data["type"]=="update":
+            return await self.toggle_update({})
         if not cache.get(data["receiver"], False):
             return await self.send(json.dumps({"type":"offline",
                                                "receiver": data["receiver"]}))
@@ -65,7 +67,7 @@ class CommonConsumer(UserConsumer):
 
     async def receive_message(self, event):
         data = json.loads(event["data"])
-        data["type"]="message"        
+        data["type"]="message"
         if self.user.id != int(data["receiver"]):
             return
         await self.send(json.dumps(data))

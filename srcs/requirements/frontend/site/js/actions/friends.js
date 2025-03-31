@@ -1,6 +1,7 @@
 import { authFetchJson } from "../api.js";
 import navigate from "../router.js";
 import { doLanguage } from "../translate.js"
+import { sendChatUpdateRequest } from "../chat.js"
 
 export const friendsActions = [
   {
@@ -195,6 +196,7 @@ async function handleDynamicFriendAction(element) {
     });
     console.log(message + ": ", response);
     await fetchAndDisplayUsers(tab);
+    await sendChatUpdateRequest();
   } catch (error) {
     const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
     let modalBody = document.getElementById("bodyModal")

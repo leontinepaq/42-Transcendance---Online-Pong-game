@@ -73,7 +73,9 @@ def other_profile(request):
 @api_view(["GET"])
 def all_profiles(request):
     user = request.user
-    users = UserProfile.objects.exclude(id=user.id)
+    blocked_users = user.blocked.all()
+    blocked_by_others = UserProfile.objects.filter(blocked=user)
+    users = UserProfile.objects.exclude(id=user.id).exclude(id__in=blocked_users).exclude(id__in=blocked_by_others)
     serializer = UserPublicProfileSerializer(users, many=True)
     return Response(serializer.data, status=200)
 
