@@ -361,6 +361,10 @@ form {
   padding: 0rem 1rem;
 }
 
+.chat-header > *{
+  cursor: pointer;
+}
+
 .chat-user {
   cursor: pointer;
   position: relative; /* Needed to position the ::after element */

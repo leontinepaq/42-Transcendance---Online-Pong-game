@@ -208,6 +208,8 @@ def block_user(request, user_id):
     if user.blocked.filter(id=blocked.id).exists():
         return Response({"details": "User already blocked"}, status=400)
     user.blocked.add(blocked)
+    if user.friends.filter(id=blocked.id).exists():
+        user.friends.remove(blocked) 
     return GenericResponse().response()
 
 

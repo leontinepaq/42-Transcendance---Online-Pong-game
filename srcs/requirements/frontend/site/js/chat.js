@@ -1,3 +1,5 @@
+import navigate from "./router.js";
+
 let socket_users = null;
 
 async function updateFriendList(data) {
@@ -66,6 +68,13 @@ function chatBubbleContent(id, username)
     </button>
     <ul class="dropdown-menu">
       <div class="d-flex flex-column">
+        <div class="d-flex flex-row align-items-center chat-header">
+          <span class="flex-fill" data-action="open-profile"
+           data-id="$id">$username</span>
+          <span class="material-symbols-outlined"
+          data-action="launch-pong" data-id="$id">videogame_asset</span>
+        </div>
+        <li><hr class="dropdown-divider"></li>
         <div class="msg-area d-flex flex-column flex-fill flex-column-reverse"
         id="msg-area-$id">
         </div>
@@ -186,6 +195,17 @@ function openDropDown(id)
   dropdownInstance.show();
 }
 
+async function navigateToStatsFromChat(element) {
+  const userId = element.dataset.id;
+  if (!userId) {
+    console.error(`Invalid user: ${userId}`);
+    return;
+  }
+  console.log("navigating to dashbord");
+  navigate("dashboard", userId);
+}
+
+
 export const chatActions = [
   {
     selector: '[data-action="open-chat"]',
@@ -194,6 +214,10 @@ export const chatActions = [
   {
     selector: '[data-action="connect-chat"]',
     handler: connectSocketUsers,
+  },
+  {
+    selector: '[data-action="open-profile"]',
+    handler: navigateToStatsFromChat,
   }
 ];
 
