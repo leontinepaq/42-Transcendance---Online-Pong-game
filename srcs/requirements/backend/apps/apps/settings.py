@@ -147,3 +147,5 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 
 MEDIA_ROOT = "/media/"
+DEFAULT_AVATAR_URL = "/media/avatars/default_avatar.png"
+AI_AVATAR_URL = "/media/avatars/ai_avatar.png" #todo @leontinepaq  changer
