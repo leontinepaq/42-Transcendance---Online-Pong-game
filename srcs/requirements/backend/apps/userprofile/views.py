@@ -34,6 +34,8 @@ from .serializers import (UpdateAvatarResponseSerializer,
 @permission_classes([IsAuthenticated])
 @api_view(["GET"])
 def profile(request):
+    if not request.user or request.user.is_anonymous:
+        return Response({"error": "Authentication required"}, status=401)
     serializer = UserProfileSerializer(request.user)
     return Response(serializer.data, status=200)
 
