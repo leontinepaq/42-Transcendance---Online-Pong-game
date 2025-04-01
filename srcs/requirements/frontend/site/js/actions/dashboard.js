@@ -13,6 +13,7 @@ function createGameCard(game) {
   });
 
   // Définition des avatars (valeurs par défaut si absents)
+  // todo @leontinepaq a supprimer
   const defaultAvatar = "/media/avatars/default_avatar.png";
   const player1Avatar = game.player1.avatar_url || defaultAvatar;
   const player2Avatar = game.player2.avatar_url || defaultAvatar;
@@ -25,7 +26,7 @@ function createGameCard(game) {
       <div class="card-body d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center">
           <div class="player-info ${isPlayer1Winner ? "winner" : ""}">
-            <img src="${player1Avatar}" class="avatar" alt="${game.player1.name}" />
+            <img src="${player1Avatar}" class="avatar-80 img-fluid" alt="${game.player1.name}" />
             <div class="text-center">
               <div class="username">
                 ${isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
@@ -36,7 +37,7 @@ function createGameCard(game) {
           </div>
           <div class="vs">VS</div>
           <div class="player-info ${!isPlayer1Winner ? "winner" : ""}">
-            <img src="${player2Avatar}" class="avatar" alt="${game.player2.name}" />
+            <img src="${player2Avatar}" class="avatar-80 img-fluid" alt="${game.player2.name}" />
             <div class="text-center">
               <div class="username">
                 ${!isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}

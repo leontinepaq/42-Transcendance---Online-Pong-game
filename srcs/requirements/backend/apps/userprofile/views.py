@@ -1,4 +1,5 @@
 import os
+import time
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.core.validators import validate_email
@@ -217,7 +218,19 @@ def update_avatar(request):
 
     avatar_dir = os.path.join(settings.MEDIA_ROOT, "avatars/")
     os.makedirs(avatar_dir, exist_ok=True)
-    avatar_path = os.path.join(avatar_dir, f"user_{user.id}.jpg")
+
+    #todo @leontinepaq : a rechecker (fait tard)
+    # Delete old image if necessary
+    if user.avatar_url:
+        old_avatar_path = os.path.join(settings.MEDIA_ROOT, user.avatar_url)
+        if os.path.exists(old_avatar_path):
+            os.remove(old_avatar_path)
+
+    # avatar_path = os.path.join(avatar_dir, f"user_{user.id}.jpg")
+    # Add timestamp to avoid cache
+    timestamp = int(time.time())
+    avatar_filename = f"user_{user.id}_{timestamp}.jpg"
+    avatar_path = os.path.join(avatar_dir, avatar_filename)
 
     try:
         # Open the files at avatar_path for writing in binary (wb)
@@ -228,7 +241,7 @@ def update_avatar(request):
         print("Error saving file:", str(e))
         return GenericResponse({"details": "Error saving file"}).response(400)
 
-    user.avatar_url = f"{settings.MEDIA_ROOT}avatars/user_{user.id}.jpg"
+    user.avatar_url = f"{settings.MEDIA_ROOT}avatars/{avatar_filename}"
     print(user.avatar_url)
     user.save()
 

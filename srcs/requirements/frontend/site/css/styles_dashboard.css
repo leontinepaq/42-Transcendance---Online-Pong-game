@@ -77,7 +77,7 @@ todo @leontinepaq : regarder si utile ou supprimer / renommer */
   filter: drop-shadow(0 0 15px var(--color-accent));
 }
 
-.player-info.winner .avatar {
+.player-info.winner .avatar-80 {
   border: 3px solid var(--color-accent-light);
   box-shadow: 0 0 10px var(--color-accent), 0 0 30px var(--color-accent);
 }
@@ -87,11 +87,8 @@ todo @leontinepaq : regarder si utile ou supprimer / renommer */
   color: var(--color-accent-light);
   text-shadow: 0 0 10px var(--color-accent), 0 0 20px var(--color-accent);
 }
-.avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-}
+
+
 
 .username {
   font-size: 1.2rem;
