@@ -311,3 +311,15 @@ def get_sent_friend_requests(request):
     friend_requests = FriendRequest.objects.filter(sender=user)
     serializer=FriendRequestSerializer(friend_requests, many=True)
     return Response(serializer.data, status=200)
+
+@extend_schema(
+    summary="Get number of current user's pending friend requests's senders",
+    description="Gives you the number of pending friend requests's senders received by the current user.",
+    responses={200: inline_serializer("pending_count", fields={"pending_count": serializers.IntegerField(default=0)})}
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_pending_count(request):
+    user = request.user
+    friend_requests_count = FriendRequest.objects.filter(receiver=user).count()
+    return Response({"pending_count": friend_requests_count}, status=200)

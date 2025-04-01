@@ -10,7 +10,8 @@ from .views import (send_request,
                     get_other_user_friends,
                     get_user_blocked,
                     get_sent_friend_requests,
-                    pending_request)
+                    pending_request,
+					get_pending_count)
 
 urlpatterns = [
     #POST
@@ -26,4 +27,5 @@ urlpatterns = [
     path("blocked/", get_user_blocked, name="get_user_blocked"),
     path("pending-requests/", pending_request, name="pending_requests"),
     path("sent-requests/", get_sent_friend_requests, name="get_sent_friend_requests"),
+	path("pending-count/", get_pending_count, name="get_pending_count"),
 ]

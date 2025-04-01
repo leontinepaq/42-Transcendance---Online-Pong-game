@@ -1,5 +1,6 @@
 import { authFetchJson } from "../api.js";
 import navigate from "../router.js";
+import { show, hide } from "../utils.js";
 import { doLanguage } from "../translate.js"
 import { sendChatUpdateRequest, hideChatById } from "../chat.js"
 
@@ -109,8 +110,6 @@ async function fetchAndDisplayUsers(tab) {
   try {
     const apiPath = TABS[tab];
     if (!apiPath) return;
-
-    //todo @leontinepaq gerer les pending notifs
     const users = await authFetchJson(apiPath);
     const container = document.getElementById(`pills-${tab}`);
     container.innerHTML = users.map((user) => createUserCard(user, tab)).join("");
@@ -125,18 +124,16 @@ async function fetchAndDisplayUsers(tab) {
 
 async function updatePendingCount() {
   try {
-    // const data = await authfetchJson("api/friends/pending-count/");
-    const data = await authFetchJson("api/friends/pending-requests/");
-    data.pending_count = 2; //todo @leontinepaq a supp
+    const data = await authFetchJson("api/friends/pending-count/");
     const count = data.pending_count;
 
     const badge = document.getElementById("pending-count");
     
     if (count > 0) {
       badge.textContent = count;
-      badge.classList.remove("hidden");
+      show(badge);
     } else {
-      badge.classList.add("hidden");
+      hide(badge);
     }
   } catch (error) {
     console.error("Error fetching pending count:", error);
