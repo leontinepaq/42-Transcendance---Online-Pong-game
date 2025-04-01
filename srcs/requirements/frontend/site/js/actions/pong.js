@@ -54,7 +54,7 @@ function initGameMulti() {
   }, 500);
 }
 
-function initGameOnline()
+export function initGameOnline()
 {
   navigate('pong');
   setTimeout(function() {

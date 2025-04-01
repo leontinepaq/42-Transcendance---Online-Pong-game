@@ -1,7 +1,6 @@
-import { authFetchJson } from "../api.js";
+import { authFetchJson, handleError } from "../api.js";
 import { show, hide } from "../utils.js";
 import { navigate } from "../router.js";
-import { showModal } from "./modals.js";
 import doLanguage from "../translate.js";
 
 export const profileActions = [
@@ -37,17 +36,6 @@ function display2fa(user) {
   else show(document.getElementById("span-2fa-app"));
 }
 
-const errorProfile = {
-  "Invalid email format": "invalidEmail",
-  "Email already in use": "profile1",
-  "Missing email field": "profile2",
-  "username already in use": "profile3",
-  "username too long": "profile4",
-  "Missing username field": "profile5",
-  "Passwords do not match": "profile6",
-  "Both fields required": "bothFields",
-};
-
 export async function loadUserProfile() {
   const usernameElem = document.getElementById("display-username");
   const emailElem = document.getElementById("display-email");
@@ -62,11 +50,7 @@ export async function loadUserProfile() {
     display2fa(user);
     for (const el of document.getElementsByClassName("edit-btn")) el.disabled = false;
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
-    profilModal.show();
-    doLanguage();
+    handleError(error, "Error loading profile");
   }
 }
 
@@ -131,12 +115,7 @@ async function updateProfileField(field, input, confirmInput) {
     console.log("Update profile: " + response.details);
     return true;
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
-    profilModal.show();
-    doLanguage();
-    return false;
+    handleError(error, "Error udating profile");
   }
 }
 
@@ -166,11 +145,7 @@ async function disable2fa(element, event) {
     console.log("Disable 2fa successful");
     navigate("profile");
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    modalBody.setAttribute('data-i18n', errorProfile[error.message] || "errorUnknow");
-    profilModal.show();
-    doLanguage();
+    handleError(error, "Disable 2FA error");
   }
 }
 
@@ -222,7 +197,7 @@ async function updateAvatar() {
         modalBody.setAttribute('data-i18n', 'avatarUpdateNo'); 
       }
     } catch (error) {
-      modalBody.setAttribute('data-i18n', 'avatarUpdateFailed');
+      handleError(error, "Update avatar error");;
     }
     profilModal.show();
     doLanguage();

@@ -1,5 +1,5 @@
 import { navigate } from "../router.js";
-import { authFetchJson } from "../api.js";
+import { authFetchJson, handleError } from "../api.js";
 
 export const usersActions = [
   {

@@ -1,4 +1,4 @@
-import { authFetchJson } from "../api.js";
+import { authFetchJson, handleError } from "../api.js";
 import navigate from "../router.js";
 import { show, hide } from "../utils.js";
 import { doLanguage } from "../translate.js"
@@ -91,20 +91,6 @@ function createUserCard(user, tabKey) {
   `;
 }
 
-const errorFriends = {
-  "You cannot send a friend request to yourself": "friend1",
-  "You are already friends with this user": "friend2",
-  "This user blocked you": "friend3",
-  "You cannot send a friend request to a user you blocked": "friend4",
-  "Friend request already sent": "friend5",
-  "You have a pending friend request from this user": "friend6",
-  "No pending friend request found": "friend7",
-  "You are not friends with this user": "friend8",
-  "User already blocked": "friend9",
-  "User not blocked": "friend10",
-  "User not found": "friend11",
-};
-
 async function fetchAndDisplayUsers(tab) {
   updatePendingCount();
   try {
@@ -114,11 +100,7 @@ async function fetchAndDisplayUsers(tab) {
     const container = document.getElementById(`pills-${tab}`);
     container.innerHTML = users.map((user) => createUserCard(user, tab)).join("");
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    modalBody.setAttribute('data-i18n', errorFriends[error.message] || "errorUnknow");
-    profilModal.show();
-    doLanguage();
+    handleError(error, "Display user error");
   }
 }
 
@@ -136,7 +118,7 @@ async function updatePendingCount() {
       hide(badge);
     }
   } catch (error) {
-    console.error("Error fetching pending count:", error);
+    handleError("Error fetching pending count:", error);
   }
 }
 
@@ -203,11 +185,7 @@ async function handleDynamicFriendAction(element) {
     if (actionType === "block-user")
       hideChatById(userId);
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    modalBody.setAttribute('data-i18n', errorFriends[error.message] || "errorUnknow");
-    profilModal.show();
-    doLanguage();
+    handleError(error, "Error in friend action");
   }
 }
 

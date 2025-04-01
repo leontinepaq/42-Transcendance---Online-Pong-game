@@ -6,7 +6,7 @@ export function loadTranslations(language) {
     .then(translations => {
       updateTextContent(translations, language);
     })
-    .catch(err => console.error('Erreur de chargement des traductions :', err));
+    .catch(err => console.error('Error loading translations:', err));
 }
 
 

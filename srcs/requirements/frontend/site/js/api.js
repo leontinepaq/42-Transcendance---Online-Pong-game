@@ -39,8 +39,8 @@ async function refreshToken() {
 }
 
 export function handleError(error, message = "An error occurred") {
-  console.error(`${message}:`, error.message);
-  showModal(`Error: ${error.message}`);
+  console.error(`${message}:`, error);
+  showModal(`${error.message}`, "error");
 }
 
 export async function authFetchJson(url, options = {}) {
@@ -80,7 +80,7 @@ async function parseJsonResponse(response) {
       const data = await response.json();
       details = data.details;
     } catch (error) {
-      // console.warn("Failed to parse error response:", error);
+      // console.warn("Failed to parse error response:", error); //todo @leontinepaq checker si try utile..?
     }
     throw new Error(details);
   }

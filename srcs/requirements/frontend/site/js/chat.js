@@ -1,5 +1,6 @@
 import navigate from "./router.js";
 import {initGameOnline} from "./actions/pong.js"
+import { show, hide } from "./utils.js";
 
 let socket_users = null;
 let reconnect = true;
@@ -169,7 +170,7 @@ export function createChatBubble(element, event, open = true) {
   var bubble = getChatBubble(user_id);
 
   if (bubble) {
-    bubble.classList.remove("d-none");
+    hide(bubble);
     if (open)
       setTimeout(() => {
         openDropDown(user_id);
@@ -235,12 +236,12 @@ function navigateToStatsFromChat(element) {
 export function hideChat(element) {
   const id = element.dataset.id;
   const bubble = getChatBubble(id);
-  if (bubble) bubble.classList.add("d-none");
+  if (bubble) show(bubble);
 }
 
 export function hideChatById(id) {
   const bubble = getChatBubble(id);
-  if (bubble) bubble.classList.add("d-none");
+  if (bubble) show(bubble);
 }
 
 export const chatActions = [

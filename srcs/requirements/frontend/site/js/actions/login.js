@@ -1,5 +1,5 @@
 import { navigate } from "../router.js";
-import { authFetchJson, fetchJson } from "../api.js";
+import { authFetchJson, fetchJson, handleError } from "../api.js";
 import { show, hide } from "../utils.js";
 import { doLanguage } from "../translate.js"
 
@@ -45,14 +45,7 @@ export async function handleSignin(element, event) {
     });
     displayAuthSection(data, username);
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    if (error.message === "User does not exist")
-      modalBody.setAttribute('data-i18n', "login1")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
-    profilModal.show();
-    doLanguage();
+    handleError(error, "Signin error");
   }
 }
 
@@ -71,14 +64,7 @@ export async function handleAuth(element, event) {
     console.log("Login successful");
     navigate("home");
   } catch (error) {
-    const profilModal = new bootstrap.Modal(document.getElementById("myModal"));
-    let modalBody = document.getElementById("bodyModal")
-    if (error.message === "Wrong password")
-      modalBody.setAttribute('data-i18n', "login2")
-    else
-      modalBody.setAttribute('data-i18n', "errorUnknow")
-    profilModal.show();
-    doLanguage();
+    handleError(error, "Authentification error");
   }
 }
 

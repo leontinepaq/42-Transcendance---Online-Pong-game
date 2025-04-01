@@ -114,7 +114,7 @@ def accept_request(request, user_id):
     friend_request = FriendRequest.objects.filter(sender=sender,
                                                   receiver=receiver).first()
     if not friend_request:
-        return Response({"details": "No pending friend request found"},
+        return Response({"details": "Friend request not found"},
                         status=404)
     receiver.friends.add(sender)
     friend_request.delete()
@@ -129,8 +129,7 @@ def accept_request(request, user_id):
                400: UserIdMissing,
                404: inline_serializer(
                    "decline404",
-                   {"details": serializers.CharField(default="No pending friend \
-                       request found")})},
+                   {"details": serializers.CharField(default="Friend request not found")})},
     parameters=[OpenApiParameter(name="user_id",
                                  type=OpenApiTypes.INT,
                                  location=OpenApiParameter.QUERY,
@@ -147,7 +146,7 @@ def decline_request(request, user_id):
     friend_request = FriendRequest.objects.filter(sender=sender,
                                                   receiver=receiver).first()
     if not friend_request:
-        return Response({"details": "No pending friend request found"}, status=400)
+        return Response({"details": "Friend request not found"}, status=400)
     friend_request.delete()
     return GenericResponse().response()
 
