@@ -21,6 +21,7 @@ export async function checkAuth() {
   }
 }
 
+//todo @leontinepaq a supp + dans bck
 async function refreshToken() {
   const response = await fetch("/api/token/refresh/", {
     method: "POST",

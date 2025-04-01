@@ -45,27 +45,17 @@ function updateTextContent(translations, language) {
   });
 }
 
-async function getUserId() {
-  try {
-    const user = await authFetchJson("api/profile/", { method: "GET" });
-    return user.id;
-  } catch (error) {
-    // console.error("Erreur lors de la récupération de l'utilisateur", error);
-    return null;
-  }
-}
-
-function setLanguageInCookie(language, userId) {
-  document.cookie = `language_${userId}=${language}; path=/; max-age=31536000`;
+function setLanguageInCookie(language, username) {
+  document.cookie = `language_${username}=${language}; path=/; max-age=31536000`;
   loadTranslations(language);
 }
 
-function getLanguageFromCookie(userId) {
+function getLanguageFromCookie(username) {
   let cookies = document.cookie.split('; ');
   for (let cookie of cookies)
   {
     let [name, value] = cookie.split('=');
-    if (name === `language_${userId}`)
+    if (name === `language_${username}`)
     {
       return value;
     }
@@ -74,10 +64,10 @@ function getLanguageFromCookie(userId) {
 }
 
 async function changeLanguage(language) {
-  const userId = await getUserId();
-  if (userId)
+  const username = sessionStorage.getItem("username");
+  if (username)
   {
-    setLanguageInCookie(language, userId);
+    setLanguageInCookie(language, username);
   }
   else
   {
@@ -87,15 +77,16 @@ async function changeLanguage(language) {
 }
 
 async function applySavedLanguage() {
-  const userId = await getUserId();
-  if (userId)
+  const username = sessionStorage.getItem("username");
+
+  if (username)
   {
-    let savedLanguage = getLanguageFromCookie(userId);
+    let savedLanguage = getLanguageFromCookie(username);
     if (!savedLanguage)
     {
       savedLanguage = 'en';
     }  
-    setLanguageInCookie(savedLanguage, userId);
+    setLanguageInCookie(savedLanguage, username);
     loadTranslations(savedLanguage);
   }
   else

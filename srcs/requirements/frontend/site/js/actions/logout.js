@@ -11,6 +11,7 @@ export const logoutAction = [
 async function handleLogout(element, event) {
   try {
     await authFetchJson("/api/user/logout/", { method: "POST" });
+    sessionStorage.removeItem("username");
     navigate("login");
   } catch (error) {
     handleError(error, "Logout error");
