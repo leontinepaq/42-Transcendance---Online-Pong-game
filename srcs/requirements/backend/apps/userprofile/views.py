@@ -221,14 +221,12 @@ def update_avatar(request):
     avatar_dir = os.path.join(settings.MEDIA_ROOT, "avatars/")
     os.makedirs(avatar_dir, exist_ok=True)
 
-    #todo @leontinepaq : a rechecker (fait tard)
     # Delete old image if necessary
-    if user.avatar_url:
+    if user.avatar_url and user.avatar_url != settings.DEFAULT_AVATAR_URL:
         old_avatar_path = os.path.join(settings.MEDIA_ROOT, user.avatar_url)
         if os.path.exists(old_avatar_path):
             os.remove(old_avatar_path)
 
-    # avatar_path = os.path.join(avatar_dir, f"user_{user.id}.jpg")
     # Add timestamp to avoid cache
     timestamp = int(time.time())
     avatar_filename = f"user_{user.id}_{timestamp}.jpg"
