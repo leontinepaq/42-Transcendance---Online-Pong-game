@@ -1,6 +1,7 @@
 import navigate from "./router.js";
 
 let socket_users = null;
+let reconnect = true;
 
 async function updateFriendList(data) {
   const friendListContainer = document.getElementById("chat-users");
@@ -27,6 +28,8 @@ export async function connectSocketUsers() {
   if (socket_users !== null) return;
   socket_users = new WebSocket("/ws/users/");
 
+  document.getElementsByTagName("footer")[0].classList.remove("d-none");
+
   socket_users.onopen = function () {
     console.log("✅ WebSocket Users connected!");
   };
@@ -41,7 +44,7 @@ export async function connectSocketUsers() {
     socket_users = null;
     const friendListContainer = document.getElementById("chat-users");
     friendListContainer.innerHTML = "";
-    setTimeout(connectSocketUsers, 1500);
+    if (reconnect) setTimeout(connectSocketUsers, 1500);
   };
 
   socket_users.onmessage = function (event) {
@@ -51,7 +54,8 @@ export async function connectSocketUsers() {
     if (data.type === "update") return updateFriendList(data.data);
     if (data.type === "offline") return lastMsgNotReceived(data.receiver);
     if (data.type === "blocked") return lastMsgNotReceived(data.receiver, true);
-    if (data.type === "message") return addMessageUi(data.sender, data.message, false)
+    if (data.type === "message") return addMessageUi(data.sender, data.message, false);
+    if (data.type === "game") return;
   };
 }
 
@@ -59,18 +63,19 @@ export async function disconnectSocketUsers() {
   if (socket_users === null) return;
   socket_users.close();
   socket_users = null;
+  document.getElementsByTagName("footer")[0].classList.add("d-none");
+  reconnect = false;
 }
 
 export async function sendChatUpdateRequest() {
   socket_users.send(
     JSON.stringify({
-      type: "update"
+      type: "update",
     })
   );
 }
 
-function chatBubbleContent(id, username)
-{
+function chatBubbleContent(id, username) {
   const content = `
     <button type="button" class="btn btn-chat btn-secondary dropdown-toggle"
     data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,10"
@@ -97,7 +102,7 @@ function chatBubbleContent(id, username)
         class="form-control" placeholder=""/>
       </div>
     </ul>`;
-    return (content.replaceAll("$id", id).replaceAll("$username", username));
+  return content.replaceAll("$id", id).replaceAll("$username", username);
 }
 
 function sendChatMessage(event) {
@@ -117,41 +122,40 @@ function sendChatMessage(event) {
   }
 }
 
-function createMessageUi(msg, sent=true)
-{
+function sendPongFromChat(event) {
+  const user_id = event.dataset.id;
+  socket_users.send(JSON.stringify({ type: "game", receiver: user_id }));
+}
+
+function createMessageUi(msg, sent = true) {
   const msgUi = document.createElement("li");
   msgUi.innerText = msg;
   msgUi.classList.add("msg");
-  if (sent)
-    msgUi.classList.add("msg-sent");
-  else
-    msgUi.classList.add("msg-received");
+  if (sent) msgUi.classList.add("msg-sent");
+  else msgUi.classList.add("msg-received");
   return msgUi;
 }
 
-function addMessageUi(id, msg, sent=true)
-{
+function addMessageUi(id, msg, sent = true) {
   const bubble = createChatBubbleById(id, false);
   const msgArea = getMessageArea(id);
   msgArea.prepend(createMessageUi(msg, sent));
   msgArea.scrollTop = msgArea.scrollHeight;
-  if (sent === false && !bubble.firstElementChild.classList.contains("show"))
+  if (sent === false && !bubble.firstElementChild.classList.contains("show")) 
     bubble.firstElementChild.classList.add("flickering");
 }
 
-function lastMsgNotReceived(id, blocked=false)
-{
+function lastMsgNotReceived(id, blocked = false) {
   const msgArea = getMessageArea(id);
   msgArea.firstChild.classList.add("msg-alert");
   const offlineMsg = document.createElement("li");
   offlineMsg.classList.add("offline");
-  offlineMsg.innerText = "User is offline."
-  if (blocked)
-    offlineMsg.innerText = "User blocked you."
+  offlineMsg.innerText = "User is offline.";
+  if (blocked) offlineMsg.innerText = "User blocked you.";
   msgArea.prepend(offlineMsg);
 }
 
-export function createChatBubble(element, event, open=true) {
+export function createChatBubble(element, event, open = true) {
   const user_id = element.dataset.id;
   const username = element.dataset.username;
   var bubble = getChatBubble(user_id);
@@ -159,9 +163,11 @@ export function createChatBubble(element, event, open=true) {
   if (bubble) {
     bubble.classList.remove("d-none");
     if (open)
-      setTimeout(() => {openDropDown(user_id);}, 50);    
-    return bubble
-  };
+      setTimeout(() => {
+        openDropDown(user_id);
+      }, 50);
+    return bubble;
+  }
 
   bubble = document.createElement("div");
   bubble.classList.add("btn-group", "dropup", "dropup-chat");
@@ -171,43 +177,38 @@ export function createChatBubble(element, event, open=true) {
   getFooter().appendChild(bubble);
   getChatInput(user_id).addEventListener("keydown", sendChatMessage);
   if (open)
-    setTimeout(() => {openDropDown(user_id);}, 50);
+    setTimeout(() => {
+      openDropDown(user_id);
+    }, 50);
   return bubble;
 }
 
-function setFlickering(event)
-{
+function setFlickering(event) {
   event.target.classList.remove("flickering");
 }
 
-export function createChatBubbleById(id, open)
-{
+export function createChatBubbleById(id, open) {
   const element = document.querySelector(`[data-id="` + id + `"`);
   return createChatBubble(element, null, open);
 }
 
-function getChatBubble(id)
-{
+function getChatBubble(id) {
   return document.getElementById("bubble-" + id);
 }
 
-function getChatInput(id)
-{
+function getChatInput(id) {
   return document.getElementById("chat-input-" + id);
 }
 
-function getMessageArea(id)
-{
+function getMessageArea(id) {
   return document.getElementById("msg-area-" + id);
 }
 
-function getFooter()
-{
+function getFooter() {
   return document.getElementsByTagName("footer")[0];
 }
 
-function openDropDown(id)
-{
+function openDropDown(id) {
   var dropdown = document.getElementById("dropdown-toggle-" + id);
   var dropdownInstance = new bootstrap.Dropdown(dropdown);
   dropdownInstance.show();
@@ -223,19 +224,15 @@ async function navigateToStatsFromChat(element) {
   navigate("dashboard", userId);
 }
 
-export function hideChat(element)
-{
+export function hideChat(element) {
   const id = element.dataset.id;
   const bubble = getChatBubble(id);
-  if (bubble)
-    bubble.classList.add("d-none");
+  if (bubble) bubble.classList.add("d-none");
 }
 
-export function hideChatById(id)
-{
+export function hideChatById(id) {
   const bubble = getChatBubble(id);
-  if (bubble)
-    bubble.classList.add("d-none");
+  if (bubble) bubble.classList.add("d-none");
 }
 
 export const chatActions = [
@@ -254,6 +251,10 @@ export const chatActions = [
   {
     selector: '[data-action="hide-chat"]',
     handler: hideChat,
+  },
+  {
+    selector: '[data-action="launch-pong"]',
+    handler: sendPongFromChat,
   },
 ];
 

@@ -20,6 +20,11 @@ class Participant(models.Model):
                                                      name="Unknown",
                                                      is_ai=False)
         return unknown
+    
+    @classmethod
+    def get_unknown_pk(cls):
+        unknown = cls.get_unknown()
+        return unknown.pk
 
     @classmethod
     def get(cls, user_id):
@@ -33,37 +38,27 @@ class Participant(models.Model):
         except UserProfile.DoesNotExist:
             participant = cls.get_unknown()
         return participant
-    # @classmethod
-    # def get(cls, user_id):
-    #     participant, created = cls.objects.get_or_create(
-    #         user_id=user_id,
-    #         defaults={
-    #             "name": UserProfile.objects.get(id=user_id).username, 
-    #             "is_ai": False}
-    #     )
-    #     return participant
 
     @classmethod
     def get_ai(cls):
-        ai, created = cls.objects.get_or_create(
-            user=None,
-            name="Computer",
-            is_ai=True)
+        ai, created = cls.objects.get_or_create(user=None,
+                                                name="Computer",
+                                                is_ai=True)
         return ai
-
 
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
     player1 = models.ForeignKey(Participant,
-                                on_delete=models.CASCADE,
+                                default=Participant.get_unknown_pk,
+                                on_delete=models.SET_DEFAULT,
                                 related_name="games_as_player1")
     player2 = models.ForeignKey(Participant,
-                                on_delete=models.CASCADE,
+                                default=Participant.get_unknown_pk,
+                                on_delete=models.SET_DEFAULT,
                                 related_name="games_as_player2")
     winner = models.ForeignKey(Participant,
-                               on_delete=models.SET_NULL,
-                               null=True,
-                               blank=True,
+                               default=Participant.get_unknown_pk,
+                               on_delete=models.SET_DEFAULT,
                                related_name="games_won")
     score_player1 = models.IntegerField(default=0)
     score_player2 = models.IntegerField(default=0)
@@ -71,31 +66,30 @@ class Game(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     duration = models.DurationField(null=True,
                                     blank=True)
-    tournament = models.ForeignKey(
-        "Tournament",
-        null=True,
-        blank=True,
-        on_delete=models.CASCADE,
-        related_name="games")
+    tournament = models.ForeignKey("Tournament",
+                                   null=True,
+                                   blank=True,
+                                   on_delete=models.SET_NULL,
+                                   related_name="games")
     finished = models.BooleanField(default=False)
 
     @classmethod
     def create(cls, id1, id2, score_1, score_2):
-        cls.objects.create(player1=Participant.get(id1),
-                           player2=Participant.get(id2),
-                           winner=Participant.get(id1) if score_1 > score_2
-                           else Participant.get(id2),
-                           score_player1=score_1,
-                           score_player2=score_2)
+        return cls.objects.create(player1=Participant.get(id1),
+                                  player2=Participant.get(id2),
+                                  winner=Participant.get(id1) if score_1 > score_2
+                                  else Participant.get(id2),
+                                  score_player1=score_1,
+                                  score_player2=score_2)
 
     @classmethod
     def create_ai(cls, id_player, score_player, score_ai):
-        cls.objects.create(player1=Participant.get(id_player),
-                           player2=Participant.get_ai(),
-                           winner=Participant.get_ai() if score_ai > score_player
-                           else Participant.get(id_player),
-                           score_player1=score_player,
-                           score_player2=score_ai)
+        return cls.objects.create(player1=Participant.get(id_player),
+                                  player2=Participant.get_ai(),
+                                  winner=Participant.get_ai() if score_ai > score_player
+                                  else Participant.get(id_player),
+                                  score_player1=score_player,
+                                  score_player2=score_ai)
 
 
 class Tournament(models.Model):
@@ -113,4 +107,3 @@ class Tournament(models.Model):
                                related_name="winner_of_tournament")
     created_at = models.DateTimeField(auto_now_add=True)
     finished = models.BooleanField(default=False)
- 

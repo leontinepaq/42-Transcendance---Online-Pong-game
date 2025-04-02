@@ -18,7 +18,6 @@ class UserProfileManager(BaseUserManager):
             raise ValueError("Password mandatory")
         
         email = self.normalize_email(email)
-        extra_fields['avatar_url'] = settings.DEFAULT_AVATAR_URL # todo @leontinepaq checker que ok
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -38,7 +37,8 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     id =                    models.AutoField(primary_key=True)
     username =              models.CharField(max_length=30, unique=True)
     email =                 models.EmailField(unique=True)
-    avatar_url =            models.URLField(blank=True, null=True) #todo @leontinepaq possibilite d'etre null a retirer ?
+    avatar_url =            models.CharField(blank=False, null=False,
+                                             default=settings.DEFAULT_AVATAR_URL)
     created_at =            models.DateTimeField(auto_now_add=True)
     is_active =             models.BooleanField(default=True)
     is_connected =          models.BooleanField(default=False)

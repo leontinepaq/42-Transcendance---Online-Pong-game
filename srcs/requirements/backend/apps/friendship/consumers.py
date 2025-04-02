@@ -10,12 +10,15 @@ from .serializers import UserFriendsSerializer
 
 User = get_user_model()
 
-def isBlocked(blockerId, blockedId):
+
+def is_blocked(blockerId, blockedId):
     return User.objects.filter(id=blockerId).first()\
         .blocked.filter(id=blockedId).exists()
-        
+
+
 def isOnline(id):
     return cache.get(id, False)
+
 
 class CommonConsumer(UserConsumer):
     group_name = "common_channel"
@@ -30,9 +33,9 @@ class CommonConsumer(UserConsumer):
                                            self.channel_name)
         await self.accept()
         asyncio.create_task(self.loop())
-        
+
     async def loop(self):
-        self.online=True
+        self.online = True
         while self.online:
             self.set_online()
             await self.toggle_group_update()
@@ -46,7 +49,7 @@ class CommonConsumer(UserConsumer):
         cache.set(self.user.id, True, 30)
 
     async def disconnect(self, close_code):
-        self.online=False
+        self.online = False
         cache.set(self.user.id, False)
         await self.toggle_group_update()
 
@@ -62,28 +65,29 @@ class CommonConsumer(UserConsumer):
         await self.send(text_data=json.dumps(data))
 
     async def receive(self, text_data):
-        data=json.loads(text_data)
-        if data["type"]=="update":
+        data = json.loads(text_data)
+        data["sender"] = self.user.id
+
+        if data["type"] == "update":
             return await self.toggle_update({})
         if not isOnline(data["receiver"]):
-            return await self.send(json.dumps({"type":"offline",
+            return await self.send(json.dumps({"type": "offline",
+                                               "init": data["type"],
                                                "receiver": data["receiver"]}))
-        if await sync_to_async(isBlocked)(data["receiver"],
-                                          self.user.id):
-            return await self.send(json.dumps({"type":"blocked",
+        if await sync_to_async(is_blocked)(data["receiver"], self.user.id):
+            return await self.send(json.dumps({"type": "blocked",
+                                               "init": data["type"],
                                                "receiver": data["receiver"]}))
-        data["sender"]=self.user.id
-        text_data=json.dumps(data)
         await self.channel_layer.group_send(self.group_name,
                                             {"type": "receive.message",
-                                             "data": text_data})
+                                             "data": json.dumps(data)})
 
     async def receive_message(self, event):
         data = json.loads(event["data"])
-        data["type"]="message"
+        
         if self.user.id != int(data["receiver"]):
             return
-        if await sync_to_async(isBlocked)(self.user.id,
-                                          data["sender"]):
+        if await sync_to_async(is_blocked)(self.user.id,
+                                           data["sender"]):
             return
         await self.send(json.dumps(data))

@@ -14,13 +14,3 @@ class FriendRequest(models.Model):
     class Meta:
         unique_together = ("sender",
                            "receiver")
-
-
-class Message(models.Model):
-    sender = models.ForeignKey(UserProfile,
-                               on_delete=models.CASCADE,
-                               related_name="message_sender")
-    receiver = models.ForeignKey(UserProfile,
-                                 on_delete=models.CASCADE,
-                                 related_name="message_receiver")
-    date = models.DateTimeField(auto_now_add=True)

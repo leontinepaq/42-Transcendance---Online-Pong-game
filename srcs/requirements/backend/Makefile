@@ -8,5 +8,8 @@ SHELL :=	/bin/zsh
 $(VENV_D):
 						virtualenv $(VENV_D)
 
+install-requirements:
+						source $(ACTIVATE_F) && pip install -r $(REQ_F) && deactivate
+
 update-requirements:	$(VENV_D)
 						source $(ACTIVATE_F) && pip freeze > ./requirements.txt && deactivate
