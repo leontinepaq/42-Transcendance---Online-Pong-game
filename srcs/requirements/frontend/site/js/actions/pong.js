@@ -19,7 +19,7 @@ export const pongActions = [
 ];
 
 let closeButton;
-let rejouerButton;
+let replayButton;
 let modalHeader;
 let modalBody;
 let modalFooter;
@@ -168,15 +168,15 @@ function addModalGameSoloMulti()
 {    
     // HEADER
 
-    let existingButton = document.querySelector('#closeendgame')
-    modalHeader = document.querySelector('.modal-header');
+    // let existingButton = document.querySelector('#closeendgame')
+    // modalHeader = document.querySelector('.modal-header');
 
-    const modalTitle = document.createElement('h5');
+    const modalTitle = document.querySelector('.modal-title');
     modalTitle.setAttribute('data-i18n', 'congratulations');
     modalTitle.setAttribute('class', 'modal-title');
-    modalTitle.setAttribute('id', 'winnerModalLabel');
+    // modalTitle.setAttribute('id', 'winnerModalLabel');
     modalTitle.textContent = 'Congratulations !';
-    modalHeader.insertBefore(modalTitle, existingButton);
+    // modalHeader.insertBefore(modalTitle, existingButton);
 
     // BODY
     modalBody = document.querySelector('.modal-body');
@@ -206,17 +206,17 @@ function addModalGameSoloMulti()
     closeButton.setAttribute('data-i18n', 'close');
     closeButton.textContent = 'CLOSE';
 
-    rejouerButton = document.createElement('button');
-    rejouerButton.type = 'button';
-    rejouerButton.classList.add('btn');
-    rejouerButton.setAttribute('data-bs-dismiss', 'modal');
-    rejouerButton.setAttribute('id', 'rejouer');
-    rejouerButton.setAttribute('data-i18n', 'playAgain');
-    rejouerButton.textContent = 'PLAY AGAIN';
+    replayButton = document.createElement('button');
+    replayButton.type = 'button';
+    replayButton.classList.add('btn');
+    replayButton.setAttribute('data-bs-dismiss', 'modal');
+    replayButton.setAttribute('id', 'replay');
+    replayButton.setAttribute('data-i18n', 'playAgain');
+    replayButton.textContent = 'PLAY AGAIN';
 
     modalFooter = document.querySelector('#myModal .modal-footer');
     modalFooter.appendChild(closeButton);
-    modalFooter.appendChild(rejouerButton);
+    modalFooter.appendChild(replayButton);
 }
 
 function rmModalParam()
@@ -298,18 +298,18 @@ function eventClose()
 
 function eventPlayAgain()
 {
-  const rejouer = document.getElementById("rejouer");
-  if (rejouer)
+  const replay = document.getElementById("replay");
+  if (replay)
   {
     if (mode === "solo" || mode === "multi")
     {
-        rejouer.addEventListener("click", function () {
+        replay.addEventListener("click", function () {
           if (mode == "solo") initGameSolo();
           else if (mode == "multi") initGameMulti();
         });
     }
     else
-      rejouer.remove();
+      replay.remove();
   }
 }
 
