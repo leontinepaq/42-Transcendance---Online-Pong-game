@@ -505,6 +505,12 @@ function playGame(mode)
   canvas = document.getElementById("gameCanvas");
   ctx = canvas.getContext("2d");
 
+  if (mode === "online")
+  {
+    const test = document.querySelector(".modal-body");
+    test.setAttribute('data-i18n', 'waiting');
+    doLanguage();
+  }
   rmModalParam();
   statePause();
   resetKey();

@@ -100,5 +100,6 @@
     "profile5": "Erreur: Champ de nom d'utilisateur requis.",
     "profile6": "Erreur: Les mots de passe ne correspondent pas.",
     "onlineVictory": "Vous avez gagne, quelle victoire incroyable !",
-    "onlineLose": "Vous avez perdu, vous ferez mieux la prochaine fois !"
+    "onlineLose": "Vous avez perdu, vous ferez mieux la prochaine fois !",
+    "waiting": "En attente d'un deuxieme joueur.."
 }

@@ -1,6 +1,8 @@
 import random
 import math
 import time
+import json
+
 
 SCORE_MAX = 3
 
@@ -115,38 +117,46 @@ class Pong:
             self.left.move(delta)
         elif side == "right":
             self.right.move(delta)
+    
+    def predict_ball_y(self, delta_time=1):
+        predicted_y = self.ball.y + self.ball.velocity_y * delta_time
 
-    def predict_ball_y(self, ball):
-        # Prédiction simple basée sur la vitesse de la balle et son mouvement
-        predicted_y = ball.y + ball.velocity_y * 1  # Calcul basique : prédire où la balle sera dans 1 seconde
-        if predicted_y < 0:  # Si la balle passe en dehors de l'écran par le haut
-            predicted_y = 0
-        elif predicted_y > 100:  # Si la balle passe en dehors de l'écran par le bas
-            predicted_y = 100
+        # Si la balle touche un mur, prévoir le rebond
+        if predicted_y <= 0:
+            predicted_y = -predicted_y  # Simulation de rebond haut
+        elif predicted_y >= 100:
+            predicted_y = 200 - predicted_y  # Simulation de rebond bas
+
         return predicted_y
+    
+    predicted_y = 50
 
     def update_ai_paddle(self):
-        # if self.use_ai and self.ball.x > 50:  
-        # AI moves only when the ball is on its side
+        global predicted_y
         current_time = time.time()
-        if current_time - self.last_ai_update_time < 1:  # Moins d'une seconde depuis la dernière mise à jour
-            return 
-        print("here")
-        self.last_ai_update_time = time.time()
-        if self.ball.x < 60:
-            return
-        reaction_chance = 0.7  # 80% chance to react to ball movement
-        if random.random() < reaction_chance:
-            # AI aims slightly off
-            predicted_y = self.predict_ball_y(self.ball)
-            target_y = predicted_y + random.uniform(-10, 10)
-            print(target_y)
-            move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
-            if self.right.y < target_y:
-                self.right.move(move_amount)
-            elif self.right.y > target_y:
-                self.right.move(-move_amount)
 
+        # Mise à jour de l'IA toutes les secondes
+        if current_time - self.last_ai_update_time >= 1:
+            self.predicted_y = self.predict_ball_y(delta_time=1)  # Prédire la position future
+            self.last_ai_update_time = current_time
+
+        # Mouvement de l'IA vers la position prédite de la balle
+        target_y = self.predicted_y
+        distance_to_target = target_y - self.right.y
+
+        # Simuler un léger retard ou une erreur humaine
+        # if random.random() < 0.2:  # 20% de chance d'erreur
+            # distance_to_target += random.choice([-1, 1]) * random.randint(1, 3)  # Erreur de 1 à 3 pixels
+
+        # Déplacement du paddle de l'IA
+        if abs(distance_to_target) > self.ai_speed:
+            if distance_to_target > 0:
+                self.right.y += self.ai_speed
+            else:
+                self.right.y -= self.ai_speed
+        else:
+            self.right.y = target_y  # Si proche, positionner directement le paddle
+        
     def update_ball(self):
         self.ball.update()
         self.ball.bounce_top_bottom()

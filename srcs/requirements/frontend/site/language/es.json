@@ -100,5 +100,6 @@
     "profile5": "Error: El campo de nombre de usuario es requerido.",
     "profile6": "Error: Las contraseñas no coinciden.",
     "onlineVictory": "¡Ganaste, qué victoria tan increíble!",
-    "onlineLose": "Perdiste, ¡lo harás mejor la próxima vez!"
+    "onlineLose": "Perdiste, ¡lo harás mejor la próxima vez!",
+    "waiting": "En espera de un segundo jugador.."
 }
