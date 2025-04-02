@@ -58,7 +58,17 @@ function initGameOnline()
 {
   navigate('pong');
   setTimeout(function() {
-    socket = new WebSocket("/ws/pong/online/");   // online/id --> comment specifier lid en question ? voir avec ja
+    socket = new WebSocket("/ws/pong/online/");
+    mode = "online";
+    playGame(mode);
+  }, 500)
+}
+
+export function initGameOnlineSpecific(id)
+{
+  navigate('pong');
+  setTimeout(function() {
+    socket = new WebSocket(`/ws/pong/online/${id}/`);
     mode = "online";
     playGame(mode);
   }, 500)

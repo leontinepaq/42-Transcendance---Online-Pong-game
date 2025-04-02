@@ -1,4 +1,5 @@
 import navigate from "./router.js";
+import {initGameOnline} from "./actions/pong.js"
 
 let socket_users = null;
 let reconnect = true;
@@ -52,10 +53,15 @@ export async function connectSocketUsers() {
     const data = JSON.parse(event.data);
 
     if (data.type === "update") return updateFriendList(data.data);
-    if (data.type === "offline") return lastMsgNotReceived(data.receiver);
-    if (data.type === "blocked") return lastMsgNotReceived(data.receiver, true);
+    if (data.type === "offline" || data.type === "blocked")
+    {
+      if (data.init === "message")
+        return lastMsgNotReceived(data.receiver, data.type === "blocked")
+      if (data.init === "game")
+        return gameRefused(data.receiver)
+    }
     if (data.type === "message") return addMessageUi(data.sender, data.message, false);
-    if (data.type === "game") return;
+    if (data.type === "game") return addGameProposalUi(data.sender);
   };
 }
 
@@ -122,9 +128,11 @@ function sendChatMessage(event) {
   }
 }
 
-function sendPongFromChat(event) {
-  const user_id = event.dataset.id;
+function sendPongFromChat(element, event) {
+  const user_id = element.dataset.id;
   socket_users.send(JSON.stringify({ type: "game", receiver: user_id }));
+  navigate("pong");
+  initGameOnline();
 }
 
 function createMessageUi(msg, sent = true) {
@@ -214,7 +222,7 @@ function openDropDown(id) {
   dropdownInstance.show();
 }
 
-async function navigateToStatsFromChat(element) {
+function navigateToStatsFromChat(element) {
   const userId = element.dataset.id;
   if (!userId) {
     console.error(`Invalid user: ${userId}`);
