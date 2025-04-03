@@ -103,7 +103,6 @@ class Pong:
         self.last_ai_update_time = time.time() # ajout last maj
         self.paused = True
         self.over = False
-        self.prediction_y = 0 #@leontinepaq a supp
         self.reset()
 
     def reset(self):
@@ -119,15 +118,18 @@ class Pong:
         elif side == "right":
             self.right.move(delta)
     
-    def predict_ball_y(self, delta_time=1):
-        predicted_y = self.ball.y + self.ball.velocity_y * delta_time
+    def predict_ball_y(self):
+        # Si la balle va vers la gauche, on revient au milieu
+        if self.ball.velocity_x <= 0:
+            return 50
+        delta_t = (100 - self.ball.x) / self.ball.velocity_x
+        predicted_y = self.ball.y + self.ball.velocity_y * delta_t
 
         # Si la balle touche un mur, prévoir le rebond
         if predicted_y <= 0:
             predicted_y = -predicted_y  # Simulation de rebond haut
         elif predicted_y >= 100:
             predicted_y = 200 - predicted_y  # Simulation de rebond bas
-        self.prediction_y =  predicted_y #@leontinepaq a supp
         return predicted_y
     
     predicted_y = 50
@@ -138,7 +140,7 @@ class Pong:
 
         # Mise à jour de l'IA toutes les secondes
         if current_time - self.last_ai_update_time >= 1:
-            self.predicted_y = self.predict_ball_y(delta_time=1)  # Prédire la position future
+            self.predicted_y = self.predict_ball_y()  # Prédire la position future
             self.last_ai_update_time = current_time
 
         # Mouvement de l'IA vers la position prédite de la balle
@@ -147,7 +149,7 @@ class Pong:
 
         # Simuler un léger retard ou une erreur humaine
         # if random.random() < 0.2:  # 20% de chance d'erreur
-            # distance_to_target += random.choice([-1, 1]) * random.randint(1, 3)  # Erreur de 1 à 3 pixels
+        #     distance_to_target += random.choice([-1, 1]) * random.randint(1, 3)  # Erreur de 1 à 3 pixels
 
         # Déplacement du paddle de l'IA
         if abs(distance_to_target) > self.ai_speed:
@@ -183,7 +185,7 @@ class Pong:
             "paused": self.paused,
             "score": score,
             "over": self.over,
-            "prediction_y": self.prediction_y #@leontinepaq a supp
+            "prediction_y": self.predicted_y #@leontinepaq a supp
         }
 
     def toggle_pause(self):
