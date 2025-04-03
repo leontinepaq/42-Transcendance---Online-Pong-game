@@ -167,16 +167,10 @@ function drawPaddle(state) {
 function addModalGameSoloMulti()
 {    
     // HEADER
-
-    // let existingButton = document.querySelector('#closeendgame')
-    // modalHeader = document.querySelector('.modal-header');
-
     const modalTitle = document.querySelector('.modal-title');
     modalTitle.setAttribute('data-i18n', 'congratulations');
-    modalTitle.setAttribute('class', 'modal-title');
-    // modalTitle.setAttribute('id', 'winnerModalLabel');
+    modalTitle.setAttribute('id', 'winnerModalLabel');
     modalTitle.textContent = 'Congratulations !';
-    // modalHeader.insertBefore(modalTitle, existingButton);
 
     // BODY
     modalBody = document.querySelector('.modal-body');
@@ -221,9 +215,12 @@ function addModalGameSoloMulti()
 
 function rmModalParam()
 {
-    const test = document.getElementById('winnerModalLabel');
-    if (test)
-        test.remove();
+    const title = document.getElementById('winnerModalLabel');
+    if (title)
+    {
+      title.setAttribute('data-i18n', '');
+      title.textContent = '';
+    }
     var remove2 = document.querySelector('.modal-body');
     while (remove2.firstChild) {
         remove2.removeChild(remove2.firstChild);
