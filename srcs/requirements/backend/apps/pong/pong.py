@@ -94,6 +94,9 @@ class Ball:
         }
 
 class Pong:
+    predicted_y = 50
+    ai_speed = 2
+
     def __init__(self, use_ai=True):
         self.ball = Ball()
         self.left = Paddle()
@@ -109,8 +112,8 @@ class Pong:
         self.left.reset()
         self.right.reset()
         self.ball.reset()
-        self.ai_speed = 2
-        self.last_ai_update_time = time.time()
+        self.last_ai_update_time = time.time() - 1
+        self.predicted_y = 50
 
     def move_paddle(self, side, delta):
         if side == "left":
@@ -119,9 +122,11 @@ class Pong:
             self.right.move(delta)
     
     def predict_ball_y(self):
-        # Si la balle va vers la gauche, on revient au milieu
+        # Si la balle va vers la gauche
         if self.ball.velocity_x <= 0:
-            return 50
+            # return 50 # on revient au milieu
+            return self.predicted_y # ne pas bouger
+
         delta_t = (100 - self.ball.x) / self.ball.velocity_x
         predicted_y = self.ball.y + self.ball.velocity_y * delta_t
 
@@ -132,10 +137,7 @@ class Pong:
             predicted_y = 200 - predicted_y  # Simulation de rebond bas
         return predicted_y
     
-    predicted_y = 50
-
     def update_ai_paddle(self):
-        global predicted_y
         current_time = time.time()
 
         # Mise à jour de l'IA toutes les secondes
@@ -146,20 +148,21 @@ class Pong:
         # Mouvement de l'IA vers la position prédite de la balle
         target_y = self.predicted_y
         distance_to_target = target_y - self.right.y
-
-        # Simuler un léger retard ou une erreur humaine
-        # if random.random() < 0.2:  # 20% de chance d'erreur
-        #     distance_to_target += random.choice([-1, 1]) * random.randint(1, 3)  # Erreur de 1 à 3 pixels
-
-        # Déplacement du paddle de l'IA
-        if abs(distance_to_target) > self.ai_speed:
-            if distance_to_target > 0:
-                self.right.y += self.ai_speed
-            else:
-                self.right.y -= self.ai_speed
-        else:
-            self.right.y = target_y  # Si proche, positionner directement le paddle
         
+        # Ne bouge pas si deja proche du centre du paddle
+        if abs(distance_to_target) < self.right.height / 4:
+            return 
+
+        # Simule comportement humain
+        reaction_chance = 0.8 # 80% chance to react to ball movement
+        if random.random() < reaction_chance:
+            target_y += random.uniform(-10, 10)
+            move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
+            if self.right.y < target_y:
+                self.right.move(move_amount)
+            elif self.right.y > target_y:
+                self.right.move(-move_amount)
+
     def update_ball(self):
         self.ball.update()
         self.ball.bounce_top_bottom()
