@@ -1,5 +1,6 @@
 import random
 import math
+import time
 
 SCORE_MAX = 3
 
@@ -60,7 +61,8 @@ class Ball:
         self.y += self.velocity_y
 
     def bounce_top_bottom(self):
-        if self.y <= 0 or self.y >= 100:
+        if self.y <= self.radius or self.y >= 100 - self.radius:
+            self.y = max(self.radius, min(self.y, 100 - self.radius))  # Avoid being stuck in the border
             self.velocity_y *= -1
             return True
         return False
@@ -106,6 +108,8 @@ class Pong:
         self.right.reset()
         self.ball.reset()
         self.ai_speed = 2
+        if self.over == False:
+            self.pause()
 
     def move_paddle(self, side, delta):
         if side == "left":
@@ -128,19 +132,22 @@ class Pong:
             elif self.right.y > target_y:
                 self.right.move(-move_amount)
 
+    def update_score(self):
+        if self.ball.x > 100:
+            self.score[0] += 1
+        else:
+            self.score[1] += 1
+        if self.score[0] >= SCORE_MAX or self.score[1] >= SCORE_MAX:
+            self.over = True
+
     def update_ball(self):
         self.ball.update()
         self.ball.bounce_top_bottom()
         self.ball.bounce_paddle(self.left)
         self.ball.bounce_paddle(self.right)
         if self.ball.is_out():
-            if self.ball.x > 100:
-                self.score[0] += 1
-            else:
-                self.score[1] += 1
+            self.update_score()
             self.reset()
-        if self.score[0] >= SCORE_MAX or self.score[1] >= SCORE_MAX:
-            self.over = True
 
     def get_state(self, sym=False):
         score=[self.score[0], self.score[1]]
