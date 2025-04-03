@@ -103,6 +103,7 @@ class Pong:
         self.last_ai_update_time = time.time() # ajout last maj
         self.paused = True
         self.over = False
+        self.prediction_y = 0 #@leontinepaq a supp
         self.reset()
 
     def reset(self):
@@ -126,7 +127,7 @@ class Pong:
             predicted_y = -predicted_y  # Simulation de rebond haut
         elif predicted_y >= 100:
             predicted_y = 200 - predicted_y  # Simulation de rebond bas
-
+        self.prediction_y =  predicted_y #@leontinepaq a supp
         return predicted_y
     
     predicted_y = 50
@@ -181,7 +182,8 @@ class Pong:
             "ball": self.ball.get_state(sym),
             "paused": self.paused,
             "score": score,
-            "over": self.over
+            "over": self.over,
+            "prediction_y": self.prediction_y #@leontinepaq a supp
         }
 
     def toggle_pause(self):

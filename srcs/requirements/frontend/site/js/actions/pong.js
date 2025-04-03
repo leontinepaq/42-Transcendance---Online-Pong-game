@@ -154,6 +154,20 @@ function drawPaddle(state) {
   );
 }
 
+function drawPrediction(state)
+{
+  ctx.beginPath();
+  ctx.arc(
+    (state.right.top_left_corner.x * canvas.width) / 100 - 5,
+    (state.prediction_y * canvas.height) / 100,
+    (state.ball.r * canvas.width) / 100,
+    0,
+    Math.PI * 2
+  );
+  ctx.fillStyle = "red";
+  ctx.fill();
+}
+
 function addModalGameSoloMulti()
 {    
     // HEADER
@@ -362,6 +376,7 @@ function messageSocket() {
 
     drawBall(state.ball.x, state.ball.y, state.ball.r);
     drawPaddle(state);
+    drawPrediction(state); //@leontinepaq a supp
 
     if (state.paused)
       statePause();
