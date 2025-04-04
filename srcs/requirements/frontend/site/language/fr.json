@@ -110,5 +110,6 @@
     "wrongPwd" : "Mot de passe incorrect",
     "wrongCode" : "Code incorrect",
     "error" : "Erreur",
-    "waiting": "En attente d'un deuxieme joueur.."
+    "waiting": "En attente d'un deuxieme joueur...",
+    "disconnected": "Le joueur s'est déconnecté"
 }

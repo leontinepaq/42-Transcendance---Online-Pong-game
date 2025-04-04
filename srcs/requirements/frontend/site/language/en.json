@@ -110,5 +110,6 @@
     "wrongPwd" : "Wrong password",
     "wrongCode" : "Wrong code",
     "error": "Error",
-    "waiting": "Looking for 2nd player.."
+    "waiting": "Looking for 2nd player...",
+    "disconnected": "Player got disconnected"
 }

@@ -35,7 +35,8 @@ const errors = {
   "File too large (Max 10MB)": "fileTooLarge",
   "Error saving file": "savingFileError",
 
-  "Looking for 2nd player": "waiting"
+  "Looking for 2nd player": "waiting",
+  "Player got disconnected": "disconnected"
 };
 
 export function showModal(message, title_i18n) {
