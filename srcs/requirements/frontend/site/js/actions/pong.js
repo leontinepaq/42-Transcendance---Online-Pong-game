@@ -246,6 +246,16 @@ function rmModalParam()
     }
 }
 
+function genericModalBody(textContent, attribut)
+{
+  let reboot = document.getElementById('bodyModal');
+  const modalBody = document.querySelector("#myModal .modal-body");
+  modalBody.textContent = textContent;
+  reboot.setAttribute('data-i18n', attribut);
+  const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
+  waitingModal.show();
+}
+
 function showWinnerGame(name)
 {
   // reset attribut du modal
@@ -270,21 +280,10 @@ function showWinnerGame(name)
   {
     rmModalParam();
     eventClose();
-    const modalBody = document.querySelector("#myModal .modal-body");
-    if (state.score[0] == 3)
-    {
-      modalBody.textContent = "You won, what an amazing victory !";
-      reboot.setAttribute('data-i18n', "onlineVictory");
-      const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
-      waitingModal.show();
-    }
+    if (state.score[0] == 3) 
+      genericModalBody("You won, what an amazing victory !", "onlineVictory")
     else
-    {
-      modalBody.textContent = "You lost, you'll do better next time !";
-      reboot.setAttribute('data-i18n', 'onlineLose');
-      const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
-      waitingModal.show();
-    }
+      genericModalBody("You lost, you'll do better next time !", "onlineLose")
     doLanguage();
   }
 }
@@ -371,10 +370,7 @@ function messageSocket() {
         {
           rmModalParam();
           eventClose();
-          const modalBody = document.querySelector("#myModal .modal-body");
-          modalBody.textContent = state.message;
-          const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
-          waitingModal.show();
+          genericModalBody(state.message, "waiting")
           doLanguage()
         }
         return ;
