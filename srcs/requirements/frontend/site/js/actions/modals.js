@@ -34,17 +34,22 @@ const errors = {
   "Invalid file type": "invalidFile",
   "File too large (Max 10MB)": "fileTooLarge",
   "Error saving file": "savingFileError",
+
+  "Looking for 2nd player": "waiting"
 };
 
 export function showModal(message, title_i18n) {
   const modalTitle = document.querySelector("#myModal .modal-title");
   modalTitle.setAttribute('data-i18n', title_i18n);
   const modalBody = document.querySelector("#myModal .modal-body");
+  console.log(message)
   modalBody.setAttribute('data-i18n', errors[message] || "errorUnknown");
   const modal = new bootstrap.Modal(document.getElementById("myModal"));
   modal.show();
   doLanguage();//todo @leontinepaq check utile
 }
+
+export default showModal
 
 // export function showModal(title_i18n, bodyContent, footerContent = null) {
 //   const modalEl = document.getElementById("myModal");

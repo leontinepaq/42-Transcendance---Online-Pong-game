@@ -1,7 +1,7 @@
 import { navigate } from "../router.js";
 import { handleError } from "../api.js";
-import { authFetchJson } from "../api.js";
 import doLanguage from "../translate.js";
+import showModal from "./modals.js"
 
 export const pongActions = [
   {
@@ -370,7 +370,7 @@ function messageSocket() {
         {
           rmModalParam();
           eventClose();
-          genericModalBody(state.message, "waiting")
+          showModal(state.message, "error")
           doLanguage()
         }
         return ;
