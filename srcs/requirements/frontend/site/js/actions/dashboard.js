@@ -4,6 +4,19 @@ import { colors, chartTheme } from "../theme.js";
 
 initChartJS();
 
+function formatDuration(duration) {
+  if (!duration) return "N/A"; 
+  const parts = duration.split(":");
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+  const seconds = parseInt(parts[2], 10);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+  return `${minutes}m ${seconds}s`;
+}
+
 function createGameCard(game) {
   const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
   const gameDate = new Date(game.created_at).toLocaleDateString("en-US", {
@@ -51,7 +64,7 @@ function createGameCard(game) {
           <div class="match-info">
             <i class="bi bi-stopwatch-fill dashboard-icon"></i>
             <span> Match duration: </span>
-            <span>${game.duration ?? "N/A"}</span>
+            <span>${formatDuration(game.duration)}</span>
           </div>
           <div class="match-info">
             <i class="bi bi-fire dashboard-icon"></i>
@@ -73,7 +86,7 @@ function displayGameCards(data) {
 async function updateStatValues(data) {
   document.getElementById("matches-won").textContent = data.wins;
   document.getElementById("win-streak").textContent = data.winstreak;
-  document.getElementById("total-time").textContent = data.total_time_played;
+  document.getElementById("total-time").textContent = formatDuration(data.total_time_played);
   document.getElementById("online-opponents").textContent =
     data.unique_opponents_count;
 }

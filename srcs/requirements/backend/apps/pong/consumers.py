@@ -1,5 +1,6 @@
 import json
 import asyncio
+from datetime import timedelta
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .pong import Pong
 from django.contrib.auth import get_user_model
@@ -66,7 +67,9 @@ class PongSoloGameConsumer(UserConsumer):
     async def save_game(self):
         await sync_to_async(Game.create_ai)(id_player=self.user.id,
                                             score_player=self.game.score[0],
-                                            score_ai=self.game.score[1])
+                                            score_ai=self.game.score[1],
+                                            duration=timedelta(seconds=self.game.total_time),
+                                            longest_exchange=self.game.longuest_exchange)
 
     async def loop(self):
         while not self.start:
@@ -234,4 +237,6 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
         await sync_to_async(Game.create)(id1=self.user.id,
                                          id2=self.opponent_id,
                                          score_1=self.game.score[0],
-                                         score_2=self.game.score[1])
+                                         score_2=self.game.score[1],
+                                         duration=timedelta(seconds=self.game.total_time),
+                                         longest_exchange=self.game.longuest_exchange)

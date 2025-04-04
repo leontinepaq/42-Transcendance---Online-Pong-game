@@ -101,6 +101,12 @@ class Pong:
         self.use_ai = use_ai
         self.paused = True
         self.over = False
+        self.start_time = time.time()  # Heure de début
+        self.paused_time = 0    # Temps total de pause
+        self.last_pause_time = None  # Heure de début de la dernière pause
+        self.total_time = 0
+        self.current_exchange = 0
+        self.longuest_exchange = 0
         self.reset()
 
     def reset(self):
@@ -108,6 +114,9 @@ class Pong:
         self.right.reset()
         self.ball.reset()
         self.ai_speed = 2
+        self.last_pause_time = None
+        self.longuest_exchange = max(self.longuest_exchange, self.current_exchange)
+        self.current_exchange = 0
         if self.over == False:
             self.pause()
 
@@ -132,6 +141,12 @@ class Pong:
             elif self.right.y > target_y:
                 self.right.move(-move_amount)
 
+    def save_game_duration(self):
+        if self.start_time and self.end_time:
+            total_time = self.end_time - self.start_time - self.paused_time  # Soustraire le temps de pause
+            print(f"Game duration (excluding pauses): {total_time} seconds")
+            self.total_time = total_time
+
     def update_score(self):
         if self.ball.x > 100:
             self.score[0] += 1
@@ -139,12 +154,15 @@ class Pong:
             self.score[1] += 1
         if self.score[0] >= SCORE_MAX or self.score[1] >= SCORE_MAX:
             self.over = True
+            self.end_time = time.time()  # Enregistre l'heure de fin quand la partie est terminée
+            self.save_game_duration()  # Sauvegarde la durée du jeu
 
     def update_ball(self):
         self.ball.update()
         self.ball.bounce_top_bottom()
-        self.ball.bounce_paddle(self.left)
-        self.ball.bounce_paddle(self.right)
+        if self.ball.bounce_paddle(self.left) or self.ball.bounce_paddle(self.right):
+            self.current_exchange += 1
+            print(f"current exchange: {self.current_exchange}")
         if self.ball.is_out():
             self.update_score()
             self.reset()
@@ -163,10 +181,22 @@ class Pong:
         }
 
     def toggle_pause(self):
-        self.paused = not self.paused
-        
+        if self.paused:
+            self.resume()
+        else: 
+            self.pause()
+
+    def resume(self):
+        if self.last_pause_time:
+            self.paused_time += time.time() - self.last_pause_time  # Ajouter le temps passé en pause
+        self.paused = False
+        self.last_pause_time = None
+        print(f"RESUME - paused time: {self.paused_time}")
+
     def pause(self):
         self.paused = True
+        self.last_pause_time = time.time()
+        print("PAUSE")
 
     def is_paused(self):
         return self.paused

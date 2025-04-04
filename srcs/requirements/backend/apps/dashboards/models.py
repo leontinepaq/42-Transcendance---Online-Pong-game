@@ -74,22 +74,26 @@ class Game(models.Model):
     finished = models.BooleanField(default=False)
 
     @classmethod
-    def create(cls, id1, id2, score_1, score_2):
+    def create(cls, id1, id2, score_1, score_2, duration=None, longest_exchange=None):
         return cls.objects.create(player1=Participant.get(id1),
                                   player2=Participant.get(id2),
                                   winner=Participant.get(id1) if score_1 > score_2
                                   else Participant.get(id2),
                                   score_player1=score_1,
-                                  score_player2=score_2)
+                                  score_player2=score_2,
+                                  duration=duration,
+                                  longest_exchange=longest_exchange)
 
     @classmethod
-    def create_ai(cls, id_player, score_player, score_ai):
+    def create_ai(cls, id_player, score_player, score_ai, duration=None, longest_exchange=None):
         return cls.objects.create(player1=Participant.get(id_player),
                                   player2=Participant.get_ai(),
                                   winner=Participant.get_ai() if score_ai > score_player
                                   else Participant.get(id_player),
                                   score_player1=score_player,
-                                  score_player2=score_ai)
+                                  score_player2=score_ai,
+                                  duration=duration,
+                                  longest_exchange=longest_exchange)
 
 
 class Tournament(models.Model):
