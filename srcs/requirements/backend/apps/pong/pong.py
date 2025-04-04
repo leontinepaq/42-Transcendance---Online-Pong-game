@@ -1,6 +1,8 @@
 import random
 import math
 import time
+import json
+
 
 SCORE_MAX = 3
 
@@ -93,12 +95,16 @@ class Ball:
         }
 
 class Pong:
+    predicted_y = 50
+    ai_speed = 2
+
     def __init__(self, use_ai=True):
         self.ball = Ball()
         self.left = Paddle()
         self.right = Paddle(right=True)
         self.score = [0, 0]
         self.use_ai = use_ai
+        self.last_ai_update_time = time.time() # ajout last maj
         self.paused = True
         self.over = False
         self.start_time = time.time()  # Heure de début
@@ -119,22 +125,51 @@ class Pong:
         self.current_exchange = 0
         if self.over == False:
             self.pause()
+        self.last_ai_update_time = time.time() - 1
+        self.predicted_y = 50
 
     def move_paddle(self, side, delta):
         if side == "left":
             self.left.move(delta)
         elif side == "right":
             self.right.move(delta)
+    
+    def predict_ball_y(self):
+        # Si la balle va vers la gauche
+        if self.ball.velocity_x <= 0:
+            # return 50 # on revient au milieu
+            return self.predicted_y # ne pas bouger
 
+        delta_t = (100 - self.ball.x) / self.ball.velocity_x
+        predicted_y = self.ball.y + self.ball.velocity_y * delta_t
+
+        # Si la balle touche un mur, prévoir le rebond
+        if predicted_y <= 0:
+            predicted_y = -predicted_y  # Simulation de rebond haut
+        elif predicted_y >= 100:
+            predicted_y = 200 - predicted_y  # Simulation de rebond bas
+        return predicted_y
+    
     def update_ai_paddle(self):
-        # if self.use_ai and self.ball.x > 50:  
-        # AI moves only when the ball is on its side
-        if self.ball.x < 60:
-                return
-        reaction_chance = 0.7  # 80% chance to react to ball movement
+        current_time = time.time()
+
+        # Mise à jour de l'IA toutes les secondes
+        if current_time - self.last_ai_update_time >= 1:
+            self.predicted_y = self.predict_ball_y()  # Prédire la position future
+            self.last_ai_update_time = current_time
+
+        # Mouvement de l'IA vers la position prédite de la balle
+        target_y = self.predicted_y
+        distance_to_target = target_y - self.right.y
+        
+        # Ne bouge pas si deja proche du centre du paddle
+        if abs(distance_to_target) < self.right.height / 4:
+            return 
+
+        # Simule comportement humain
+        reaction_chance = 0.8 # 80% chance to react to ball movement
         if random.random() < reaction_chance:
-            # AI aims slightly off
-            target_y = self.ball.y + random.uniform(-10, 10)
+            target_y += random.uniform(-10, 10)
             move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
             if self.right.y < target_y:
                 self.right.move(move_amount)
@@ -177,7 +212,8 @@ class Pong:
             "ball": self.ball.get_state(sym),
             "paused": self.paused,
             "score": score,
-            "over": self.over
+            "over": self.over,
+            "prediction_y": self.predicted_y #@leontinepaq a supp
         }
 
     def toggle_pause(self):

@@ -109,5 +109,6 @@
     "wrongPwdCode" : "Wrong code/Wrong password",
     "wrongPwd" : "Wrong password",
     "wrongCode" : "Wrong code",
-    "error": "Error"
+    "error": "Error",
+    "waiting": "Looking for 2nd player.."
 }

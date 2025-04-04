@@ -53,16 +53,25 @@ class PongSoloGameConsumer(UserConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-
+        print(data)
         if "toggle_pause" in data and data["toggle_pause"]:
             self.game.toggle_pause()
             await self.update()
             return
+        
         if "paddle" in data:
             self.game.move_paddle("left", data["paddle"])
 
+        if "ai_paddle" in data:  # 👈 Ajouter la gestion de l'IA
+            self.game.move_paddle("right", data["ai_paddle"])
+
     async def update(self):
+        test = self.game.get_state()
         await self.send(text_data=json.dumps(self.game.get_state()))
+
+    # async def update_ai_paddle(self):
+    #     move_input = self.game.update_ai_paddle()
+    #     await self.send(text_data=json.dumps({"ai_paddle": move_input}))
 
     async def save_game(self):
         await sync_to_async(Game.create_ai)(id_player=self.user.id,
