@@ -1,4 +1,5 @@
 import navigate from "../router.js";
+import { rmKey } from "./pong.js"
 
 export const navigateAction = [
   {
@@ -8,6 +9,7 @@ export const navigateAction = [
 ];
 
 async function handleNavigate(element, event) {
+  rmKey()
   const route = element.getAttribute("href");
   if (route) await navigate(route);
 }

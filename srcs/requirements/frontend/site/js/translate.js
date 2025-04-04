@@ -65,6 +65,7 @@ function getLanguageFromCookie(username) {
 
 async function changeLanguage(language) {
   const username = sessionStorage.getItem("username");
+  console.log(username)
   if (username)
   {
     setLanguageInCookie(language, username);
@@ -82,6 +83,7 @@ async function applySavedLanguage() {
   if (username)
   {
     let savedLanguage = getLanguageFromCookie(username);
+    console.log(savedLanguage)
     if (!savedLanguage)
     {
       savedLanguage = 'en';

@@ -181,10 +181,10 @@ function drawPrediction(state)
 function addModalGameSoloMulti()
 {    
     // HEADER
-    const modalTitle = document.querySelector('.modal-title');
-    modalTitle.setAttribute('data-i18n', 'congratulations');
-    modalTitle.setAttribute('id', 'winnerModalLabel');
-    modalTitle.textContent = 'Congratulations !';
+    // const modalTitle = document.querySelector('.modal-title');
+    // modalTitle.setAttribute('data-i18n', 'congratulations');
+    // modalTitle.setAttribute('id', 'winnerModalLabel');
+    // modalTitle.textContent = 'Congratulations !';
 
     // BODY
     modalBody = document.querySelector('.modal-body');
@@ -232,6 +232,7 @@ function rmModalParam()
     const title = document.getElementById('winnerModalLabel');
     if (title)
     {
+      // title.remove()
       title.setAttribute('data-i18n', '');
       title.textContent = '';
     }
@@ -258,8 +259,10 @@ function showWinnerGame(name)
     const winnerName = document.getElementById("winner-name");
     if (name === "one")
       winnerName.textContent = "player 1";
-    else
+    else if (name === "two" && mode === "multi")
       winnerName.textContent = "player 2";
+    else
+      winnerName.textContent = "Computer"
     winnerModal.show();
     doLanguage();
   }
@@ -292,6 +295,7 @@ function eventClose()
   if (closeendgame)
   {
     closeendgame.addEventListener("click", function () {
+      rmKey();
       rmModalParam();
       navigate("home");
     });
@@ -301,6 +305,7 @@ function eventClose()
   if (closeendgame1)
   {
     closeendgame1.addEventListener("click", function () {
+      rmKey();
       rmModalParam();
       navigate("playerMode");
     });
@@ -336,7 +341,7 @@ function addKey()
   document.addEventListener("keyup", keyUpHandler);
 }
 
-function rmKey()
+export function rmKey()
 {
   document.removeEventListener("keydown", keyDownHandler);
   document.removeEventListener("keyup", keyUpHandler);
@@ -370,6 +375,7 @@ function messageSocket() {
           modalBody.textContent = state.message;
           const waitingModal = new bootstrap.Modal(document.getElementById("myModal"));
           waitingModal.show();
+          doLanguage()
         }
         return ;
     }
@@ -522,6 +528,29 @@ function setupGame()
   eventHandleButton();
 }
 
+function showPlayerName(mode)
+{
+  const player1 = document.getElementById('player1')
+  const player2 = document.getElementById('player2')
+  if (mode === "solo")
+  {
+    const username = sessionStorage.getItem("username");
+    player1.textContent = username
+    player2.textContent = "Computer";
+  }
+  else if (mode === "multi")
+  {
+    player1.textContent = "Player 1"
+    player2.textContent = "Player 2"
+  }
+  else
+  {
+    const username = sessionStorage.getItem("username");
+    player1.textContent = username
+    player2.textContent = "Player 2"
+  }
+}
+
 function playGame(mode)
 {
   canvas = document.getElementById("gameCanvas");
@@ -531,8 +560,8 @@ function playGame(mode)
   {
     const test = document.querySelector(".modal-body");
     test.setAttribute('data-i18n', 'waiting');
-    doLanguage();
   }
+  showPlayerName(mode);
   rmModalParam();
   statePause();
   resetKey();
