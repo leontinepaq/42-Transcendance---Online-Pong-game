@@ -229,7 +229,7 @@ function addModalGameSoloMulti()
 
 function rmModalParam()
 {
-    const title = document.getElementById('winnerModalLabel');
+    const title = document.querySelector('.modal-title');
     if (title)
     {
       // title.remove()
