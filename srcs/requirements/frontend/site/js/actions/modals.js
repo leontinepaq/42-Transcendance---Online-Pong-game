@@ -69,8 +69,6 @@ export function showModal(
   onClose,
   closeOnClickOutside = true
 ) {
-  console.log("SHOWING MODAL WITH BODY BEING");
-  console.log(body_i18n);
   if (clear) clearModalContent();
 
   getModalElement("title").setAttribute("data-i18n", title_i18n);
@@ -92,7 +90,6 @@ export function showModal(
 }
 
 export function hideModal(triggerCloseEvent = false) {
-  console.log("HIDDING MODAL");
   const modalElement = document.getElementById("myModal");
 
   if (triggerCloseEvent)

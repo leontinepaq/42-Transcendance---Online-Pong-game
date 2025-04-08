@@ -51,6 +51,7 @@ export async function initGameOnline() {
 }
 
 function endGameBackHome() {
+  killGame();
   navigate("home");
 }
 
