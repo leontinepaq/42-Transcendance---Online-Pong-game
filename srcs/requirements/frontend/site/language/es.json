@@ -111,5 +111,10 @@
     "wrongCode": "Código incorrecto",
     "error": "Error",
     "waiting": "En espera de un segundo jugador...",
-    "disconnected": "El jugador se desconectó"
+    "disconnected": "El jugador se desconectó",
+    "invalidName": "Nombre inválido",
+    "invalidID": "ID inválido",
+    "alreadyRegistered": "Ya estás registrado para este torneo",
+    "tooManyParticipants": "Este torneo ya tiene 4 participantes",
+    "notRegistered": "No estás registrado para este torneo"
 }

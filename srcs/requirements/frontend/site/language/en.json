@@ -111,5 +111,10 @@
     "wrongCode" : "Wrong code",
     "error": "Error",
     "waiting": "Waiting for 2nd player...",
-    "disconnected": "Player got disconnected"
+    "disconnected": "Player got disconnected",
+    "invalidName": "Invalid name",
+    "invalidID": "Invalid ID",
+    "alreadyRegistered": "You are already registered for this tournament",
+    "tooManyParticipants": "This tournament already has 4 participants",
+    "notRegistered": "You are not registered for this tournament"
 }

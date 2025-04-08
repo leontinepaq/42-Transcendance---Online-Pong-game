@@ -39,6 +39,7 @@ class GameSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'id']
 
 class TournamentSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=50),
     games = GameSerializer(many=True, read_only=True)
     creator = ParticipantSerializer(read_only=True)
     players = ParticipantSerializer(many=True, read_only=True)

@@ -1,8 +1,6 @@
 from django.db import models
 from users.models import UserProfile
-from django.utils.timezone import now
-from datetime import timedelta
-
+from django.shortcuts import get_object_or_404
 
 class Participant(models.Model):
     user = models.ForeignKey(UserProfile,
@@ -111,3 +109,15 @@ class Tournament(models.Model):
                                related_name="winner_of_tournament")
     created_at = models.DateTimeField(auto_now_add=True)
     finished = models.BooleanField(default=False)
+
+    @classmethod
+    def create_tournament(cls, name, creator_id):
+        try:
+            creator_user = UserProfile.objects.get(id=creator_id)
+        except UserProfile.DoesNotExist:
+            raise ValueError("User not found")
+        
+        participant = Participant.get(creator_id)
+        tournament = cls.objects.create(name=name, creator=creator_user)
+        tournament.players.add(participant)
+        return tournament

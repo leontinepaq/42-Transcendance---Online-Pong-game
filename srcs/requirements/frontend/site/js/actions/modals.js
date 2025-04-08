@@ -38,7 +38,14 @@ const errors = {
   "Waiting for 2nd player": "waiting",
   "Player got disconnected": "disconnected",
   "victory": "victory",
-  "lost": "lost"
+  "lost": "lost",
+
+  "Invalid name": "invalidName",
+  "Invalid ID":  "invalidID",
+  "You are already registered for this tournament": "alreadyRegistered",
+  "This tournament already has 4 participants": "tooManyParticipants",
+  "You are not registered for this tournament": "notRegistered"
+
 };
 
 let modal = null;

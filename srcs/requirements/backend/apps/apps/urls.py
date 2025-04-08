@@ -15,5 +15,6 @@ urlpatterns = [
     path('user/', include("users.urls")),
     path('profile/', include("userprofile.urls")),
     path('dashboards/', include("dashboards.urls")),
-    path('friends/', include("friendship.urls"))
+    path('friends/', include("friendship.urls")),
+	path("tournament/", include("tournament.urls")), 
 ]

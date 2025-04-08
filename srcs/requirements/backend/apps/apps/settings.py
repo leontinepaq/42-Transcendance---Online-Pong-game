@@ -40,6 +40,7 @@ INSTALLED_APPS = ['daphne',
                   'userprofile',
                   'dashboards',
                   'friendship',
+				  'tournament',
                   'pong']
 
 # Use Daphne as the ASGI application
