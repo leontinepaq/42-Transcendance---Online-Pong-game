@@ -184,7 +184,6 @@ class Pong:
         if self.start_time and self.end_time:
             total_time = self.end_time - self.start_time - \
                 self.paused_time  # Soustraire le temps de pause
-            print(f"Game duration (excluding pauses): {total_time} seconds")
             self.total_time = total_time
 
     def update_score(self):
@@ -202,7 +201,6 @@ class Pong:
         self.ball.bounce_top_bottom()
         if self.ball.bounce_paddle(self.left) or self.ball.bounce_paddle(self.right):
             self.current_exchange += 1
-            print(f"current exchange: {self.current_exchange}")
         if self.ball.is_out():
             self.update_score()
             self.reset()
@@ -233,12 +231,10 @@ class Pong:
             self.paused_time += time.time() - self.last_pause_time
         self.paused = False
         self.last_pause_time = None
-        print(f"RESUME - paused time: {self.paused_time}")
 
     def pause(self):
         self.paused = True
         self.last_pause_time = time.time()
-        print("PAUSE")
 
     def is_paused(self):
         return self.paused
