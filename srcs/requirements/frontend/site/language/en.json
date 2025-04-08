@@ -97,8 +97,8 @@
     "profile3": "Username already in use.",
     "profile4": "Username too long.",
     "profile5": "Missing username field.",
-    "onlineVictory": "You won, what an amazing victory !",
-    "onlineLose": "You lost, you'll do better next time !",
+    "victory": "You won, what an amazing victory !",
+    "lost": "You lost, you'll do better next time !",
     "invalidUserID" : "Invalid user_id",
     "unexistantUser" : "User does not exist",
     "userIDRequired" : "user_id is required",
@@ -110,6 +110,6 @@
     "wrongPwd" : "Wrong password",
     "wrongCode" : "Wrong code",
     "error": "Error",
-    "waiting": "Looking for 2nd player...",
+    "waiting": "Waiting for 2nd player...",
     "disconnected": "Player got disconnected"
 }

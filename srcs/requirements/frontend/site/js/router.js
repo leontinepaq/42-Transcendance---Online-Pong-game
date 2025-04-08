@@ -1,6 +1,6 @@
 import checkAuth from "./api.js";
 import loadView from "./views.js";
-import closeSocket from "./actions/pong.js";
+import killGame from "./actions/pong.js";
 import { doLanguage } from "./translate.js"
 import connectSocketUsers, { disconnectSocketUsers } from "./chat.js"
 
@@ -9,7 +9,7 @@ window.addEventListener("popstate", async (event) => {
     console.log("route is ", event.state.route);
     const newRoute = await authRedirector(event.state.route);
     console.log("new route is ", newRoute);
-    closeSocket(); // si socket pong open on va la fermer
+    killGame(); // si socket pong open on va la fermer
     loadView(newRoute);
     doLanguage();
   }
@@ -34,7 +34,7 @@ export async function navigate(route, ...params) {
   route = newRoute;
 
   try {
-    closeSocket(); // si socket pong open on va la fermer
+    killGame(); // si socket pong open on va la fermer
     const state = { route, params };
     const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
     history.pushState(state, title, `/${route}`);

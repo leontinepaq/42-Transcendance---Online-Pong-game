@@ -1,13 +1,13 @@
 import random
 import math
 import time
-import json
-
 
 SCORE_MAX = 3
 
+
 def symetric(x):
     return 100 - x
+
 
 class Paddle:
     height = 15
@@ -64,7 +64,8 @@ class Ball:
 
     def bounce_top_bottom(self):
         if self.y <= self.radius or self.y >= 100 - self.radius:
-            self.y = max(self.radius, min(self.y, 100 - self.radius))  # Avoid being stuck in the border
+            # Avoid being stuck in the border
+            self.y = max(self.radius, min(self.y, 100 - self.radius))
             self.velocity_y *= -1
             return True
         return False
@@ -94,6 +95,7 @@ class Ball:
             "r": self.radius
         }
 
+
 class Pong:
     predicted_y = 50
     ai_speed = 2
@@ -104,7 +106,7 @@ class Pong:
         self.right = Paddle(right=True)
         self.score = [0, 0]
         self.use_ai = use_ai
-        self.last_ai_update_time = time.time() # ajout last maj
+        self.last_ai_update_time = time.time()  # ajout last maj
         self.paused = True
         self.over = False
         self.start_time = time.time()  # Heure de début
@@ -121,7 +123,8 @@ class Pong:
         self.ball.reset()
         self.ai_speed = 2
         self.last_pause_time = None
-        self.longuest_exchange = max(self.longuest_exchange, self.current_exchange)
+        self.longuest_exchange = max(
+            self.longuest_exchange, self.current_exchange)
         self.current_exchange = 0
         if self.over == False:
             self.pause()
@@ -133,12 +136,12 @@ class Pong:
             self.left.move(delta)
         elif side == "right":
             self.right.move(delta)
-    
+
     def predict_ball_y(self):
         # Si la balle va vers la gauche
         if self.ball.velocity_x <= 0:
             # return 50 # on revient au milieu
-            return self.predicted_y # ne pas bouger
+            return self.predicted_y  # ne pas bouger
 
         delta_t = (100 - self.ball.x) / self.ball.velocity_x
         predicted_y = self.ball.y + self.ball.velocity_y * delta_t
@@ -149,7 +152,7 @@ class Pong:
         elif predicted_y >= 100:
             predicted_y = 200 - predicted_y  # Simulation de rebond bas
         return predicted_y
-    
+
     def update_ai_paddle(self):
         current_time = time.time()
 
@@ -161,16 +164,17 @@ class Pong:
         # Mouvement de l'IA vers la position prédite de la balle
         target_y = self.predicted_y
         distance_to_target = target_y - self.right.y
-        
+
         # Ne bouge pas si deja proche du centre du paddle
         if abs(distance_to_target) < self.right.height / 4:
-            return 
+            return
 
         # Simule comportement humain
-        reaction_chance = 0.8 # 80% chance to react to ball movement
+        reaction_chance = 0.6  # 80% chance to react to ball movement
         if random.random() < reaction_chance:
             target_y += random.uniform(-10, 10)
-            move_amount = self.ai_speed * random.uniform(0.8, 1.2)  # Imperfect speed
+            move_amount = self.ai_speed * \
+                random.uniform(0.8, 1.2)  # Imperfect speed
             if self.right.y < target_y:
                 self.right.move(move_amount)
             elif self.right.y > target_y:
@@ -178,7 +182,8 @@ class Pong:
 
     def save_game_duration(self):
         if self.start_time and self.end_time:
-            total_time = self.end_time - self.start_time - self.paused_time  # Soustraire le temps de pause
+            total_time = self.end_time - self.start_time - \
+                self.paused_time  # Soustraire le temps de pause
             print(f"Game duration (excluding pauses): {total_time} seconds")
             self.total_time = total_time
 
@@ -203,9 +208,9 @@ class Pong:
             self.reset()
 
     def get_state(self, sym=False):
-        score=[self.score[0], self.score[1]]
+        score = [self.score[0], self.score[1]]
         if sym:
-            score=[self.score[1], self.score[0]]
+            score = [self.score[1], self.score[0]]
         return {
             "left": self.left.get_state(sym),
             "right": self.right.get_state(sym),
@@ -213,18 +218,19 @@ class Pong:
             "paused": self.paused,
             "score": score,
             "over": self.over,
-            "prediction_y": self.predicted_y #@leontinepaq a supp
+            "prediction_y": self.predicted_y  # @leontinepaq a supp
         }
 
     def toggle_pause(self):
         if self.paused:
             self.resume()
-        else: 
+        else:
             self.pause()
 
     def resume(self):
         if self.last_pause_time:
-            self.paused_time += time.time() - self.last_pause_time  # Ajouter le temps passé en pause
+            # Ajouter le temps passé en pause
+            self.paused_time += time.time() - self.last_pause_time
         self.paused = False
         self.last_pause_time = None
         print(f"RESUME - paused time: {self.paused_time}")

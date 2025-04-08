@@ -40,7 +40,7 @@ async function refreshToken() {
 
 export function handleError(error, message = "An error occurred") {
   console.error(`${message}:`, error);
-  showModal(`${error.message}`, "error");
+  showModal("error", `${error.message}`);
 }
 
 export async function authFetchJson(url, options = {}) {

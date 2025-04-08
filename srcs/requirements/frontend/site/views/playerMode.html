@@ -1,15 +1,22 @@
 <div class="row w-100 justify-content-center mt-4"></div>
 <div class="col-12 col-md-6 col-lg-4 d-flex flex-column gap-3">
-  <button data-i18n="solo" data-action="playGameSolo" class="btn nav-btn">SOLO</button>
+    <a data-i18n="solo" data-action="play-game" data-mode="solo" class="btn nav-btn" href="pong">
+    SOLO
+    </a>
   <button
     data-i18n="multiplayer"
-    data-action="playGameMultiplayer"
-    class="btn nav-btn"
-    id="multiplayer-btn"
-  >
+    href = "pong"
+    data-action="play-game"
+    data-mode="multi"
+    class="btn nav-btn">
     MULTIPLAYER
   </button>
-  <button data-i18n="online" data-action="playGameOnline" class="btn nav-btn" id="online-btn">
+  <button
+    data-i18n="online"
+    href = "pong"
+    data-action="play-game"
+    data-mode="online"
+    class="btn nav-btn">
     ONLINE
   </button>
 </div>
