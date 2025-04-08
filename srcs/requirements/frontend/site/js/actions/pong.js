@@ -67,7 +67,7 @@ function sendTogglePause() {
 
 function playGame()
 {
-  game = new Game("gameCanvas");
+  game = new Game();
   socket = new WebSocket(links[mode]);
   updatePlayerName("");
   
