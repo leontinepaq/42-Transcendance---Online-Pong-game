@@ -116,5 +116,7 @@
     "invalidID": "ID invalide",
     "alreadyRegistered": "Vous êtes déjà inscrit a ce tournoi",
     "tooManyParticipants": "Ce tournoi a déjà 4 participants",
-    "notRegistered": "Vous n'êtes pas inscrit à ce tournoi"
+    "notRegistered": "Vous n'êtes pas inscrit à ce tournoi",
+    "previous": "PRECEDENT",
+    "next": "SUIVANT"
 }

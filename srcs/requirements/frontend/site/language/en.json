@@ -116,5 +116,7 @@
     "invalidID": "Invalid ID",
     "alreadyRegistered": "You are already registered for this tournament",
     "tooManyParticipants": "This tournament already has 4 participants",
-    "notRegistered": "You are not registered for this tournament"
+    "notRegistered": "You are not registered for this tournament",
+    "previous": "PREVIOUS",
+    "next": "NEXT"
 }

@@ -1,6 +1,7 @@
 import { authFetchJson, handleError } from "../api.js";
 import { createHistogram, createDoughnutChart, initChartJS } from "../charts.js";
 import { colors, chartTheme } from "../theme.js";
+import { updatePaginationBtns } from "./pagination.js"
 
 initChartJS();
 
@@ -77,8 +78,8 @@ function createGameCard(game) {
   `;
 }
 
-function displayGameCards(data) {
-  const games = data.results; // ⚠️ Correction ici
+export function displayGameCards(data) {
+  const games = data.results;
   const container = document.getElementById("game-history-container");
   container.innerHTML = games.map(createGameCard).join("");
 }
@@ -187,6 +188,7 @@ async function displayGameHistory(userId) {
     : `api/dashboards/match-history/`;
   const games = await authFetchJson(endpoint, { method: "GET" });
   displayGameCards(games);
+  updatePaginationBtns(games);
 }
 
 export async function loadUserStats(userId = null) {
@@ -197,3 +199,4 @@ export async function loadUserStats(userId = null) {
     handleError(error, "Load user stats error");
   }
 }
+
