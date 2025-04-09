@@ -55,7 +55,6 @@ class PongSoloGameConsumer(UserConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(data)
         if "toggle_pause" in data and data["toggle_pause"]:
             self.game.toggle_pause()
             await self.update()
