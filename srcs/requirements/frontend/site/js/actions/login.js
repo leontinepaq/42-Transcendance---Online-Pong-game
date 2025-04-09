@@ -60,7 +60,7 @@ export async function handleAuth(element, event) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password, two_factor_code }),
     });
-    sessionStorage.setItem("username", username); //todo @leontinepaq checker si utile / si ok qd change username
+    sessionStorage.setItem("username", username);
     console.log("Login successful");
     navigate("home");
   } catch (error) {

@@ -33,6 +33,7 @@ body {
 
 #app {
   min-height: calc(100vh - 24rem); /* 100vh minus navbar height * 2 to be centered*/
+  margin-bottom: 6rem;
   display: flex;
   justify-content: center;
   align-items: flex-start;

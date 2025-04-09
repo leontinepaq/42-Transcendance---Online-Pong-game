@@ -83,7 +83,3 @@ export function initEventDelegation() {
  *  - actions/login.js avec les deux actions a faire sur cette page: signin ou forgot-pwd
 
 */
-
-// todo @leontinepaq voir si mieux de le faire que sur l'app
-// const app = document.getElementById("body");
-// app.addEventListener("click", async (event) => {
