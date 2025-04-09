@@ -129,32 +129,3 @@ export function showModalWithCustomUi(
 
 export default showModal;
 
-// export function showModal(title_i18n, bodyContent, footerContent = null) {
-//   const modalEl = document.getElementById("myModal");
-//   const modalTitle = modalEl.querySelector(".modal-title");
-//   const modalBody = modalEl.querySelector(".modal-body");
-//   const modalFooter = modalEl.querySelector(".modal-footer");
-
-//   // Mise à jour du titre
-//   modalTitle.setAttribute('data-i18n', title_i18n);
-//   modalTitle.textContent = title_i18n; // Au cas où la traduction ne passe pas immédiatement
-
-//   // Mise à jour du corps du modal
-//   modalBody.innerHTML = ''; // Nettoyage
-//   if (typeof bodyContent === 'string') {
-//     modalBody.setAttribute('data-i18n', bodyContent);
-//     modalBody.textContent = bodyContent; // Fallback
-//   } else {
-//     modalBody.appendChild(bodyContent);
-//   }
-
-//   // Mise à jour du footer
-//   modalFooter.innerHTML = ''; // Nettoyage
-//   if (footerContent) {
-//     modalFooter.appendChild(footerContent);
-//   }
-
-//   const modal = new bootstrap.Modal(modalEl);
-//   modal.show();
-//   doLanguage(); // Appliquer la traduction
-// }

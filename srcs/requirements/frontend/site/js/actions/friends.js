@@ -2,7 +2,7 @@ import { authFetchJson, handleError } from "../api.js";
 import navigate from "../router.js";
 import { show, hide } from "../utils.js";
 import { doLanguage } from "../translate.js"
-import { sendChatUpdateRequest, hideChatById } from "../chat.js"
+import { chat, hideChat } from "../chat.js"
 
 export const friendsActions = [
   {
@@ -181,9 +181,9 @@ async function handleDynamicFriendAction(element) {
     });
     console.log(message + ": ", response);
     await fetchAndDisplayUsers(tab);
-    await sendChatUpdateRequest();
+    await chat.updateList();
     if (actionType === "block-user")
-      hideChatById(userId);
+      hideChat(userId);
   } catch (error) {
     handleError(error, "Error in friend action");
   }

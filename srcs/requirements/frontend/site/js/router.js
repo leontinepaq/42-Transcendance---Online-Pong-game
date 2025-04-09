@@ -2,7 +2,7 @@ import checkAuth from "./api.js";
 import loadView from "./views.js";
 import killGame from "./actions/pong.js";
 import { doLanguage } from "./translate.js"
-import connectSocketUsers, { disconnectSocketUsers } from "./chat.js"
+import chat from "./chat.js"
 
 window.addEventListener("popstate", async (event) => {
   if (event.state) {
@@ -20,8 +20,8 @@ let socket_users = null;
 
 export async function authRedirector(route) {
   const isAuthenticated = await checkAuth();
-  if (isAuthenticated) connectSocketUsers();
-  else disconnectSocketUsers();
+  if (isAuthenticated) chat.connect();
+  else chat.disconnect();
   if (isAuthenticated && publicRoutes.has(route)) return "home";
   else if (!isAuthenticated && !publicRoutes.has(route)) return "login";
   return route;

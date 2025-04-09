@@ -67,6 +67,7 @@ class CommonConsumer(UserConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         data["sender"] = self.user.id
+        data["sender_username"] = self.user.username
 
         if data["type"] == "update":
             return await self.toggle_update({})

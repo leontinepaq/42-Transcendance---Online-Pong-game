@@ -1,86 +1,211 @@
 import navigate from "./router.js";
-import {initGameOnline} from "./actions/pong.js"
+import { initGameOnline } from "./actions/pong.js";
 import { show, hide } from "./utils.js";
 
-let socket_users = null;
-let reconnect = true;
-
-async function updateFriendList(data) {
-  const friendListContainer = document.getElementById("chat-users");
-  if (!friendListContainer) {
-    console.error("❌ Friend list container not found!");
-    return;
+class Chat {
+  constructor() {
+    this.socket = null;
+    this.reconnect = true;
+    this.bubbles = new Map();
   }
 
-  friendListContainer.innerHTML = "";
+  getBubble(id, username = "") {
+    if (this.bubbles.has(id)) {
+      return this.bubbles.get(id);
+    }
+  
+    const bubble = new ChatBubble(id, username);
+    this.bubbles.set(id, bubble);
+    return bubble;
+  }
 
-  data.forEach((friend) => {
-    const friendElement = document.createElement("li");
-    friendElement.classList.add("chat-user");
-    friendElement.setAttribute("data-id", friend.id);
-    friendElement.setAttribute("data-username", friend.username);
-    friendElement.setAttribute("data-action", "open-chat");
-    friendElement.innerHTML = friend.username;
-    if (friend.online) friendElement.classList.add("user-online");
-    friendListContainer.appendChild(friendElement);
-  });
-}
-
-export async function connectSocketUsers() {
-  if (socket_users !== null) return;
-  socket_users = new WebSocket("/ws/users/");
-
-  document.getElementsByTagName("footer")[0].classList.remove("d-none");
-
-  socket_users.onopen = function () {
+  onopen() {
     console.log("✅ WebSocket Users connected!");
-  };
+    show(getFooter());
+  }
 
-  socket_users.onerror = function (error) {
+  onerror() {
     console.error("❌ WebSocket Users error:", error);
-    setTimeout(connectSocketUsers, 5000);
-  };
+    this.socket = null;
+    setTimeout(this.connect, 5000);
+  }
 
-  socket_users.onclose = function () {
+  onclose() {
     console.log("🔴 WebSocket Users closed.");
-    socket_users = null;
+    this.socket = null;
     const friendListContainer = document.getElementById("chat-users");
     friendListContainer.innerHTML = "";
-    if (reconnect) setTimeout(connectSocketUsers, 1500);
-  };
+    if (this.reconnect) setTimeout(this.connect, 1500);
+  }
 
-  socket_users.onmessage = function (event) {
+  onmessage(event) {
     console.log("Received: ", event);
     const data = JSON.parse(event.data);
 
-    if (data.type === "update") return updateFriendList(data.data);
+    if (data.type === "update")
+      return updateFriendList(data.data);
     if (data.type === "offline" || data.type === "blocked")
-    {
-      if (data.init === "message")
-        return lastMsgNotReceived(data.receiver, data.type === "blocked")
-      if (data.init === "game")
-        return gameRefused(data.receiver)
-    }
-    if (data.type === "message") return addMessageUi(data.sender, data.message, false);
-    if (data.type === "game") return addGameProposalUi(data.sender);
-  };
-}
+      return this.getBubble(data.receiver).setMsgNotReceived(data.type === "blocked");
+    if (data.type === "message")
+      return this.getBubble(data.sender, data.sender_username).addReceivedMessage(data.message);
+    // if (data.type === "game") return addGameProposalUi(data.sender);
+  }
 
-export async function disconnectSocketUsers() {
-  if (socket_users === null) return;
-  socket_users.close();
-  socket_users = null;
-  document.getElementsByTagName("footer")[0].classList.add("d-none");
-  reconnect = false;
-}
+  connect() {
+    if (this.socket === null) this.socket = new WebSocket("/ws/users/");
 
-export async function sendChatUpdateRequest() {
-  socket_users.send(
-    JSON.stringify({
-      type: "update",
+    this.socket.onopen = this.onopen.bind(this);
+    this.socket.onerror = this.onerror.bind(this);
+    this.socket.onclose = this.onclose.bind(this);
+    this.socket.onmessage = this.onmessage.bind(this);
+  }
+
+  disconnect() {
+    if (this.socket === null) return;
+    this.socket.close();
+    this.socket = null;
+    hide(getFooter());
+    this.reconnect = false;
+  }
+
+  updateList() {
+    this.send({type: "update"});
+  }
+
+  sendMessage(receiverId, msg)
+  {
+    this.send({
+      type: "message",
+      receiver: receiverId,
+      message: msg
     })
-  );
+  }
+
+  sendGame(receiverId)
+  {
+    this.send({
+      type: "game",
+      receiver: receiverId
+    })
+  }
+
+  send(message) {
+    this.socket.send(JSON.stringify(message));
+  }
 }
+
+export const chat = new Chat();
+
+
+function createMessageElement(msg, sent = true) {
+  const msgElement = document.createElement("li");
+  msgElement.innerText = msg;
+  msgElement.classList.add("msg");
+  if (sent) msgElement.classList.add("msg-sent");
+  else msgElement.classList.add("msg-received");
+  return msgElement;
+}
+
+class ChatBubble {
+  constructor(id, username) {
+    this.bubble = createChatBubble(id, username, false);
+    this.msgArea  = getMessageArea(id);
+    this.dropdown = document.getElementById("dropdown-toggle-" + id);
+    this.dropdownInstance = new bootstrap.Dropdown(this.dropdown);
+    this.dropdown.addEventListener("show.bs.dropdown", this.unsetFlickering.bind(this));
+  }
+
+  open() {
+    setTimeout(() => {this.dropdownInstance.show();}, 50);
+  }
+
+  isOpened() {
+    return this.bubble.firstElementChild.classList.contains("show");
+  }
+
+  setFlickering() {
+    this.bubble.firstElementChild.classList.add("flickering");
+  }
+
+  unsetFlickering() {
+    this.bubble.firstElementChild.classList.remove("flickering");
+  }
+
+  addMessage(message, sent) {
+    const messageElement = createMessageElement(message, sent = sent);
+    this.msgArea.prepend(messageElement);
+    this.msgArea.scrollTop = this.msgArea.scrollHeight;
+    if (sent === false && !this.isOpened())
+      this.setFlickering();
+  }
+
+  addReceivedMessage(message) {
+    this.addMessage(message, false);
+  }
+
+  addSentMessage(message){
+    this.addMessage(message, true);
+  }
+
+  setMsgNotReceived(blocked = false) {
+    this.msgArea.firstChild.classList.add("msg-alert");
+    const offlineMsg = document.createElement("li");
+    offlineMsg.classList.add("offline");
+    offlineMsg.innerText = "User is offline.";
+    if (blocked) offlineMsg.innerText = "User blocked you.";
+    this.msgArea.prepend(offlineMsg);
+  }
+}
+
+//CHAT FRIEND LIST
+
+function getFriendListContainer() {
+  return document.getElementById("chat-users");
+}
+
+function clearFriendListContainer() {
+  getFriendListContainer().innerHTML = "";
+}
+
+function createFriendListElement(id, username, online) {
+  const element = document.createElement("li");
+  element.classList.add("chat-user");
+  element.setAttribute("data-id", id);
+  element.setAttribute("data-username", username);
+  element.setAttribute("data-action", "open-chat");
+  element.innerHTML = username;
+  if (online) element.classList.add("user-online");
+  return element;
+}
+
+async function updateFriendList(data) {
+  clearFriendListContainer();
+
+  data.forEach((friend) => {
+    var friendElement = createFriendListElement(
+      friend.id,
+      friend.username,
+      friend.online
+    );
+    getFriendListContainer().appendChild(friendElement);
+  });
+}
+
+// SEND TO SOCKET
+
+function sendMessageOnEnter(event) {
+  if (event.key !== "Enter")
+      return ;
+  event.preventDefault();
+
+  const userId = event.target.dataset.id;
+  const message = event.target.value;
+  chat.sendMessage(userId, message);
+  event.target.value = "";
+  new ChatBubble(userId).addSentMessage(message);
+}
+
+// CHAT BUBBLE CREATION/OPEN/CLOSE
 
 function chatBubbleContent(id, username) {
   const content = `
@@ -112,94 +237,27 @@ function chatBubbleContent(id, username) {
   return content.replaceAll("$id", id).replaceAll("$username", username);
 }
 
-function sendChatMessage(event) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    const user_id = event.target.dataset.id;
-    const msg = event.target.value;
-    socket_users.send(
-      JSON.stringify({
-        type: "message",
-        receiver: user_id,
-        message: msg,
-      })
-    );
-    event.target.value = "";
-    addMessageUi(user_id, msg, true);
+function createChatBubble(userId, username, open = true) {
+  var bubble = getChatBubble(userId);
+
+  if (!bubble) {
+    bubble = document.createElement("div");
+    bubble.classList.add("btn-group", "dropup", "dropup-chat");
+    bubble.id = "bubble-" + userId;
+    bubble.innerHTML = chatBubbleContent(userId, username);
+    getFooter().appendChild(bubble);
+    getChatInput(userId).addEventListener("keydown", sendMessageOnEnter);
   }
-}
-
-function sendPongFromChat(element, event) {
-  const user_id = element.dataset.id;
-  socket_users.send(JSON.stringify({ type: "game", receiver: user_id }));
-  navigate("pong");
-  initGameOnline();
-}
-
-function createMessageUi(msg, sent = true) {
-  const msgUi = document.createElement("li");
-  msgUi.innerText = msg;
-  msgUi.classList.add("msg");
-  if (sent) msgUi.classList.add("msg-sent");
-  else msgUi.classList.add("msg-received");
-  return msgUi;
-}
-
-function addMessageUi(id, msg, sent = true) {
-  const bubble = createChatBubbleById(id, false);
-  const msgArea = getMessageArea(id);
-  msgArea.prepend(createMessageUi(msg, sent));
-  msgArea.scrollTop = msgArea.scrollHeight;
-  if (sent === false && !bubble.firstElementChild.classList.contains("show")) 
-    bubble.firstElementChild.classList.add("flickering");
-}
-
-function lastMsgNotReceived(id, blocked = false) {
-  const msgArea = getMessageArea(id);
-  msgArea.firstChild.classList.add("msg-alert");
-  const offlineMsg = document.createElement("li");
-  offlineMsg.classList.add("offline");
-  offlineMsg.innerText = "User is offline.";
-  if (blocked) offlineMsg.innerText = "User blocked you.";
-  msgArea.prepend(offlineMsg);
-}
-
-export function createChatBubble(element, event, open = true) {
-  const user_id = element.dataset.id;
-  const username = element.dataset.username;
-  var bubble = getChatBubble(user_id);
-
-  if (bubble) {
-    hide(bubble);
-    if (open)
-      setTimeout(() => {
-        openDropDown(user_id);
-      }, 50);
-    return bubble;
-  }
-
-  bubble = document.createElement("div");
-  bubble.classList.add("btn-group", "dropup", "dropup-chat");
-  bubble.id = "bubble-" + user_id;
-  bubble.innerHTML = chatBubbleContent(user_id, username);
-  bubble.addEventListener("click", setFlickering);
-  getFooter().appendChild(bubble);
-  getChatInput(user_id).addEventListener("keydown", sendChatMessage);
-  if (open)
-    setTimeout(() => {
-      openDropDown(user_id);
-    }, 50);
+  if (open) openDropDown(userId);
   return bubble;
-}
-
-function setFlickering(event) {
-  event.target.classList.remove("flickering");
 }
 
 export function createChatBubbleById(id, open) {
   const element = document.querySelector(`[data-id="` + id + `"`);
   return createChatBubble(element, null, open);
 }
+
+// Element getters
 
 function getChatBubble(id) {
   return document.getElementById("bubble-" + id);
@@ -217,41 +275,21 @@ function getFooter() {
   return document.getElementsByTagName("footer")[0];
 }
 
-function openDropDown(id) {
-  var dropdown = document.getElementById("dropdown-toggle-" + id);
-  var dropdownInstance = new bootstrap.Dropdown(dropdown);
-  dropdownInstance.show();
-}
-
-function navigateToStatsFromChat(element) {
-  const userId = element.dataset.id;
-  if (!userId) {
-    console.error(`Invalid user: ${userId}`);
-    return;
-  }
-  console.log("navigating to dashbord");
-  navigate("dashboard", userId);
-}
-
-export function hideChat(element) {
-  const id = element.dataset.id;
+export function hideChat(id) {
   const bubble = getChatBubble(id);
   if (bubble) show(bubble);
 }
 
-export function hideChatById(id) {
-  const bubble = getChatBubble(id);
-  if (bubble) show(bubble);
-}
+// ACTIONS
 
 export const chatActions = [
   {
     selector: '[data-action="open-chat"]',
-    handler: createChatBubble,
+    handler: createChatBubbleAction,
   },
   {
     selector: '[data-action="connect-chat"]',
-    handler: connectSocketUsers,
+    handler: chat.connect,
   },
   {
     selector: '[data-action="open-profile"]',
@@ -259,7 +297,7 @@ export const chatActions = [
   },
   {
     selector: '[data-action="hide-chat"]',
-    handler: hideChat,
+    handler: hideChatAction,
   },
   {
     selector: '[data-action="launch-pong"]',
@@ -267,4 +305,25 @@ export const chatActions = [
   },
 ];
 
-export default connectSocketUsers;
+export function createChatBubbleAction(element) {
+  const userId = element.dataset.id;
+  const username = element.dataset.username;
+  chat.getBubble(userId, username).open();
+}
+
+function navigateToStatsFromChat(element) {
+  const userId = element.dataset.id;
+  navigate("dashboard", userId);
+}
+
+export function hideChatAction(element) {
+  const id = element.dataset.id;
+  hideChat(id);
+}
+
+function sendPongFromChat(element) {
+  const userId = element.dataset.id;
+  chat.sendGame(userId);
+}
+
+export default chat;
