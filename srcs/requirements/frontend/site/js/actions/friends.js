@@ -1,8 +1,8 @@
 import { authFetchJson, handleError } from "../api.js";
-import navigate from "../router.js";
+import { navigate } from "../router.js";
 import { show, hide } from "../utils.js";
-import { doLanguage } from "../translate.js"
-import { chat, hideChat } from "../chat.js"
+import { chat, hideChat } from "../chat.js";
+import { UserUI } from "../ui/UserUI.js";
 
 export const friendsActions = [
   {
@@ -14,7 +14,7 @@ export const friendsActions = [
     handler: navigateToStats,
   },
   {
-    selector: '[data-bs-toggle="pill"]',
+    selector: '#friends-section [data-bs-toggle="pill"]',
     handler: switchFriendsTab,
   },
 ];
@@ -30,67 +30,6 @@ const TABS = {
   all: "api/profile/all/",
 };
 
-const ACTION_BUTTONS = {
-  friends: [{ type: "delete-friend", icon: "remove", class: "btn-red" }],
-  pending: [
-    { type: "accept-request", icon: "check", class: "btn-green" },
-    { type: "decline-request", icon: "close", class: "btn-red" },
-  ],
-  blocked: [{ type: "unblock-user", icon: "remove", class: "btn-red" }],
-  all: [
-    { type: "send-request", icon: "add", class: "btn-green" },
-    { type: "block-user", icon: "block", class: "btn-red" },
-  ],
-};
-
-const VIEW_STATS_BUTTON = { type: "view-stats", icon: "emoji_events", class: "" };
-
-function getUserCardButtons(tabKey) {
-  const viewStatsButton = createButton(VIEW_STATS_BUTTON, "view-stats");
-  const buttons = ACTION_BUTTONS[tabKey] || [];
-  const actionButtons = buttons
-    .map((btn) => createButton(btn, "friend-action"))
-    .join("");
-  return viewStatsButton + actionButtons;
-}
-
-function createButton({ type, icon, class: btnClass }, action) {
-  return `
-    <button type="button" class="btn ${btnClass}" data-action="${action}" data-type="${type}">
-      <span class="material-symbols-outlined">${icon}</span>
-    </button>
-  `;
-}
-
-function createUserCard(user, tabKey) {
-  var msgButton = "";
-  if (tabKey !== "blocked")
-    msgButton = `
-      <button type="button" class="btn chat-btn" data-action="open-chat" 
-      data-id="${user.id}" data-username="${user.username}">
-        <span class="material-symbols-outlined">chat</span>
-      </button>`;
-  return `
-    <div class="card card-user neon-border mt-4 gap-3" data-user-id="${user.id}">
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="d-flex align-items-center">
-            <img src="${user.avatar_url}" alt=${user.username} class="avatar-80 img-fluid" />
-            <div class="infos ms-3">
-              <div class="username">${user.username}</div>
-              <div class="mail">${user.email}</div>
-            </div>
-          </div>
-          <div class="button-container">
-            ${msgButton}    
-            ${getUserCardButtons(tabKey)}
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
 async function fetchAndDisplayUsers(tab) {
   updatePendingCount();
   try {
@@ -98,7 +37,7 @@ async function fetchAndDisplayUsers(tab) {
     if (!apiPath) return;
     const users = await authFetchJson(apiPath);
     const container = document.getElementById(`pills-${tab}`);
-    container.innerHTML = users.map((user) => createUserCard(user, tab)).join("");
+    container.innerHTML = users.map((t) => UserUI.createUserCard(t, tab)).join("");
   } catch (error) {
     handleError(error, "Display user error");
   }
@@ -110,7 +49,7 @@ async function updatePendingCount() {
     const count = data.pending_count;
 
     const badge = document.getElementById("pending-count");
-    
+
     if (count > 0) {
       badge.textContent = count;
       show(badge);
@@ -182,8 +121,7 @@ async function handleDynamicFriendAction(element) {
     console.log(message + ": ", response);
     await fetchAndDisplayUsers(tab);
     await chat.updateList();
-    if (actionType === "block-user")
-      hideChat(userId);
+    if (actionType === "block-user") hideChat(userId);
   } catch (error) {
     handleError(error, "Error in friend action");
   }

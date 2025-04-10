@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from dashboards.models import Tournament
+from dashboards.serializers import ParticipantSerializer
 
 class TournamentCreateSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=50)
@@ -7,13 +8,21 @@ class TournamentCreateSerializer(serializers.Serializer):
 class TournamentSuccessResponseSerializer(serializers.Serializer):
     id = serializers.IntegerField()
 
-class displayTournamentSerializer(serializers.ModelSerializer):
+class DisplayTournamentSerializer(serializers.ModelSerializer):
     creator_username = serializers.CharField(source="creator.username")
     creator_avatar = serializers.CharField(source="creator.avatar_url")
-    
+    participants = serializers.SerializerMethodField()
+    winner = ParticipantSerializer(read_only=True)
+
     class Meta:
         model = Tournament
-        fields = ['id', 'name', 'created_at', 'creator_username', 'creator_avatar']
+        fields = ['id', 'name', 'created_at', 'creator_username', 'creator_avatar', 'participants', 'winner']
+
+    def get_participants(self, obj):
+        # Récupérer les 4 premiers participants du tournoi
+        participants = obj.players.all()[:4]  # Limité à 4 participants maximum
+        return ParticipantSerializer(participants, many=True).data
+
 
 class TournamentRegisterSerializer(serializers.Serializer):
     tournament_id = serializers.IntegerField()

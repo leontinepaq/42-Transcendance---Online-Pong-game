@@ -5,7 +5,7 @@ from drf_spectacular.utils import extend_schema
 from dashboards.models import Tournament, Participant
 from rest_framework.pagination import PageNumberPagination
 from .serializers import (TournamentCreateSerializer,
-                          displayTournamentSerializer,
+                          DisplayTournamentSerializer,
                           TournamentSuccessResponseSerializer,
                           TournamentRegisterSerializer,
                           ApiResponse,
@@ -49,7 +49,7 @@ class TournamentPagination(PageNumberPagination):
     summary="Display available tournaments",
     description="Display tournaments that are available for participation (less than 4 participants registered and user not registered).",
     responses={
-        200: displayTournamentSerializer(many=True),
+        200: DisplayTournamentSerializer(many=True),
         400: ErrorResponseSerializer,
     }
 )
@@ -72,13 +72,13 @@ def display_available(request):
     paginator = TournamentPagination()
     result_page = paginator.paginate_queryset(available_tournaments, request)
     
-    return paginator.get_paginated_response(displayTournamentSerializer(result_page, many=True).data)
+    return paginator.get_paginated_response(DisplayTournamentSerializer(result_page, many=True).data)
 
 @extend_schema(
     summary="Display registered tournaments",
     description="Display tournaments where the user is registered that are not over.",
     responses={
-        200: displayTournamentSerializer(many=True),
+        200: DisplayTournamentSerializer(many=True),
         400: ErrorResponseSerializer,
     }
 )
@@ -97,7 +97,7 @@ def display_registered(request):
     paginator = TournamentPagination()
     result_page = paginator.paginate_queryset(registered_tournaments, request)
     
-    return paginator.get_paginated_response(displayTournamentSerializer(result_page, many=True).data)
+    return paginator.get_paginated_response(DisplayTournamentSerializer(result_page, many=True).data)
 
 
 @extend_schema(

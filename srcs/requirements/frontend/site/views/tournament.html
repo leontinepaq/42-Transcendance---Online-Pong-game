@@ -1,54 +1,102 @@
-<h2 class="mt-4">ENTER PLAYER'S NAME</h2>
-<!-- <h3 class="mt-4">Match 1</h3> -->
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-      <input
-        data-i18n="player1"
-        type="text"
-        id="player1"
-        class="form-control"
-        placeholder="Player 1"
-        required
-      />
+<div class="col-12 col-md-8 col-lg-8" id="tournament-section" style="min-height: inherit">
+  <ul class="nav nav-pills nav-justified" id="tournament-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link active"
+        id="tab-available"
+        data-bs-toggle="pill"
+        data-bs-target="#pills-available"
+        data-tab="available"
+        type="button"
+        role="tab">
+        AVAILABLE
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="tab-registered"
+        data-bs-toggle="pill"
+        data-bs-target="#pills-registered"
+        data-tab="registered"
+        type="button"
+        role="tab">
+        REGISTERED
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="tab-ongoing"
+        data-bs-toggle="pill"
+        data-bs-target="#pills-ongoing"
+        data-tab="ongoing"
+        type="button"
+        role="tab">
+        ONGOING
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="tab-history"
+        data-bs-toggle="pill"
+        data-bs-target="#pills-history"
+        data-tab="history"
+        type="button"
+        role="tab">
+        HISTORY
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button
+        class="nav-link"
+        id="tab-create"
+        data-bs-toggle="pill"
+        data-bs-target="#pills-create"
+        data-tab="create"
+        type="button"
+        role="tab">
+        CREATE
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-3" id="tournament-tabContent">
+    <div
+      class="tab-pane fade show active"
+      id="pills-available"
+      role="tabpanel"
+      aria-labelledby="tab-available">
+      <!-- Available tournaments -->
     </div>
-    <div class="col-md-4">
-      <input
-        data-i18n="player2"
-        type="text"
-        id="player2"
-        class="form-control"
-        placeholder="Player 2"
-        required
-      />
+    <div
+      class="tab-pane fade"
+      id="pills-registered"
+      role="tabpanel"
+      aria-labelledby="tab-registered">
+      <!-- Registered tournaments -->
+    </div>
+    <div
+      class="tab-pane fade"
+      id="pills-ongoing"
+      role="tabpanel"
+      aria-labelledby="tab-ongoing">
+      <!-- Ongoing tournaments -->
+    </div>
+    <div
+      class="tab-pane fade"
+      id="pills-history"
+      role="tabpanel"
+      aria-labelledby="tab-history">
+      <!-- Tournament history -->
+    </div>
+    <div
+      class="tab-pane fade"
+      id="pills-create"
+      role="tabpanel"
+      aria-labelledby="tab-create">
+      <!-- Create tournament form -->
     </div>
   </div>
 </div>
-<!-- <h3 class="mt-4">Match 2</h3> -->
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-4">
-      <input
-        data-i18n="player3"
-        type="text"
-        id="player3"
-        class="form-control"
-        placeholder="Player 3"
-        required
-      />
-    </div>
-    <div class="col-md-4">
-      <input
-        data-i18n="player4"
-        type="text"
-        id="player4"
-        class="form-control"
-        placeholder="Player 4"
-        required
-      />
-    </div>
-  </div>
-</div>
-<button data-i18n="startTournament" class="btn btn-light mt-5" id="startTournament">
-  START TOURNAMENT
-</button>

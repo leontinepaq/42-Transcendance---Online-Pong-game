@@ -9,7 +9,7 @@ import { profileActions } from "./actions/profile.js";
 import { verify2faEmailActions } from "./actions/validate2faEmail.js";
 import { verify2faAppActions } from "./actions/validate2faApp.js";
 // import { usersActions } from "./actions/users.js";
-// import { tournamentActions } from "./actions/tournament.js";
+import { tournamentActions } from "./actions/tournament.js";
 import { chatActions } from "./chat.js";
 
 // Table des actions à gérer, "..." = concat
@@ -25,7 +25,7 @@ const clickActions = [
   ...profileActions,
   ...verify2faEmailActions,
   ...verify2faAppActions,
-  // ...tournamentActions,
+  ...tournamentActions,
   ...chatActions,
   // ...TwofaActions,
 ];

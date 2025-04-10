@@ -192,14 +192,14 @@ async function updateAvatar() {
 
       if (response.avatar_url) {
         document.getElementById("profile-avatar").src = response.avatar_url;
-        modalBody.setAttribute('data-i18n', 'avatarUpdateYes');
+        modalBody.setAttribute('data-i18n', 'avatarUpdateYes'); //tddo @leontinepaq a changer
       } else {
         modalBody.setAttribute('data-i18n', 'avatarUpdateNo'); 
+        profilModal.show();
       }
     } catch (error) {
       handleError(error, "Update avatar error");;
     }
-    profilModal.show();
     doLanguage();
   });
   

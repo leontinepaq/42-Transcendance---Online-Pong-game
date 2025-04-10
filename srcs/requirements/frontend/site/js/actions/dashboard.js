@@ -2,34 +2,17 @@ import { authFetchJson, handleError } from "../api.js";
 import { createHistogram, createDoughnutChart, initChartJS } from "../charts.js";
 import { colors, chartTheme } from "../theme.js";
 import { updatePaginationBtns } from "./pagination.js"
+import { formatDate, formatDuration } from "../utils.js"; 
 
 initChartJS();
 
-function formatDuration(duration) {
-  if (!duration) return "N/A"; 
-  const parts = duration.split(":");
-  const hours = parseInt(parts[0], 10);
-  const minutes = parseInt(parts[1], 10);
-  const seconds = parseInt(parts[2], 10);
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m ${seconds}s`;
-  }
-  return `${minutes}m ${seconds}s`;
-}
-
 function createGameCard(game) {
   const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
-  const gameDate = new Date(game.created_at).toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
   return `
     <div class="card match-card neon-border mt-4">
       <div class="card-header text-center match-date">
-        <i class="bi bi-calendar2-event-fill dashboard-icon"></i> ${gameDate}
+        <i class="bi bi-calendar2-event-fill dashboard-icon"></i> ${formatDate(game.created_at)}
       </div>
       <div class="card-body d-flex flex-column">
         <div class="d-flex justify-content-between align-items-center">
