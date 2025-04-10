@@ -109,9 +109,9 @@ class Pong:
         self.last_ai_update_time = time.time()  # ajout last maj
         self.paused = True
         self.over = False
-        self.start_time = time.time()  # Heure de début
-        self.paused_time = 0    # Temps total de pause
-        self.last_pause_time = None  # Heure de début de la dernière pause
+        self.start_time = time.time()
+        self.paused_time = 0
+        self.last_pause_time = None
         self.total_time = 0
         self.current_exchange = 0
         self.longuest_exchange = 0
@@ -170,7 +170,7 @@ class Pong:
             return
 
         # Simule comportement humain
-        reaction_chance = 0.6  # 80% chance to react to ball movement
+        reaction_chance = 0.6  # 60% chance to react to ball movement
         if random.random() < reaction_chance:
             target_y += random.uniform(-10, 10)
             move_amount = self.ai_speed * \
@@ -183,7 +183,7 @@ class Pong:
     def save_game_duration(self):
         if self.start_time and self.end_time:
             total_time = self.end_time - self.start_time - \
-                self.paused_time  # Soustraire le temps de pause
+                self.paused_time
             self.total_time = total_time
 
     def update_score(self):
@@ -193,8 +193,8 @@ class Pong:
             self.score[1] += 1
         if self.score[0] >= SCORE_MAX or self.score[1] >= SCORE_MAX:
             self.over = True
-            self.end_time = time.time()  # Enregistre l'heure de fin quand la partie est terminée
-            self.save_game_duration()  # Sauvegarde la durée du jeu
+            self.end_time = time.time()
+            self.save_game_duration()
 
     def update_ball(self):
         self.ball.update()
@@ -216,7 +216,6 @@ class Pong:
             "paused": self.paused,
             "score": score,
             "over": self.over,
-            "prediction_y": self.predicted_y  # @leontinepaq a supp
         }
 
     def toggle_pause(self):
