@@ -45,6 +45,11 @@ class TournamentPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 50
 
+def paginated_response(request, queryset, serializer_class):
+    paginator = TournamentPagination()
+    result_page = paginator.paginate_queryset(queryset, request)
+    return paginator.get_paginated_response(serializer_class(result_page, many=True).data)
+
 @extend_schema(
     summary="Display available tournaments",
     description="Display tournaments that are available for participation (less than 4 participants registered and user not registered).",
@@ -68,15 +73,11 @@ def display_available(request):
     ).exclude(
         players=participant
     )
-
-    paginator = TournamentPagination()
-    result_page = paginator.paginate_queryset(available_tournaments, request)
-    
-    return paginator.get_paginated_response(DisplayTournamentSerializer(result_page, many=True).data)
+    return paginated_response(request, available_tournaments, DisplayTournamentSerializer)
 
 @extend_schema(
     summary="Display registered tournaments",
-    description="Display tournaments where the user is registered that are not over.",
+    description="Display tournaments where the user is registered that are not started.",
     responses={
         200: DisplayTournamentSerializer(many=True),
         400: ErrorResponseSerializer,
@@ -90,14 +91,58 @@ def display_registered(request):
 
     registered_tournaments = Tournament.objects.filter(
         finished=False
+    ).annotate(
+        participant_count=Count('players')
     ).filter(
+        participant_count__lt=4,
         players=participant
     )
+    return paginated_response(request, registered_tournaments, DisplayTournamentSerializer)
 
-    paginator = TournamentPagination()
-    result_page = paginator.paginate_queryset(registered_tournaments, request)
-    
-    return paginator.get_paginated_response(DisplayTournamentSerializer(result_page, many=True).data)
+
+@extend_schema(
+    summary="Display ongoing tournaments",
+    description="Display tournaments where the user is registered that are started but not over.",
+    responses={
+        200: DisplayTournamentSerializer(many=True),
+        400: ErrorResponseSerializer,
+    }
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def display_ongoing(request):
+    user = request.user
+    participant = Participant.get(user.id)
+
+    ongoing_tournaments = Tournament.objects.filter(
+        finished=False
+    ).annotate(
+        participant_count=Count('players')
+    ).filter(
+        players=participant,
+        participant_count=4
+    )
+    return paginated_response(request, ongoing_tournaments, DisplayTournamentSerializer)
+
+@extend_schema(
+    summary="Display history of tournaments",
+    description="Display tournaments where the user was registered that are over.",
+    responses={
+        200: DisplayTournamentSerializer(many=True),
+        400: ErrorResponseSerializer,
+    }
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def display_history(request):
+    user = request.user
+    participant = Participant.get(user.id)
+
+    history_tournaments = Tournament.objects.filter(
+        finished=True,
+        players=participant
+    )
+    return paginated_response(request, history_tournaments, DisplayTournamentSerializer)
 
 
 @extend_schema(
