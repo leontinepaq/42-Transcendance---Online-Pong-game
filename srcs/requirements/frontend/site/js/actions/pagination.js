@@ -1,5 +1,6 @@
 import { authFetchJson, handleError } from "../api.js";
-import { displayGameCards } from "./dashboard.js";
+import { displayGames } from "./dashboard.js";
+import { displayTournaments } from  "./tournament.js";
 
 export const paginationAction = [
   {
@@ -9,8 +10,8 @@ export const paginationAction = [
 ];
 
 const paginationTargetsMap = {
-  "game-history": displayGameCards,
-  // "available-tournaments": displayAvailableTournaments
+  "game-history": displayGames,
+  "tournaments": displayTournaments,
 };
 
 function adaptApiUrl(url) {
@@ -22,6 +23,7 @@ function adaptApiUrl(url) {
 export async function handlePaginationClick(element) {
   const rawUrl = element.dataset.url;
   const target = element.dataset.updatetarget;
+  const tabKey = element.dataset.tab || null;
   if (!rawUrl || !target) {
     console.error("Missing URL or target data for pagination");
     return;
@@ -33,7 +35,7 @@ export async function handlePaginationClick(element) {
 
     const targetHandler = paginationTargetsMap[target];
     if (targetHandler) {
-      targetHandler(data);
+      targetHandler(data, tabKey);
     } else {
       console.error(`Handler not found for target: ${target}`);
     }
@@ -74,8 +76,8 @@ export function updatePaginationBtns(data) {
  *
  * 2. **Mappage des targets aux handlers** : 
  *    - Ajoutez un mappage dans `paginationTargetHandlers` entre le nom de la cible (par ex. "game-history") et la fonction 
- *      qui mettra à jour le contenu pour cette cible (par ex. `displayGameCards`).
- *    - Par exemple : `"game-history": displayGameCards` associe la cible "game-history" au handler `displayGameCards`.
+ *      qui mettra à jour le contenu pour cette cible (par ex. `displayGames`).
+ *    - Par exemple : `"game-history": displayGames` associe la cible "game-history" au handler `displayGames`.
  *
  * 3. **Utilisation** :
  *    - Importez ce module dans d'autres fichiers où vous souhaitez utiliser la pagination.

@@ -1,5 +1,6 @@
 import { authFetchJson, handleError } from "../api.js";
 import { TournamentUI } from "../ui/TournamentUI.js";
+import { createPagination } from "../ui/PaginationUI.js";
 
 export const tournamentActions = [
   {
@@ -23,12 +24,22 @@ const TABS = {
   history: "api/tournament/display_history/",
 };
 
-function displayTournaments(data, tabKey) {
+export function displayTournaments(data, tabKey) {
   const tournaments = data.results;
   const container = document.getElementById(`pills-${tabKey}`);
-  container.innerHTML = tournaments
+
+  const cardsHtml = tournaments
     .map((t) => TournamentUI.createCard(t, tabKey))
     .join("");
+
+  const paginationHtml = createPagination({
+    previous: data.previous,
+    next: data.next,
+    target: "tournaments",
+    tabKey,
+  });
+
+  container.innerHTML = cardsHtml + paginationHtml;
 }
 
 async function fetchAndDisplayTournaments(tab) {

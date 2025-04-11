@@ -2,63 +2,24 @@ import { authFetchJson, handleError } from "../api.js";
 import { createHistogram, createDoughnutChart, initChartJS } from "../charts.js";
 import { colors, chartTheme } from "../theme.js";
 import { updatePaginationBtns } from "./pagination.js"
-import { formatDate, formatDuration } from "../utils.js"; 
+import { formatDuration } from "../utils.js"; 
+import { createPagination } from "../ui/PaginationUI.js";
+import { GameUI } from "../ui/GameUI.js";
 
 initChartJS();
 
-function createGameCard(game) {
-  const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
-
-  return `
-    <div class="card match-card neon-border mt-4">
-      <div class="card-header text-center match-date">
-        <i class="bi bi-calendar2-event-fill dashboard-icon"></i> ${formatDate(game.created_at)}
-      </div>
-      <div class="card-body d-flex flex-column">
-        <div class="d-flex justify-content-between align-items-center">
-          <div class="player-info ${isPlayer1Winner ? "winner" : ""}">
-            <img src="${game.player1.avatar_url}" alt=${game.player1.name} class="avatar-80 img-fluid" alt="${game.player1.name}" />
-            <div class="text-center">
-              <div class="username">
-                ${isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
-                ${game.player1.name}
-              </div>
-              <div class="score">${game.score_player1}</div>
-            </div>
-          </div>
-          <div class="vs">VS</div>
-          <div class="player-info ${!isPlayer1Winner ? "winner" : ""}">
-            <img src="${game.player2.avatar_url}" alt=${game.player2.name} class="avatar-80 img-fluid" alt="${game.player2.name}" />
-            <div class="text-center">
-              <div class="username">
-                ${!isPlayer1Winner ? '<i class="bi bi-trophy-fill fs-6"></i>' : ""}
-                ${game.player2.name}
-              </div>
-              <div class="score">${game.score_player2}</div>
-            </div>
-          </div>
-        </div>
-        <div class="match-details">
-          <div class="match-info">
-            <i class="bi bi-stopwatch-fill dashboard-icon"></i>
-            <span> Match duration: </span>
-            <span>${formatDuration(game.duration)}</span>
-          </div>
-          <div class="match-info">
-            <i class="bi bi-fire dashboard-icon"></i>
-            <span>Longest exchange: </span>
-            <span>${game.longest_exchange ?? "N/A"}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-export function displayGameCards(data) {
+export function displayGames(data) {
   const games = data.results;
   const container = document.getElementById("game-history-container");
-  container.innerHTML = games.map(createGameCard).join("");
+
+  const cardsHtml = games.map(GameUI.createCard).join("");
+  const paginationHtml = createPagination({
+      previous: data.previous,
+      next: data.next,
+      target: "game-history"
+    });
+  
+    container.innerHTML = cardsHtml + paginationHtml;
 }
 
 async function updateStatValues(data) {
@@ -164,7 +125,8 @@ async function displayGameHistory(userId) {
     ? `api/dashboards/match-history/?user_id=${userId}`
     : `api/dashboards/match-history/`;
   const games = await authFetchJson(endpoint, { method: "GET" });
-  displayGameCards(games);
+  displayGames(games);
+
   updatePaginationBtns(games);
 }
 

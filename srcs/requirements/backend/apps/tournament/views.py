@@ -41,9 +41,9 @@ def create(request):
 
 
 class TournamentPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 3
     page_size_query_param = 'page_size'
-    max_page_size = 50
+    max_page_size = 20
 
 def paginated_response(request, queryset, serializer_class):
     paginator = TournamentPagination()
