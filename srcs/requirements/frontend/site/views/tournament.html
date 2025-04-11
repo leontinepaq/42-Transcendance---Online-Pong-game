@@ -1,4 +1,7 @@
-<div class="col-12 col-md-8 col-lg-8" id="tournament-section" style="min-height: inherit">
+<div
+  class="col-12 col-md-8 col-lg-8"
+  id="tournament-section"
+  style="min-height: inherit">
   <ul class="nav nav-pills nav-justified" id="tournament-tabs" role="tablist">
     <li class="nav-item" role="presentation">
       <button
@@ -96,7 +99,19 @@
       id="pills-create"
       role="tabpanel"
       aria-labelledby="tab-create">
-      <!-- Create tournament form -->
+      <div class="card neon-border mt-4">
+        <div class="card-body">
+          <h2>Create your tournament</h2>
+          <form id="tournament-form" class="form-control-xl w-100 mt-3">
+            <div class="mb-3">
+              <input data-i18n="tournament-name" type="text" class="form-control" id="new-tournament-name" placeholder="Tournament name" required />
+            </div>
+            <div class="d-flex justify-content-between">
+              <button data-action="create-tournament" type="submit" class="btn flex-grow-1">CREATE TOURNAMENT</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </div>

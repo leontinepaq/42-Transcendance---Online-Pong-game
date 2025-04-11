@@ -8,6 +8,10 @@ export const tournamentActions = [
     handler: handleTournamentAction,
   },
   {
+    selector: '[data-action="create-tournament"',
+    handler: createTournament,
+  },
+  {
     selector: '#tournament-section [data-bs-toggle="pill"]',
     handler: switchTournamentTab,
   },
@@ -93,5 +97,21 @@ async function handleTournamentAction(element) {
     await fetchAndDisplayTournaments(tab);
   } catch (error) {
     handleError("Error in tournament action");
+  }
+}
+
+async function createTournament(element, event) {
+  const input = document.getElementById("new-tournament-name");
+  const name = input.value;
+
+  try {
+    await authFetchJson("/api/tournament/create/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    input.value = "";
+  } catch (error) {
+    handleError(error, "Create tournament error");
   }
 }

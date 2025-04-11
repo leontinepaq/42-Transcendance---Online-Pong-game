@@ -1,6 +1,5 @@
 import { navigate } from "../router.js";
 import { authFetchJson, handleError } from "../api.js";
-import { doLanguage } from "../translate.js";
 
 export const signupActions = [
   {
