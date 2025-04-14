@@ -1,7 +1,7 @@
 import { navigate } from "../router.js";
 import { authFetchJson, fetchJson, handleError } from "../api.js";
 import { show, hide } from "../utils.js";
-import { doLanguage } from "../translate.js"
+import { doLanguage } from "../translate.js";
 
 export const loginActions = [
   {
@@ -19,12 +19,9 @@ export const loginActions = [
 ];
 
 export async function displayAuthSection(data, username) {
-  const log = document.getElementById('login-page-title');
-  log.setAttribute('data-i18n', "welcome2")
-  doLanguage();
-  log.textContent = log.textContent + username + " !";
-  
-    if (data.two_factor_mail == true)
+  document.getElementById("login-page-title").dataset.i18nUsername = username;
+  doLanguage()
+  if (data.two_factor_mail == true)
     document.getElementById("auth-label").textContent = "2FA code received by mail";
   if (data.two_factor_auth == true)
     document.getElementById("auth-label").textContent =

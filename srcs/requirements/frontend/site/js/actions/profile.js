@@ -200,7 +200,7 @@ async function updateAvatar() {
     } catch (error) {
       handleError(error, "Update avatar error");;
     }
-    doLanguage();
+    // doLanguage();
   });
   
   refreshedInput.click();

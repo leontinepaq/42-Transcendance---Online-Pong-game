@@ -1,17 +1,31 @@
-import { authFetchJson, fetchJson } from "./api.js"
+export const translateActions = [
+  {
+    selector: '[data-action="translate-en"]',
+    handler: handleEnglish,
+  },
+  {
+    selector: '[data-action="translate-fr"]',
+    handler: handleFrench,
+  },
+  {
+    selector: '[data-action="translate-es"]',
+    handler: handleSpanish,
+  },
+];
 
-export function loadTranslations(language) {
-  fetch(`../language/${language}.json`)
-    .then(response => response.json())
-    .then(translations => {
-      updateTextContent(translations, language);
-    })
-    .catch(err => console.error('Error loading translations:', err));
+export async function loadTranslations(language) {
+  try {
+    const response = await fetch(`../language/${language}.json`);
+    const translations = await response.json();
+    return translations;
+  } catch (err) {
+    console.error("Error loading translations:", err);
+    return null;
+  }
 }
 
-
 function updateButtonTranslations(button, translations, editKey) {
-  button.dataset.editText = translations[editKey];       // Mise à jour de "EDIT"
+  button.dataset.editText = translations[editKey]; // Mise à jour de "EDIT"
   button.dataset.saveText = translations[editKey + "_save"]; // On utilise une clé commune "saveGeneral"
 }
 
@@ -21,11 +35,46 @@ function replaceWithDataPlaceholders(str, element) {
   });
 }
 
+function interpolate(template, variables) {
+  return template.replace(/{{(.*?)}}/g, (_, key) => variables[key.trim()] || "");
+}
+
+//@leontinepaq checker si JA avait fait avec data-key
+function getInterpolationData(element) {
+  const variables = {};
+  for (const attr of element.attributes) {
+    if (attr.name.startsWith("data-i18n-") && attr.name !== "data-i18n") {
+      const varName = attr.name.replace("data-i18n-", "");
+      variables[varName] = attr.value;
+    }
+  }
+  return variables;
+}
+
+function applyTranslation(element, translation) {
+  const variables = getInterpolationData(element);
+  const translated = interpolate(translation, variables);
+  if ("placeholder" in element) {
+    element.placeholder = translated;
+  } else {
+    element.textContent = translated;
+  }
+}
+
 function updateTextContent(translations, language) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
 
     if (element.hasAttribute("data-edit-text") && element.hasAttribute("data-save-text")) {
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.getAttribute("data-i18n");
+    const translation = translations[key];
+    if (!translation) return;
+
+    if (
+      element.hasAttribute("data-edit-text") &&
+      element.hasAttribute("data-save-text")
+    ) {
       updateButtonTranslations(element, translations, key);
     }
 
@@ -48,103 +97,64 @@ function updateTextContent(translations, language) {
         }
       }
     }
+
+    applyTranslation(element, translation);
   });
 }
 
 function setLanguageInCookie(language, username) {
   document.cookie = `language_${username}=${language}; path=/; max-age=31536000`;
-  loadTranslations(language);
 }
 
 function getLanguageFromCookie(username) {
-  let cookies = document.cookie.split('; ');
-  for (let cookie of cookies)
-  {
-    let [name, value] = cookie.split('=');
-    if (name === `language_${username}`)
-    {
+  let cookies = document.cookie.split("; ");
+  for (let cookie of cookies) {
+    let [name, value] = cookie.split("=");
+    if (name === `language_${username}`) {
       return value;
     }
   }
-  return 'en';
+  return "en";
 }
 
 async function changeLanguage(language) {
   const username = sessionStorage.getItem("username");
-  console.log(username)
-  if (username)
-  {
+  if (username) {
+    console.log("Loading language for " + username);
     setLanguageInCookie(language, username);
+  } else {
+    localStorage.setItem("lang", language);
   }
-  else
-  {
-    loadTranslations(language);
-    localStorage.setItem('lang', language);
-  }
-}
-
-async function applySavedLanguage() {
-  const username = sessionStorage.getItem("username");
-
-  if (username)
-  {
-    let savedLanguage = getLanguageFromCookie(username);
-    console.log(savedLanguage)
-    if (!savedLanguage)
-    {
-      savedLanguage = 'en';
-    }  
-    setLanguageInCookie(savedLanguage, username);
-    loadTranslations(savedLanguage);
-  }
-  else
-  {
-    const savedLang = localStorage.getItem('lang');
-    if (savedLang)
-      loadTranslations(savedLang);
-    else
-      loadTranslations('en')
+  const translations = await loadTranslations(language);
+  if (translations) {
+    updateTextContent(translations, language);
   }
 }
 
 function handleFrench() {
-  changeLanguage('fr');
+  changeLanguage("fr");
 }
 
 function handleEnglish() {
-  changeLanguage('en');
+  changeLanguage("en");
 }
 
-function handleEspagnol() {
-  changeLanguage('es');
+function handleSpanish() {
+  changeLanguage("es");
 }
 
-function rmButton() {
-  const french = document.getElementById('french');
-  const english = document.getElementById('english');
-  const espagnol = document.getElementById('espagnol');
+export async function doLanguage() {
+  let savedLanguage;
+  
+  const username = sessionStorage.getItem("username");
+  if (username) {
+    savedLanguage = getLanguageFromCookie(username);
+  } else {
+    savedLanguage = localStorage.getItem("lang");
+  }
 
-  if (french) french.removeEventListener("click", handleFrench);
-  if (english) english.removeEventListener("click", handleEnglish);
-  if (espagnol) espagnol.removeEventListener("click", handleEspagnol);
+  const language = savedLanguage || "en";
+  await changeLanguage(language);
 }
 
-function addButton() {
-  const french = document.getElementById('french');
-  const english = document.getElementById('english');
-  const espagnol = document.getElementById('espagnol');
-
-  if (french) french.addEventListener("click", handleFrench);
-  if (english) english.addEventListener("click", handleEnglish);
-  if (espagnol) espagnol.addEventListener("click", handleEspagnol);
-}
-
-
-export async function doLanguage()
-{
-  applySavedLanguage();
-  rmButton();
-  addButton();
-}
-
-export default doLanguage
+export default doLanguage;

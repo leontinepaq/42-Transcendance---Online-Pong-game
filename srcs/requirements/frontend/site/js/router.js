@@ -1,22 +1,10 @@
 import checkAuth from "./api.js";
 import loadView from "./views.js";
 import killGame from "./actions/pong.js";
-import { doLanguage } from "./translate.js"
-import chat from "./chat.js"
-
-window.addEventListener("popstate", async (event) => {
-  if (event.state) {
-    console.log("route is ", event.state.route);
-    const newRoute = await authRedirector(event.state.route);
-    console.log("new route is ", newRoute);
-    killGame(); // si socket pong open on va la fermer
-    loadView(newRoute);
-    doLanguage();
-  }
-});
+import doLanguage from "./translate.js";
+import chat from "./chat.js";
 
 const publicRoutes = new Set(["login", "signup"]);
-let socket_users = null;
 
 export async function authRedirector(route) {
   const isAuthenticated = await checkAuth();
@@ -27,22 +15,33 @@ export async function authRedirector(route) {
   return route;
 }
 
-export async function navigate(route, ...params) {
-  console.log("Navigating: ", route);
-
+async function navigateToPage(route, isHistoryUpdate, ...params) {
   const newRoute = await authRedirector(route);
-  route = newRoute;
 
   try {
     killGame(); // si socket pong open on va la fermer
-    const state = { route, params };
-    const title = `${route.charAt(0).toUpperCase() + route.slice(1)}`;
-    history.pushState(state, title, `/${route}`);
-    await loadView(route, ...params);
+    if (isHistoryUpdate) {
+      const state = { route: newRoute, params };
+      const title = `${route.charAt(0).toUpperCase() + newRoute.slice(1)}`;
+      history.pushState(state, title, `/${newRoute}`);
+    }
+    await loadView(newRoute, ...params);
     doLanguage();
   } catch (error) {
     console.error("Navigation error:", error);
   }
+}
+
+window.addEventListener("popstate", async (event) => {
+  if (event.state) {
+    console.log("Back to: ", event.state.route);
+    navigateToPage(event.state.route, false);
+  }
+});
+
+export async function navigate(route, ...params) {
+  console.log("Navigating: ", route);
+  navigateToPage(route, true, params);
 }
 
 export default navigate;

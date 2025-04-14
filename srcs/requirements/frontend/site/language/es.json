@@ -1,6 +1,6 @@
 {
     "welcome1": "¡Bienvenido al espacio!",
-    "welcome2": "Nos alegra verte de nuevo",
+    "welcome2": "¡Nos alegra verte de nuevo {{username}}!",
     "signIn": "INICIAR SESIÓN",
     "logIn": "INICIAR SESIÓN",
     "forgotPwd": "¿OLVIDASTE TU CONTRASEÑA?",
