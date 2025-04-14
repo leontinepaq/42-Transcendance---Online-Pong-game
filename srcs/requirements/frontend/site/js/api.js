@@ -1,5 +1,5 @@
 import { navigate } from "./router.js";
-import { showModal } from "./actions/modals.js";
+import { showModal } from "./modals.js";
 
 export async function checkAuth() {
   try {
@@ -38,9 +38,9 @@ async function refreshToken() {
   }
 }
 
-export function handleError(error, message = "An error occurred") {
-  console.error(`${message}:`, error);
-  showModal("error", `${error.message}`);
+export async function handleError(error, message = "An error occurred") {
+  // console.error(`${message}:`, error);
+  await showModal({i18n: "error"}, {i18n: `${error.message}`});
 }
 
 export async function authFetchJson(url, options = {}) {

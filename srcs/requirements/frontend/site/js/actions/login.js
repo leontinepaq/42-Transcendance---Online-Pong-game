@@ -33,6 +33,7 @@ export async function displayAuthSection(data, username) {
     for (const el of document.getElementsByClassName("2fa-enabled")) show(el);
   for (const el of document.getElementsByClassName("auth-login")) show(el);
   for (const el of document.getElementsByClassName("pre-login")) hide(el);
+  document.getElementById("pwd-input").focus();
 }
 
 export async function handleSignin(element, event) {

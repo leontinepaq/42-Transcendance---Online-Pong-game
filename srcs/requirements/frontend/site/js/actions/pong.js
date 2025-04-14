@@ -1,6 +1,7 @@
 import { navigate } from "../router.js";
-import { showModal, hideModal, showModalWithCustomUi } from "./modals.js";
+import { showModal, hideModal, showModalWithFooterButtons } from "../modals.js";
 import Game from "../game.js";
+import chat from "../chat.js"
 
 let state = true;
 let mode;
@@ -40,14 +41,14 @@ export const pongActions = [
 // ACTIONS
 
 async function initGame(element, event) {
- if (element.dataset.mode) mode = element.dataset.mode;
+  if (element.dataset.mode) mode = element.dataset.mode;
   await navigate("pong");
   playGame();
 }
 
-export async function initGameOnline() {
+export async function initGameOnline(link) {
   await navigate("pong");
-  playGame();
+  playGame(link);
 }
 
 function endGameBackHome() {
@@ -66,12 +67,15 @@ function sendTogglePause() {
 
 // GAME LOGIC
 
-function playGame()
-{
+function playGame(link = null) {
+  chat.sendBusyOn();
   game = new Game();
-  socket = new WebSocket(links[mode]);
+  if (!link)
+    socket = new WebSocket(links[mode]);
+  else
+    socket = new WebSocket(link);
   updatePlayerName("");
-  
+
   socket.onmessage = handleSocketMessage;
 
   resetKey();
@@ -80,12 +84,13 @@ function playGame()
 }
 
 export function killGame() {
-  if (socket)
-    socket.close();
+  if (!socket) return
+  socket.close();
   socket = null;
   clearInterval(interval);
   removeKeyListeners();
   resetKey();
+  chat.sendBusyOff();
 }
 
 function updatePlayerName(opponent) {
@@ -101,39 +106,28 @@ function updatePlayerName(opponent) {
 
 // HANDLE MESSAGES FROM SOCKET
 
-function handleSocketMessage(event)
-{
+async function handleSocketMessage(event) {
   state = JSON.parse(event.data);
   console.log(state);
 
   if (state.info && state.opponent) updatePlayerName(state.opponent);
-  if (state.info && state.message === "") return hideModal();
+  if (state.info && state.message === "")
+    return hideModal();
   if (state.info && state.message !== "")
-    return showModal("Info", state.message, null, true, endGameBackMenu, true);
+  {
+    return await showModal(
+      { i18n: "" },
+      { i18n: state.message },
+      null,
+      true,
+      endGameBackMenu,
+      true
+    );
+  }
+  hideModal();
   game.draw(state);
   if (state.paused) game.drawPause();
-  if (state.over) return displayGameOver(state);
-}
-
-// UI ELEMENT FOR MODAL
-
-function footerButton(textContent, dataAction = "", dataI18N = "") {
-  var button = document.createElement("button");
-  button.type = "button";
-  button.classList.add("btn");
-  button.setAttribute("data-bs-dismiss", "modal");
-  button.setAttribute("data-action", dataAction);
-  button.setAttribute("data-i18n", dataI18N);
-  button.textContent = textContent;
-  return button;
-}
-
-function closeButton() {
-  return footerButton("CLOSE", "end-game", "close");
-}
-
-function replayButton() {
-  return footerButton("PLAY AGAIN", "replay", "playAgain");
+  if (state.over) return await displayGameOver(state);
 }
 
 // KEY CAPTURE MANAGEMENT
@@ -171,16 +165,16 @@ export function removeKeyListeners() {
   document.removeEventListener("keyup", keyUpHandler);
 }
 
-function displayGameOver(state) {
+async function displayGameOver(state) {
   killGame();
   clearInterval(interval);
-  return showModalWithCustomUi(
-    "",
-    state.score[0] == 3 ? "victory" : "lost",
-    null,
-    null,
-    [closeButton(), replayButton()],
-    null
+  return await showModalWithFooterButtons(
+    { i18n: "" },
+    { i18n: state.score[0] == 3 ? "victory" : "lost" },
+    [
+      { action: "end-game", i18n: "close" },
+      { action: "replay", i18n: "playAgain" },
+    ]
   );
 }
 

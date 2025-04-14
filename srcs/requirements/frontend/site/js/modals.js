@@ -1,4 +1,4 @@
-import { doLanguage } from "../translate.js";
+import { doLanguage } from "./translate.js";
 
 const errors = {
   "Invalid email format": "invalidEmail",
@@ -44,8 +44,12 @@ const errors = {
   "Invalid ID":  "invalidID",
   "You are already registered for this tournament": "alreadyRegistered",
   "This tournament already has 4 participants": "tooManyParticipants",
-  "You are not registered for this tournament": "notRegistered"
+  "You are not registered for this tournament": "notRegistered",
 
+  "waitingFor": "waitingFor",
+  "unavailable": "unavailable",
+  "gameFrom": "gameFrom",
+  "gameDeclined": "gameDeclined",
 };
 
 let modal = null;
@@ -68,48 +72,69 @@ function clearModalContent() {
   });
 }
 
-export function showModal(
-  title_i18n,
-  body_i18n = null,
-  footer_i18n = null,
+function setI18NContentData(element, i18n) {
+  if (!i18n) return;
+  if (i18n["i18n"] !== "") i18n["i18n"] = errors[i18n["i18n"]] || "errorUnknown";
+  Object.entries(i18n).forEach(([key, value]) => {
+    element.setAttribute(`data-${key}`, value);
+  });
+}
+
+function removeModalBackdrop() {
+  document.querySelectorAll(".modal-backdrop").forEach((el) => el.remove());
+}
+
+export async function showModal(
+  title_i18n = { i18n: "" },
+  body_i18n = { i18n: "" },
+  footer_i18n = { i18n: "" },
   clear = true,
   onClose,
   closeOnClickOutside = true
 ) {
   if (clear) clearModalContent();
 
-  getModalElement("title").setAttribute("data-i18n", title_i18n);
-  getModalElement("body").setAttribute("data-i18n", errors[body_i18n] || "errorUnknown");
-  getModalElement("footer").setAttribute("data-i18n", footer_i18n);
+  setI18NContentData(getModalElement("title"), title_i18n);
+  setI18NContentData(getModalElement("body"), body_i18n);
+  setI18NContentData(getModalElement("title"), footer_i18n);
 
   const modalElement = document.getElementById("myModal");
   modal = new bootstrap.Modal(modalElement, { backdrop: closeOnClickOutside });
-  modal.show();
+  modalElement.addEventListener("hide.bs.modal", removeModalBackdrop, {
+    once: true,
+  });
+  await modal.show();
   doLanguage();
 
-  if (typeof onClose === "function")
-  {
+  if (typeof onClose === "function") {
     onCloseFunction = onClose;
-    modalElement.addEventListener("hidden.bs.modal", onCloseFunction, {once: true});
+    modalElement.addEventListener("hide.bs.modal", onCloseFunction, {
+      once: true,
+    });
   }
 
   return modal;
 }
 
-export function hideModal(triggerCloseEvent = false) {
+export async function hideModal(triggerCloseEvent = false) {
   const modalElement = document.getElementById("myModal");
 
-  if (triggerCloseEvent)
-    modalElement.removeEventListener("hidden.bs.modal", onCloseFunction, {once: true});
+  if (!triggerCloseEvent)
+    modalElement.removeEventListener("hide.bs.modal", onCloseFunction, {
+      once: true,
+    });
   if (modal) modal.hide();
-  modalElement.removeEventListener("hidden.bs.modal", onCloseFunction, {once: true});
+  modalElement.removeEventListener("hide.bs.modal", onCloseFunction, {
+    once: true,
+  });
   modal = null;
+  clearModalContent();
 }
 
-export function showModalWithCustomUi(
-  title_i18n,
-  body_i18n = null,
-  footer_i18n = null,
+export async function showModalWithCustomUi(
+  title_i18n = { i18n: "" },
+  body_i18n = { i18n: "" },
+  footer_i18n = { i18n: "" },
   bodyUi,
   footerUi,
   onClose = null,
@@ -124,7 +149,7 @@ export function showModalWithCustomUi(
     footerUi.forEach((element) => {
       getModalElement("footer").appendChild(element);
     });
-  return showModal(
+  return await showModal(
     title_i18n,
     body_i18n,
     footer_i18n,
@@ -134,5 +159,39 @@ export function showModalWithCustomUi(
   );
 }
 
-export default showModal;
+function footerButton(data = {}) {
+  var button = document.createElement("button");
+  button.type = "button";
+  button.classList.add("btn");
+  button.setAttribute("data-bs-dismiss", "modal");
 
+  Object.entries(data).forEach(([key, value]) => {
+    button.setAttribute(`data-${key}`, value);
+  });
+  return button;
+}
+
+export async function showModalWithFooterButtons(
+  title_i18n = { i18n: "" },
+  body_i18n = { i18n: "" },
+  buttons = [{ action: "cancel", i18n: "cancel", username: "Username" }],
+  onClose = null,
+  closeOnClickOutside = true
+) {
+  var buttonsElements = [];
+  buttons.forEach((param) => {
+    buttonsElements.push(footerButton(param));
+  });
+
+  return await showModalWithCustomUi(
+    title_i18n,
+    body_i18n,
+    null,
+    null,
+    buttonsElements,
+    onClose,
+    closeOnClickOutside
+  );
+}
+
+export default showModal;

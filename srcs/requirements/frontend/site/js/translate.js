@@ -15,31 +15,37 @@ function updateButtonTranslations(button, translations, editKey) {
   button.dataset.saveText = translations[editKey + "_save"]; // On utilise une clé commune "saveGeneral"
 }
 
+function replaceWithDataPlaceholders(str, element) {
+  return str.replace(/{{(.*?)}}/g, (_, key) => {
+    return element.getAttribute(`data-${key}`) || `{{${key}}}`;
+  });
+}
+
 function updateTextContent(translations, language) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
+
     if (element.hasAttribute("data-edit-text") && element.hasAttribute("data-save-text")) {
       updateButtonTranslations(element, translations, key);
     }
-    if (translations[key] || key === "pending")
-    {
-      if (key === "pending")
-      {
+
+    if (translations[key] || key === "pending") {
+      if (key === "pending") {
         const variable = document.getElementById("pending1");
-        if (language === "fr")
-          variable.firstChild.textContent = 'EN ATTENTE';
-        else if (language === "es")
-          variable.firstChild.textContent = 'EN ESPERA';
-        else if (language === "en")
-          variable.firstChild.textContent = 'PENDING';
-      }
-      else if (element.placeholder !== undefined)
-      {
-        element.placeholder = translations[key];
-      }
-      else
-      {
-        element.textContent = translations[key];
+        const textMap = {
+          fr: 'EN ATTENTE',
+          es: 'EN ESPERA',
+          en: 'PENDING'
+        };
+        variable.firstChild.textContent = textMap[language] || 'PENDING';
+      } else {
+        const content = replaceWithDataPlaceholders(translations[key], element);
+
+        if (element.placeholder !== undefined && element.tagName === "INPUT") {
+          element.placeholder = content;
+        } else {
+          element.textContent = content;
+        }
       }
     }
   });

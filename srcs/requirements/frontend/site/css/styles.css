@@ -246,6 +246,14 @@ form {
   padding-top: 0;
 }
 
+.modal.fade .modal-dialog {
+  transition: 0;
+}
+
+.modal.fade {
+  transition: 0;
+}
+
 /* FRIENDS */
 .nav-justified .nav-link {
   height: 100%;
@@ -383,11 +391,15 @@ form {
   border-radius: 50%; /* Makes it circular */
 }
 
-.chat-user.user-online::after {
+.chat-user[data-status="1"]::after {
   background-color: green; /* Green ball for online users */
 }
 
-.chat-user:not(.user-online)::after {
+.chat-user[data-status="2"]::after {
+  background-color: orange;
+}
+
+.chat-user[data-status="0"]::after {
   background-color: grey; /* Grey ball for offline users */
 }
 
