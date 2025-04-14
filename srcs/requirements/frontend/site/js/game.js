@@ -1,13 +1,23 @@
+import {doLanguage} from "./translate.js"
+
+const i18n = {
+  "Waiting for 2nd player": "waiting",
+  "Player got disconnected": "disconnected",
+}
+
 export default class Game {
+
   constructor() {
     this.canvas = document.getElementById("gameCanvas");
     this.ctx = this.canvas.getContext("2d");
     this.leftScore = document.getElementById("leftScore");
     this.rightScore = document.getElementById("rightScore");
-    this.drawPause()
+    this.backgroundText = document.getElementById("gameBackgroundText");
+    this.drawPause();
   }
 
   clear() {
+    this.clearMessage();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
@@ -85,6 +95,17 @@ export default class Game {
   updateScore(state) {
     this.leftScore.textContent = state.score[0];
     this.rightScore.textContent = state.score[1];
+  }
+
+  writeMessage(msg) {
+    this.clear();
+    this.backgroundText.setAttribute("data-i18n", i18n[msg]);
+    doLanguage();
+  }
+
+  clearMessage() {
+    this.backgroundText.removeAttribute("data-i18n");
+    this.backgroundText.innerText = "";
   }
 
   draw(state) {

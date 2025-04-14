@@ -115,7 +115,7 @@ class CommonConsumer(UserConsumer):
             return await self.set_status(Status.ONLINE)
                 
         # OFFLINE RECEIVER
-        if not is_online(data["receiver"]) \
+        if not is_online(data["receiver"]) and not is_busy(data["receiver"]) \
             and (data["type"] == "message" or data["type"] == "game"):
             data["type"] = "offline"
             return await self.send(json.dumps(data))

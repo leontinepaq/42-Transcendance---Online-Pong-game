@@ -7,7 +7,7 @@ from django.contrib.auth.admin import UserAdmin
 
 # Participant Admin
 class ParticipantAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_ai', 'user')  # Customize columns you want to display in the list view
+    list_display = ("id", 'name', 'is_ai', 'user')  # Customize columns you want to display in the list view
     search_fields = ('name', 'user__username')  # Allow search by name and user
     list_filter = ('is_ai',)  # Filter by AI status
     ordering = ('name',)  # Order by name

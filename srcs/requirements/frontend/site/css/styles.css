@@ -202,9 +202,23 @@ form {
 }
 
 .paddle-rail {
+  position: relative;
   width: 97.6%;
   border-left: dashed 3px #511db2a8;
   border-right: dashed 3px #511db2a8;
+}
+
+.game-background-text {
+  position: absolute;
+  z-index: 0;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 1); /* light transparent text */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none; /* allow clicks to go through */
+  width: 100%;
+  text-align: center;
 }
 
 #gameCanvas {
@@ -215,6 +229,8 @@ form {
   height: 40vmin;
   margin: 0 auto; /* Centrer le rectangle de jeu */
   /* border-radius: 20px; */
+  z-index: 1;
+  position:relative;
 }
 
 #leftScore,

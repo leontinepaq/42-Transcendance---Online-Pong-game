@@ -148,8 +148,7 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
     async def init_master(self):
         if self.master:
             asyncio.create_task(self.send_info_group("message",
-                                                     "Waiting for 2nd player",
-                                                     True))
+                                                     "Waiting for 2nd player"))
             asyncio.create_task(self.loop())
 
     async def init_slave(self):
@@ -188,9 +187,9 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
         cache.set(self.group_name,
                   self.get_connected_players() - 1)
 
-    async def send_info_group(self, key, value, onlyIfBothConnected = False):
-        if onlyIfBothConnected and self.get_connected_players() != 2:
-            return
+    async def send_info_group(self, key, value):
+        # if onlyIfBothConnected and self.get_connected_players() != 2:
+        #     return
         await self.channel_layer.group_send(self.group_name,
                                             {"type": "receive.info",
                                              "key": key,

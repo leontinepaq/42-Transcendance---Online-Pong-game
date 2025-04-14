@@ -67,11 +67,7 @@ class Chat {
           username: data.receiver_username,
         });
       else if (data.type === "game-decline") await receiveGameDeclined(data);
-      else if (
-        data.type === "game-cancel" &&
-        document.querySelector('[data-action="game-accept"]')
-      )
-        await hideModal();
+      else if (data.type === "game-cancel") receiveGameCancel(data);
       else if (data.type === "game-accept") receiveGameAccept(data);
     };
   }
@@ -107,7 +103,6 @@ class Chat {
 
   updateStatus() {
     this.status.forEach((status, id) => {
-      console.log("for id " + id + " status is ", status);
       document.querySelectorAll(`.chat-user[data-id="${id}"]`).forEach((element) => {
         element.setAttribute("data-status", status);
       });
@@ -169,6 +164,12 @@ class Chat {
   send(message) {
     console.log("Sending: ", message);
     this.socket.send(JSON.stringify(message));
+  }
+
+  collapseAll() {
+    this.bubbles.forEach((element) => {
+      element.close();
+    });
   }
 }
 
@@ -279,17 +280,19 @@ function chatBubbleContent(id, username) {
     <button type="button" class="btn btn-chat btn-secondary dropdown-toggle"
     data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,10"
     id="dropdown-toggle-$id" data-bs-auto-close="false">
-    $username
+    <div class="chat-user" data-id="$id">$username</div>
     </button>
     <ul class="dropdown-menu">
       <div class="d-flex flex-column">
-        <div class="d-flex flex-row align-items-center chat-header">
-          <span class="flex-fill chat-user" data-action="open-profile"
-           data-id="$id">$username</span>
-          <span class="material-symbols-outlined"
-          data-action="launch-pong" data-id="$id" data-username="$username">videogame_asset</span>
-          <span class="material-symbols-outlined" data-action="collapse-chat" data-id="$id">remove</span>
-          <span class="material-symbols-outlined" data-action="hide-chat" data-id="$id">close</span>
+        <div class="d-flex flex-row justify-content-end chat-header">
+          <span class="material-symbols-outlined" data-action="open-profile"
+          data-id="$id" data-username="$username">insert_chart</span>
+          <span class="material-symbols-outlined" data-action="launch-pong" 
+          data-id="$id" data-username="$username">videogame_asset</span>
+          <span class="material-symbols-outlined" data-action="collapse-chat" 
+          data-id="$id">remove</span>
+          <span class="material-symbols-outlined" data-action="hide-chat" 
+          data-id="$id">close</span>
         </div>
         <li><hr class="dropdown-divider"></li>
         <div class="msg-area d-flex flex-column flex-fill flex-column-reverse"
@@ -395,6 +398,7 @@ export const chatActions = [
 ];
 
 export function createChatBubbleAction(element) {
+  chat.collapseAll();
   const userId = element.dataset.id;
   const username = element.dataset.username;
   chat.getBubble(userId, username).open();
@@ -417,6 +421,15 @@ export function collapseChatAction(element) {
 
 function sendGameCancel(id) {
   chat.sendGameCancel(id);
+  chat.sendBusyOff();
+}
+
+function receiveGameCancel(data) {
+  if (
+    !document.querySelector(`[data-id="${data.sender}"][data-action="game-accept"]`)
+  )
+    return;
+  hideModal();
   chat.sendBusyOff();
 }
 
@@ -452,7 +465,10 @@ async function receiveGame(data) {
 async function receiveGameDeclined(data) {
   const username = data.sender_username;
 
-  hideModal();
+  if (
+    !document.querySelector(`[data-id="${data.sender}"][data-action="game-cancel"]`)
+  )
+    return;
   chat.sendBusyOff();
   await showModal(null, { i18n: "gameDeclined", username: username });
 }
@@ -460,7 +476,6 @@ async function receiveGameDeclined(data) {
 function sendGameDeclined(element) {
   const id = element.dataset.id;
 
-  hideModal();
   chat.sendBusyOff();
   chat.sendGameDecline(id);
 }
@@ -469,7 +484,6 @@ function sendGameAccept(element) {
   const id = element.dataset.id;
   const link = element.dataset.link;
 
-  hideModal();
   chat.sendGameAccept(id);
   initGameOnline(link);
 }
@@ -478,7 +492,7 @@ function receiveGameAccept(data) {
   const id = data.sender;
   const link = data.link;
 
-  hideModal();
+  if (!document.querySelector('[data-action="game-accept"]')) hideModal();
   initGameOnline(link);
 }
 

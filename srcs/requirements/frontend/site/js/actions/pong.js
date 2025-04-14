@@ -41,12 +41,14 @@ export const pongActions = [
 // ACTIONS
 
 async function initGame(element, event) {
+  chat.collapseAll();
   if (element.dataset.mode) mode = element.dataset.mode;
   await navigate("pong");
   playGame();
 }
 
 export async function initGameOnline(link) {
+  chat.collapseAll();
   await navigate("pong");
   playGame(link);
 }
@@ -112,19 +114,19 @@ async function handleSocketMessage(event) {
 
   if (state.info && state.opponent) updatePlayerName(state.opponent);
   if (state.info && state.message === "")
-    return hideModal();
+    return game.clearMessage();
   if (state.info && state.message !== "")
-  {
-    return await showModal(
-      { i18n: "" },
-      { i18n: state.message },
-      null,
-      true,
-      endGameBackMenu,
-      true
-    );
-  }
-  hideModal();
+    return game.writeMessage(state.message);
+  // {
+  //   return await showModal(
+  //     { i18n: "" },
+  //     { i18n: state.message },
+  //     null,
+  //     true,
+  //     endGameBackMenu,
+  //     true
+  //   );
+  // }
   game.draw(state);
   if (state.paused) game.drawPause();
   if (state.over) return await displayGameOver(state);
