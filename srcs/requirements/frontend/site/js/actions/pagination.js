@@ -1,6 +1,7 @@
 import { authFetchJson, handleError } from "../api.js";
 import { displayGames } from "./dashboard.js";
 import { displayTournaments } from  "./tournament.js";
+import { doLanguage } from "../translate.js";
 
 export const paginationAction = [
   {
@@ -40,6 +41,7 @@ export async function handlePaginationClick(element) {
       console.error(`Handler not found for target: ${target}`);
     }
     updatePaginationBtns(data);
+    doLanguage();
   } catch (error) {
     handleError(error, "Pagination error");
   }

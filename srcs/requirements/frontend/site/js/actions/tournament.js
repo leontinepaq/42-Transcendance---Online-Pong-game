@@ -1,6 +1,7 @@
 import { authFetchJson, handleError } from "../api.js";
 import { TournamentUI } from "../ui/TournamentUI.js";
 import { createPagination } from "../ui/PaginationUI.js";
+import { doLanguage } from "../translate.js";
 
 export const tournamentActions = [
   {
@@ -52,17 +53,18 @@ async function fetchAndDisplayTournaments(tab) {
     if (!apiPath) return;
     const tournaments = await authFetchJson(apiPath);
     displayTournaments(tournaments, tab);
+    doLanguage();
   } catch (error) {
     handleError(error, "Display user error");
   }
 }
 
-function switchTournamentTab(element, event) {
+async function switchTournamentTab(element, event) {
   const tabKey = element.dataset.tab;
   if (!TABS[tabKey]) return;
 
   console.log(`Switching to tab: ${tabKey}`);
-  fetchAndDisplayTournaments(tabKey);
+  await fetchAndDisplayTournaments(tabKey);
 }
 
 const tournamentActionMap = {

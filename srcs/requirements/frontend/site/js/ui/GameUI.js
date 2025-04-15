@@ -20,12 +20,12 @@ function createMatchDetails(game) {
     <div class="match-details">
       <div class="match-info">
         <i class="bi bi-stopwatch-fill dashboard-icon"></i>
-        <span> Match duration: </span>
+        <span data-i18n="match-duration">Match duration:</span>
         <span>${formatDuration(game.duration)}</span>
       </div>
       <div class="match-info">
         <i class="bi bi-fire dashboard-icon"></i>
-        <span>Longest exchange: </span>
+        <span data-i18n="longest-exchange">Longest exchange:</span>
         <span>${game.longest_exchange ?? "N/A"}</span>
       </div>
     </div>

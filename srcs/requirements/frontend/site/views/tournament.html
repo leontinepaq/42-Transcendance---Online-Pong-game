@@ -11,7 +11,8 @@
         data-bs-target="#pills-available"
         data-tab="available"
         type="button"
-        role="tab">
+        role="tab"
+        data-i18n="available">
         AVAILABLE
       </button>
     </li>
@@ -23,7 +24,9 @@
         data-bs-target="#pills-registered"
         data-tab="registered"
         type="button"
-        role="tab">
+        role="tab"
+        ,
+        data-i18n="registered">
         REGISTERED
       </button>
     </li>
@@ -35,7 +38,9 @@
         data-bs-target="#pills-ongoing"
         data-tab="ongoing"
         type="button"
-        role="tab">
+        role="tab"
+        ,
+        data-i18n="ongoing">
         ONGOING
       </button>
     </li>
@@ -47,7 +52,9 @@
         data-bs-target="#pills-history"
         data-tab="history"
         type="button"
-        role="tab">
+        role="tab"
+        ,
+        data-i18n="history">
         HISTORY
       </button>
     </li>
@@ -59,7 +66,9 @@
         data-bs-target="#pills-create"
         data-tab="create"
         type="button"
-        role="tab">
+        role="tab"
+        ,
+        data-i18n="create">
         CREATE
       </button>
     </li>
@@ -101,13 +110,25 @@
       aria-labelledby="tab-create">
       <div class="card neon-border mt-4">
         <div class="card-body">
-          <h2>Create your tournament</h2>
+          <h2 data-i18n="createYourTournament">Create your tournament</h2>
           <form id="tournament-form" class="form-control-xl w-100 mt-3">
             <div class="mb-3">
-              <input data-i18n="tournament-name" type="text" class="form-control" id="new-tournament-name" placeholder="Tournament name" required />
+              <input
+                data-i18n="tournament-name"
+                type="text"
+                class="form-control"
+                id="new-tournament-name"
+                placeholder="Tournament name"
+                required />
             </div>
             <div class="d-flex justify-content-between">
-              <button data-action="create-tournament" type="submit" class="btn flex-grow-1">CREATE TOURNAMENT</button>
+              <button
+                data-action="create-tournament"
+                type="submit"
+                class="btn flex-grow-1"
+                data-i18n="createTournament">
+                CREATE TOURNAMENT
+              </button>
             </div>
           </form>
         </div>

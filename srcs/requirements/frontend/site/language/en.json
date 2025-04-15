@@ -14,9 +14,9 @@
     "friends": "FRIENDS",
     "profile": "PROFILE",
     "logout": "LOG OUT",
-    "solo": "SOLO",
-    "multiplayer": "MULTIPLAYER",
-    "online": "ONLINE",
+    "solo": "SOLO VS COMPUTER",
+    "multiplayer": "MULTIPLAYER LOCAL",
+    "online": "MULTIPLAYER ONLINE",
     "refresh": "REFRESH",
     "matchHistory": "MATCH HISTORY",
     "matchWon": "Matches won",
@@ -125,6 +125,26 @@
     "accept": "accept",
     "decline": "decline",
     "cancel": "cancel",
-    "gameDeclined": "{{username}} declined your invitation."
+    "gameDeclined": "{{username}} declined your invitation.",
+    "available": "AVAILABLE",
+    "registered": "REGISTERED",
+    "ongoing": "ONGOING",
+    "history": "HISTORY",
+    "create": "CREATE",
+    "createYourTournament": "Create your tournament",
+    "tournament-name": "Tournament name",
+    "createTournament": "CREATE TOURNAMENT",
+    "REGISTER": "REGISTER",
+    "UNREGISTER": "UNREGISTER",
+    "created-on": "Created on",
+    "created-by": "Created by",
+    "participants": "Participants",
+    "match-duration": "Match duration:",
+    "longest-exchange": "Longest exchange:",
+    "dashboardTitleYour": "Your dashboard",
+    "dashboardTitleOther": "{{username}}'s dashboard"
+
+
+
 }
   

@@ -5,6 +5,7 @@ import { updatePaginationBtns } from "./pagination.js"
 import { formatDuration } from "../utils.js"; 
 import { createPagination } from "../ui/PaginationUI.js";
 import { GameUI } from "../ui/GameUI.js";
+import { doLanguage } from "../translate.js";
 
 initChartJS();
 
@@ -103,15 +104,24 @@ async function plotGameHistory(data) {
   createHistogram(ctx, labels, datasets);
 }
 
+function updateDashboardTitle(userId, username) {
+  const titleEl = document.getElementById("dashboard-title");
+
+  if (!userId) {
+    titleEl.setAttribute("data-i18n", "dashboardTitleYour");
+  } else {
+    titleEl.setAttribute("data-i18n", "dashboardTitleOther");
+    titleEl.setAttribute("data-username", username);
+  }
+}
+
 async function displayStatistics(userId) {
   const endpoint = userId
     ? `api/dashboards/display-user-stats/?user_id=${userId}`
     : `api/dashboards/display-user-stats/`;
 
   const data = await authFetchJson(endpoint, { method: "GET" });
-  document.getElementById("dashboard-title").textContent = userId
-  ? `${data.user}'s Dashboard`
-  : "Your Dashboard"; //todo @leontinepaq a modifier
+  updateDashboardTitle(userId, data.user);
   updateStatValues(data);
   initChartJS();
   window.dashboardCharts = [];
@@ -130,10 +140,12 @@ async function displayGameHistory(userId) {
   updatePaginationBtns(games);
 }
 
-export async function loadUserStats(userId = null) {
+export async function loadUserStats(rawUserId = null) {
   try {
-    displayStatistics(userId);
-    displayGameHistory(userId);
+    const userId = Array.isArray(rawUserId) ? rawUserId[0] : rawUserId || null;
+    await displayStatistics(userId);
+    await displayGameHistory(userId);
+    doLanguage();
   } catch (error) {
     handleError(error, "Load user stats error");
   }

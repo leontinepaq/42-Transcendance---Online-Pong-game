@@ -3,6 +3,7 @@ import { navigate } from "../router.js";
 import { show, hide } from "../utils.js";
 import { chat, hideChat } from "../chat.js";
 import { UserUI } from "../ui/UserUI.js";
+import { doLanguage } from "../translate.js";
 
 export const friendsActions = [
   {
@@ -122,6 +123,7 @@ async function handleDynamicFriendAction(element) {
     await fetchAndDisplayUsers(tab);
     await chat.updateList();
     if (actionType === "block-user") hideChat(userId);
+    doLanguage();
   } catch (error) {
     handleError(error, "Error in friend action");
   }
