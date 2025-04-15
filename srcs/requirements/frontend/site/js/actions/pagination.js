@@ -47,19 +47,17 @@ export async function handlePaginationClick(element) {
   }
 }
 
+function updateBtn(btn, data)
+{
+  if (!btn || !data)
+    return;
+  btn.disabled = !data.previous;
+  btn.dataset.url = data.previous || "";
+}
+
 export function updatePaginationBtns(data) {
-  const prevBtn = document.getElementById("prev-page");
-  const nextBtn = document.getElementById("next-page");
-
-  if (prevBtn && nextBtn) {
-    prevBtn.disabled = !data.previous;
-    nextBtn.disabled = !data.next;
-
-    prevBtn.dataset.url = data.previous || "";
-    nextBtn.dataset.url = data.next || "";
-  } else {
-    console.error("Pagination buttons not found.");
-  }
+  updateBtn(document.getElementById("prev-page"));
+  updateBtn(document.getElementById("next-page"));
 }
 
 /**
