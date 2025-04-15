@@ -35,25 +35,8 @@ function replaceWithDataPlaceholders(str, element) {
   });
 }
 
-function interpolate(template, variables) {
-  return template.replace(/{{(.*?)}}/g, (_, key) => variables[key.trim()] || "");
-}
-
-//@leontinepaq checker si JA avait fait avec data-key
-function getInterpolationData(element) {
-  const variables = {};
-  for (const attr of element.attributes) {
-    if (attr.name.startsWith("data-i18n-") && attr.name !== "data-i18n") {
-      const varName = attr.name.replace("data-i18n-", "");
-      variables[varName] = attr.value;
-    }
-  }
-  return variables;
-}
-
 function applyTranslation(element, translation) {
-  const variables = getInterpolationData(element);
-  const translated = interpolate(translation, variables);
+  const translated = replaceWithDataPlaceholders(translation, element);
   if ("placeholder" in element) {
     element.placeholder = translated;
   } else {
@@ -64,40 +47,12 @@ function applyTranslation(element, translation) {
 function updateTextContent(translations, language) {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
-
-    if (element.hasAttribute("data-edit-text") && element.hasAttribute("data-save-text")) {
-  document.querySelectorAll("[data-i18n]").forEach((element) => {
-    const key = element.getAttribute("data-i18n");
     const translation = translations[key];
     if (!translation) return;
 
-    if (
-      element.hasAttribute("data-edit-text") &&
-      element.hasAttribute("data-save-text")
-    ) {
-      updateButtonTranslations(element, translations, key);
-    }
-
-    if (translations[key] || key === "pending") {
-      if (key === "pending") {
-        const variable = document.getElementById("pending1");
-        const textMap = {
-          fr: 'EN ATTENTE',
-          es: 'EN ESPERA',
-          en: 'PENDING'
-        };
-        variable.firstChild.textContent = textMap[language] || 'PENDING';
-      } else {
-        const content = replaceWithDataPlaceholders(translations[key], element);
-
-        if (element.placeholder !== undefined && element.tagName === "INPUT") {
-          element.placeholder = content;
-        } else {
-          element.textContent = content;
-        }
-      }
-    }
-
+    if (element.hasAttribute("data-edit-text") && element.hasAttribute("data-save-text")) {
+      updateButtonTranslations(element, translations, key);}
+    
     applyTranslation(element, translation);
   });
 }

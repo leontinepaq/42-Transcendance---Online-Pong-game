@@ -19,7 +19,7 @@ export const loginActions = [
 ];
 
 export async function displayAuthSection(data, username) {
-  document.getElementById("login-page-title").dataset.i18nUsername = username;
+  document.getElementById("login-page-title").dataset.username = username;
   doLanguage()
   if (data.two_factor_mail == true)
     document.getElementById("auth-label").textContent = "2FA code received by mail";
