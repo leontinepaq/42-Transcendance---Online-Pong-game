@@ -41,7 +41,7 @@ window.addEventListener("popstate", async (event) => {
 
 export async function navigate(route, ...params) {
   console.log("Navigating: ", route);
-  navigateToPage(route, true, params);
+  await navigateToPage(route, true, params);
 }
 
 export default navigate;
