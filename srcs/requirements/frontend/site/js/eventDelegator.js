@@ -10,8 +10,8 @@ import { verify2faEmailActions } from "./actions/validate2faEmail.js";
 import { verify2faAppActions } from "./actions/validate2faApp.js";
 // import { usersActions } from "./actions/users.js";
 import { tournamentActions } from "./actions/tournament.js";
-import { chatActions } from "./chat.js";
 import {translateActions} from "./translate.js";
+import { chatActions } from "./actions/chat.js";
 
 // Table des actions à gérer, "..." = concat
 const clickActions = [

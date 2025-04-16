@@ -1,7 +1,7 @@
 import { navigate } from "../router.js";
 import { showModal, hideModal, showModalWithFooterButtons } from "../modals.js";
 import Game from "../game.js";
-import chat from "../chat.js"
+import chat from "../chat.js";
 
 let state = true;
 let mode;
@@ -49,6 +49,7 @@ async function initGame(element, event) {
 
 export async function initGameOnline(link) {
   chat.collapseAll();
+  mode = "link";
   await navigate("pong");
   playGame(link);
 }
@@ -72,10 +73,8 @@ function sendTogglePause() {
 function playGame(link = null) {
   chat.sendBusyOn();
   game = new Game();
-  if (!link)
-    socket = new WebSocket(links[mode]);
-  else
-    socket = new WebSocket(link);
+  if (!link) socket = new WebSocket(links[mode]);
+  else socket = new WebSocket(link);
   updatePlayerName("");
 
   socket.onmessage = handleSocketMessage;
@@ -86,7 +85,7 @@ function playGame(link = null) {
 }
 
 export function killGame() {
-  if (!socket) return
+  if (!socket) return;
   socket.close();
   socket = null;
   clearInterval(interval);
@@ -112,20 +111,8 @@ async function handleSocketMessage(event) {
   state = JSON.parse(event.data);
 
   if (state.info && state.opponent) updatePlayerName(state.opponent);
-  if (state.info && state.message === "")
-    return game.clearMessage();
-  if (state.info && state.message !== "")
-    return game.writeMessage(state.message);
-  // {
-  //   return await showModal(
-  //     { i18n: "" },
-  //     { i18n: state.message },
-  //     null,
-  //     true,
-  //     endGameBackMenu,
-  //     true
-  //   );
-  // }
+  if (state.info && state.message === "") return game.clearMessage();
+  if (state.info && state.message !== "") return game.writeMessage(state.message);
   game.draw(state);
   if (state.paused) game.drawPause();
   if (state.over) return await displayGameOver(state);
@@ -167,15 +154,20 @@ export function removeKeyListeners() {
 }
 
 async function displayGameOver(state) {
+  var buttonsParam = [
+    { action: "end-game", i18n: "close" },
+    { action: "replay", i18n: "playAgain" },
+  ];
+
+  console.log("mode: " + mode);
+  if (mode === "link") buttonsParam = [{ action: "close-game", i18n: "close" }];
+
   killGame();
   clearInterval(interval);
   return await showModalWithFooterButtons(
     { i18n: "" },
     { i18n: state.score[0] == 3 ? "victory" : "lost" },
-    [
-      { action: "end-game", i18n: "close" },
-      { action: "replay", i18n: "playAgain" },
-    ]
+    buttonsParam
   );
 }
 

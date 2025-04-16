@@ -142,5 +142,11 @@
     "match-duration": "Durée du match :",
     "longest-exchange": "Échange le plus long :",
     "dashboardTitleYour": "Votre tableau de bord",
-    "dashboardTitleOther": "Tableau de bord de {{username}}"
+    "dashboardTitleOther": "Tableau de bord de {{username}}",
+    "previous": "PRECEDENT",
+    "next": "SUIVANT",
+    "chatFailed": "La connexion au chat a échoué après cinq tentatives.",
+    "notification_online": "🏆 Tournoi {{tournament-name}} 🏆 : Cliquez ici pour inviter {{username}} à jouer le prochain match.",
+    "notification_offline": "🏆 Tournoi {{tournament-name}} 🏆 :\n Prochain match avec {{username}}. {{username}} n'est pas disponible pour le moment.",
+    "tournamentFrom": "🏆 Tournoi {{tournament-name}} 🏆 : {{username}} vous invite a jouer votre prochain match."
   }

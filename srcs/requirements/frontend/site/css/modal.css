@@ -1,0 +1,24 @@
+.neon-border {
+	border: 1px solid white;
+	box-shadow: inset 0px 0px 0px 4px var(--color-accent), 
+				inset 0px 0px 0px 8px #511db2a8, 
+				0px 0px 0px 4px var(--color-accent), 
+				0px 0px 0px 8px #511db2a8;
+}
+
+.modal-dialog,
+.modal.show .modal-dialog {
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+.modal-content {
+	font-size: 1.5rem;
+	background: var(--color-background);
+	color: white;
+}
+
+.modal-footer {
+	border-top: none;
+	padding-top: 0;
+}

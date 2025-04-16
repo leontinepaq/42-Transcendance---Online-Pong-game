@@ -142,9 +142,10 @@
     "match-duration": "Match duration:",
     "longest-exchange": "Longest exchange:",
     "dashboardTitleYour": "Your dashboard",
-    "dashboardTitleOther": "{{username}}'s dashboard"
-
-
-
+    "dashboardTitleOther": "{{username}}'s dashboard",
+    "notification_online": "🏆 Tournament {{tournament-name}} 🏆: Click here to invite {{username}} to play next match.",
+    "notification_offline": "🏆 Tournament {{tournament-name}} 🏆:\n Next match with {{username}}. {{username}} is not available at the moment.",
+    "chatFailed": "Chat connection failed after 5 attemps.",
+    "tournamentFrom": "🏆 Tournament {{tournament-name}} 🏆: {{username}} invites you to play your next match."
 }
   

@@ -1,7 +1,8 @@
 import { authFetchJson, handleError } from "../api.js";
 import { navigate } from "../router.js";
 import { show, hide } from "../utils.js";
-import { chat, hideChat } from "../chat.js";
+import { chat } from "../chat.js";
+import { hideChat } from "../ui/ChatUI.js";
 import { UserUI } from "../ui/UserUI.js";
 import { doLanguage } from "../translate.js";
 

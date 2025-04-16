@@ -50,6 +50,8 @@ const errors = {
   "unavailable": "unavailable",
   "gameFrom": "gameFrom",
   "gameDeclined": "gameDeclined",
+  "tournamentFrom": "tournamentFrom",
+  "chatFailed": "chatFailed"
 };
 
 let modal = null;
@@ -100,7 +102,7 @@ export async function showModal(
 
   const modalElement = document.getElementById("myModal");
   modal = new bootstrap.Modal(modalElement, { backdrop: closeOnClickOutside });
-  modalElement.addEventListener("hide.bs.modal", removeModalBackdrop, {
+  modalElement.addEventListener("hidden.bs.modal", removeModalBackdrop, {
     once: true,
   });
   await modal.show();
@@ -108,7 +110,7 @@ export async function showModal(
 
   if (typeof onClose === "function") {
     onCloseFunction = onClose;
-    modalElement.addEventListener("hide.bs.modal", onCloseFunction, {
+    modalElement.addEventListener("hidden.bs.modal", onCloseFunction, {
       once: true,
     });
   }
@@ -120,11 +122,11 @@ export async function hideModal(triggerCloseEvent = false) {
   const modalElement = document.getElementById("myModal");
 
   if (!triggerCloseEvent)
-    modalElement.removeEventListener("hide.bs.modal", onCloseFunction, {
+    modalElement.removeEventListener("hidden.bs.modal", onCloseFunction, {
       once: true,
     });
-  if (modal) modal.hide();
-  modalElement.removeEventListener("hide.bs.modal", onCloseFunction, {
+  if (modal) await modal.hide();
+  modalElement.removeEventListener("hidden.bs.modal", onCloseFunction, {
     once: true,
   });
   modal = null;

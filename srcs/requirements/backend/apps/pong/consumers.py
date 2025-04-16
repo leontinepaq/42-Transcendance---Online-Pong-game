@@ -9,6 +9,7 @@ from django.contrib.auth.models import AnonymousUser
 from asgiref.sync import sync_to_async
 from django.core.cache import cache
 from dashboards.models import Game
+from channels.layers import get_channel_layer
 
 User = get_user_model()
 
@@ -130,6 +131,7 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
         kwargs = self.scope['url_route']['kwargs']
         user_id_1 = kwargs.get('user_id_1')
         user_id_2 = kwargs.get('user_id_2')
+        self.tournament_id = kwargs.get('tournament_id')
         
         if user_id_1 != None and user_id_2 != None:
             self.random = True
@@ -260,4 +262,9 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
                                          score_1=self.game.score[0],
                                          score_2=self.game.score[1],
                                          duration=timedelta(seconds=self.game.total_time),
-                                         longest_exchange=self.game.longuest_exchange)
+                                         longest_exchange=self.game.longuest_exchange,
+                                         tournament_id=self.tournament_id)
+        if self.tournament_id != None:
+            channel_layer = get_channel_layer()
+            await channel_layer.group_send("common_channel",
+                                           {"type": "toggle.update"})

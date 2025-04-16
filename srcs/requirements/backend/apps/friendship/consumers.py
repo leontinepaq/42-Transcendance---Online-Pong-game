@@ -8,6 +8,7 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from .serializers import UserFriendsSerializer
 from enum import Enum
+from dashboards.models import Tournament
 
 class Status(Enum):
     OFFLINE = 0
@@ -67,6 +68,11 @@ class CommonConsumer(UserConsumer):
     async def update_status(self):
         await self.set_status(get_status(self.user.id))
         
+    async def send_next_games(self):
+        next = await sync_to_async(self.get_next_games)()
+        await self.send(json.dumps({"type": "next-game",
+                                    "data": next}))
+        
     async def set_status(self, status):
         toggle_update = True
         if get_status(self.user.id) == status:
@@ -84,11 +90,21 @@ class CommonConsumer(UserConsumer):
         return [{**UserFriendsSerializer(friend).data,
                  "status": get_status(friend.id).value}
                 for friend in friends]
+        
+    def get_next_games(self):
+        next = Tournament.get_next_matchs_for_user(self.user.id)
+        return [{"id": game["player"].id,
+                 "username": game["player"].username,
+                 "online": is_online(game["player"].id),
+                 "tournament_id": game["tournament"].id,
+                 "tournament_name": game["tournament"].name}
+                for game in next]
 
     async def toggle_update(self, event):
         data = {"type": "update",
                 "data": await sync_to_async(self.get_friends_data)()}
         await self.send(text_data=json.dumps(data))
+        await self.send_next_games()
         
         
     async def complete_data(self, data):
@@ -127,8 +143,10 @@ class CommonConsumer(UserConsumer):
             return await self.send(json.dumps(data))
         
         # BUILDING GAME LINK
-        if data["type"] == "game" or data["type"] == "game-accept":
+        if data["type"] == "game":
             data["link"] = get_game_link(int(data["receiver"]), int(data["sender"]))
+            if "tournament" in data:
+                data["link"] = f"{data["link"]}{data["tournament"]}/"
 
         # SEND THRU WHOLE GROUP
         await self.channel_layer.group_send(self.group_name,

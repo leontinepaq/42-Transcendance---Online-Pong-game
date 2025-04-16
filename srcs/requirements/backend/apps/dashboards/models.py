@@ -150,14 +150,13 @@ class Tournament(models.Model):
 
         if len(players) != 4:
             return None
-
         if len(games) == 0:
-            return (players[0].get_id(), players[1].get_id())
+            return (players[0].user, players[1].user)
         elif len(games) == 1:
-            return (players[2].get_id(), players[3].get_id())
+            return (players[2].user, players[3].user)
         elif len(games) == 2:
             winners = [game.winner for game in games]
-            return (winners[0].get_id(), winners[1].get_id())
+            return (winners[0].user, winners[1].user)
 
         return None
     
@@ -169,7 +168,7 @@ class Tournament(models.Model):
             next_match = tournament.get_next_match()
             if next_match:
                 p1, p2 = next_match
-                matchups.append((p1, p2, tournament.id))
+                matchups.append((p1, p2, tournament))
 
         return matchups
     
@@ -181,8 +180,9 @@ class Tournament(models.Model):
                                              players__user__id=user_id).distinct():
             next_match = tournament.get_next_match()
             if next_match:
-                p1_id, p2_id = next_match
-                if user_id in (p1_id, p2_id):
-                    matchups.append((p1_id, p2_id, tournament.id))
+                p1, p2 = next_match
+                if user_id in (p1.id, p2.id):
+                    matchups.append({"player": p1 if p1.id != user_id else p2,
+                                     "tournament": tournament})
 
         return matchups

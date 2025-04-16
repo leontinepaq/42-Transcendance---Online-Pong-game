@@ -2,6 +2,17 @@ import navigate from "./router.js";
 import { initGameOnline } from "./actions/pong.js";
 import { show, hide } from "./utils.js";
 import { showModal, hideModal, showModalWithFooterButtons } from "./modals.js";
+import doLanguage from "./translate.js";
+import {
+  createFriendListElement,
+  createMessageElement,
+  createChatBubble,
+  getFriendListContainer,
+  getChatInput,
+  getMessageArea,
+  getFooter,
+  getChatBubble,
+} from "./ui/ChatUI.js";
 
 // JSON MSG MODEL
 // {
@@ -14,31 +25,37 @@ import { showModal, hideModal, showModalWithFooterButtons } from "./modals.js";
 //   sender_username: (only in messages sent back by backend)
 // }
 
+let MAXATTEMPTS = 5;
+
 class Chat {
   constructor() {
     this.socket = null;
-    this.reconnect = true;
     this.bubbles = new Map();
     this.reconnectAttempts = 0;
     this.status = new Map();
+    this.notifications = new Map();
+
     this.onopen = () => {
       console.log("✅ WebSocket Users connected!");
       this.reconnectAttempts = 0;
+      this.reconnect = true;
       show(getFooter());
     };
 
     this.onerror = () => {
-      console.error("❌ WebSocket Users error:", error);
       this.socket = null;
-      setTimeout(() => this.connect(), 5000);
+      clearFriendListContainer();
+      console.error("❌ WebSocket Users error");
+      if (this.reconnect)
+        setTimeout(() => this.connect(), 5000);
     };
 
     this.onclose = () => {
-      console.log("🔴 WebSocket Users closed.");
       this.socket = null;
-      const friendListContainer = document.getElementById("chat-users");
-      friendListContainer.innerHTML = "";
-      if (this.reconnect) setTimeout(() => this.connect(), 1500);
+      clearFriendListContainer();
+      console.log("🔴 WebSocket Users closed.");
+      if (this.reconnect)
+        setTimeout(() => this.connect(), 1000);
     };
 
     this.onmessage = async (event) => {
@@ -46,29 +63,17 @@ class Chat {
       console.log("Received: ", data);
 
       if (data.type === "update") return this.updateFriendList(data.data);
-      else if (
-        (data.type === "offline" || data.type === "blocked") &&
-        data.init === "message"
-      )
-        return this.getBubble(data.receiver).setMsgNotReceived(
-          data.type === "blocked"
-        );
-      else if (data.type === "message")
-        return this.getBubble(data.sender, data.sender_username).addReceivedMessage(
-          data.message
-        );
+      else if (data.type === "message") this.addReceivedMessage(data);
       else if (data.type === "game") await receiveGame(data);
-      else if (
-        (data.type === "offline" || data.type === "blocked") &&
-        data.init === "game"
-      )
-        return await showModal(null, {
-          i18n: "unavailable",
-          username: data.receiver_username,
-        });
       else if (data.type === "game-decline") await receiveGameDeclined(data);
-      else if (data.type === "game-cancel") receiveGameCancel(data);
-      else if (data.type === "game-accept") receiveGameAccept(data);
+      else if (data.type === "game-cancel") await receiveGameCancel(data);
+      else if (data.type === "game-accept") await receiveGameAccept(data);
+      else if (data.type === "next-game") this.updateNotifications(data.data);
+      else if (data.type === "offline" || data.type === "blocked") {
+        if (data.init === "message")
+          this.getBubble(data.receiver).setMsgNotReceived(data.type === "blocked");
+        else if (data.init === "game") await receiveUnavailable(data);
+      }
     };
   }
 
@@ -109,11 +114,54 @@ class Chat {
     });
   }
 
+  getNotification(tournament_id) {
+    const id = parseInt(tournament_id);
+
+    if (!this.notifications.has(id)) this.notifications.set(id, new Notif(id));
+    return this.notifications.get(id);
+  }
+
+  updateNotifications(data) {
+    var flickering = false;
+
+    this.notifications.forEach((notif) => {
+      notif.setOutdated();
+    });
+
+    data.forEach((game) => {
+      const notif = this.getNotification(game.tournament_id);
+      flickering = notif.update(game) || flickering;
+    });
+
+    this.notifications.forEach((notif, key, map) => {
+      if (notif.removeIfOutdated()) return map.delete(key);
+      else notif.append();
+    });
+
+    doLanguage();
+    if (!flickering) return;
+
+    const dropdown = document.getElementById("dropdown-toggle-robot");
+    if (dropdown.classList.contains("show")) return;
+    dropdown.classList.add("flickering");
+    dropdown.addEventListener("show.bs.dropdown", () => {
+      dropdown.classList.remove("flickering");
+    });
+  }
+
   connect() {
-    if (this.socket === null && this.reconnectAttempts < 10) {
+    if (this.socket === null && this.reconnectAttempts >= MAXATTEMPTS)
+    {
+      this.reconnectAttempts = 0;
+      return showModal(null, { i18n: "chatFailed" });
+    }
+
+    if (this.socket === null) {
       this.reconnectAttempts++;
       this.socket = new WebSocket("/ws/users/");
     }
+
+    if (this.socket === null) return;
 
     this.socket.onopen = this.onopen;
     this.socket.onerror = this.onerror;
@@ -122,11 +170,11 @@ class Chat {
   }
 
   disconnect() {
+    this.reconnect = false;
     if (this.socket === null) return;
     this.socket.close();
     this.socket = null;
     hide(getFooter());
-    this.reconnect = false;
   }
 
   updateList() {
@@ -137,16 +185,21 @@ class Chat {
     this.send({ type: "message", receiver: id, message: msg });
   }
 
-  sendGame(id) {
-    this.send({ type: "game", receiver: id });
+  sendGame(id, tournament_id, tournament_name) {
+    this.send({
+      type: "game",
+      receiver: id,
+      tournament: tournament_id,
+      tournament_name: tournament_name,
+    });
   }
 
   sendGameCancel(id) {
     this.send({ type: "game-cancel", receiver: id });
   }
 
-  sendGameAccept(id) {
-    this.send({ type: "game-accept", receiver: id });
+  sendGameAccept(id, link) {
+    this.send({ type: "game-accept", receiver: id, link: link });
   }
 
   sendGameDecline(id) {
@@ -171,22 +224,22 @@ class Chat {
       element.close();
     });
   }
+
+  addReceivedMessage(data) {
+    const id = data.sender;
+    const username = data.sender_username;
+    const bubble = this.getBubble(id, username);
+
+    bubble.addReceivedMessage(data.message);
+  }
 }
 
 export const chat = new Chat();
 
-function createMessageElement(msg, sent = true) {
-  const element = document.createElement("li");
-  element.innerText = msg;
-  element.classList.add("msg");
-  if (sent) element.classList.add("msg-sent");
-  else element.classList.add("msg-received");
-  return element;
-}
-
 class ChatBubble {
   constructor(id, username) {
     this.bubble = createChatBubble(id, username);
+    getChatInput(id).addEventListener("keydown", sendMessageOnEnter);
     this.msgArea = getMessageArea(id);
     this.dropdown = document.getElementById("dropdown-toggle-" + id);
     this.dropdownInstance = new bootstrap.Dropdown(this.dropdown);
@@ -253,68 +306,63 @@ class ChatBubble {
   }
 }
 
-//CHAT FRIEND LIST
+class Notif {
+  constructor(id) {
+    this.element = createMessageElement("", false);
+    this.outdated = false;
+  }
 
-function getFriendListContainer() {
-  return document.getElementById("chat-users");
+  isOnline() {
+    return this.element.getAttribute("data-i18n") === "notification_online";
+  }
+
+  getOpponentId() {
+    return this.element.getAttribute("data-id");
+  }
+
+  setOutdated() {
+    this.outdated = true;
+  }
+
+  removeIfOutdated() {
+    if (!this.outdated) return;
+    this.element.remove();
+    return true;
+  }
+
+  update(data) {
+    this.outdated = false;
+
+    var flickering = false;
+    //If opponent changed, or changed status, trigger flickering notif bubble
+    if (!this.isOnline() && data.online) flickering = true;
+    if (this.getOpponentId() != data.id) flickering = true;
+    this.element.setAttribute("data-i18n", "notification_offline");
+    this.element.removeAttribute("data-action");
+    if (data.online) {
+      this.element.setAttribute("data-i18n", "notification_online");
+      this.element.setAttribute("data-action", "launch-pong");
+    }
+    this.element.setAttribute("data-username", data.username.toUpperCase());
+    this.element.setAttribute("data-id", data.id);
+    this.element.setAttribute("data-tournament-id", data.tournament_id);
+    this.element.setAttribute(
+      "data-tournament-name",
+      data.tournament_name.toUpperCase()
+    );
+    return flickering;
+  }
+
+  append() {
+    if (!this.isOnline()) getMessageArea("robot").append(this.element);
+    else getMessageArea("robot").prepend(this.element);
+  }
 }
+
+//CHAT FRIEND LIST
 
 function clearFriendListContainer() {
   getFriendListContainer().innerHTML = "";
-}
-
-function createFriendListElement(id, username) {
-  const element = document.createElement("li");
-  element.classList.add("chat-user");
-  element.setAttribute("data-id", id);
-  element.setAttribute("data-username", username);
-  element.setAttribute("data-action", "open-chat");
-  element.innerHTML = username;
-  return element;
-}
-
-// CHAT BUBBLE CREATION
-
-function chatBubbleContent(id, username) {
-  const content = `
-    <button type="button" class="btn btn-chat btn-secondary dropdown-toggle"
-    data-bs-toggle="dropdown" aria-expanded="false" data-bs-offset="0,10"
-    id="dropdown-toggle-$id" data-bs-auto-close="false">
-    <div class="chat-user" data-id="$id">$username</div>
-    </button>
-    <ul class="dropdown-menu">
-      <div class="d-flex flex-column">
-        <div class="d-flex flex-row justify-content-end chat-header">
-          <span class="material-symbols-outlined" data-action="open-profile"
-          data-id="$id" data-username="$username">insert_chart</span>
-          <span class="material-symbols-outlined" data-action="launch-pong" 
-          data-id="$id" data-username="$username">videogame_asset</span>
-          <span class="material-symbols-outlined" data-action="collapse-chat" 
-          data-id="$id">remove</span>
-          <span class="material-symbols-outlined" data-action="hide-chat" 
-          data-id="$id">close</span>
-        </div>
-        <li><hr class="dropdown-divider"></li>
-        <div class="msg-area d-flex flex-column flex-fill flex-column-reverse"
-        id="msg-area-$id">
-        </div>
-        <li><hr class="dropdown-divider"></li>
-        <input id="chat-input-$id" data-id=$id type="text"
-        class="form-control" placeholder=""/>
-      </div>
-    </ul>`;
-  return content.replaceAll("$id", id).replaceAll("$username", username);
-}
-
-function createChatBubble(userId, username) {
-  var bubble = document.createElement("div");
-  bubble.classList.add("btn-group", "dropup", "dropup-chat");
-  bubble.setAttribute("data-id", userId);
-  bubble.setAttribute("data-username", username);
-  bubble.innerHTML = chatBubbleContent(userId, username);
-  getFooter().appendChild(bubble);
-  getChatInput(userId).addEventListener("keydown", sendMessageOnEnter);
-  return bubble;
 }
 
 // SEND TO SOCKET
@@ -330,135 +378,43 @@ function sendMessageOnEnter(event) {
   chat.getBubble(userId).addSentMessage(message);
 }
 
-// Element getters
+// GAME MSG TREATMENT
 
-function getChatBubble(id) {
-  return document.getElementById("bubble-" + id);
-}
-
-function getChatInput(id) {
-  return document.getElementById("chat-input-" + id);
-}
-
-function getMessageArea(id) {
-  return document.getElementById("msg-area-" + id);
-}
-
-function getFooter() {
-  return document.getElementsByTagName("footer")[0];
-}
-
-export function hideChat(id) {
-  const bubble = getChatBubble(id);
-  if (bubble) hide(bubble);
-}
-
-// ACTIONS
-
-export const chatActions = [
-  {
-    selector: '[data-action="open-chat"]',
-    handler: createChatBubbleAction,
-  },
-  {
-    selector: '[data-action="connect-chat"]',
-    handler: chat.connect,
-  },
-  {
-    selector: '[data-action="open-profile"]',
-    handler: navigateToStatsFromChat,
-  },
-  {
-    selector: '[data-action="hide-chat"]',
-    handler: hideChatAction,
-  },
-  {
-    selector: '[data-action="collapse-chat"]',
-    handler: collapseChatAction,
-  },
-  {
-    selector: '[data-action="launch-pong"]',
-    handler: sendGame,
-  },
-  {
-    selector: '[data-action="game-cancel"]',
-    handler: (element) => {
-      const id = element.dataset.id;
-      sendGameCancel(id);
-    },
-  },
-  {
-    selector: '[data-action="game-decline"]',
-    handler: sendGameDeclined,
-  },
-  {
-    selector: '[data-action="game-accept"]',
-    handler: sendGameAccept,
-  },
-];
-
-export function createChatBubbleAction(element) {
-  chat.collapseAll();
-  const userId = element.dataset.id;
-  const username = element.dataset.username;
-  chat.getBubble(userId, username).open();
-}
-
-function navigateToStatsFromChat(element) {
-  const userId = element.dataset.id;
-  navigate("dashboard", userId);
-}
-
-export function hideChatAction(element) {
-  const id = element.dataset.id;
-  chat.getBubble(id).hide();
-}
-
-export function collapseChatAction(element) {
-  const id = element.dataset.id;
-  chat.getBubble(id).close();
-}
-
-function sendGameCancel(id) {
-  chat.sendGameCancel(id);
-  chat.sendBusyOff();
-}
-
-function receiveGameCancel(data) {
+async function receiveGameCancel(data) {
   if (
     !document.querySelector(`[data-id="${data.sender}"][data-action="game-accept"]`)
   )
     return;
-  hideModal();
+  await hideModal();
   chat.sendBusyOff();
-}
-
-async function sendGame(element) {
-  const id = element.dataset.id;
-  const username = element.dataset.username;
-
-  chat.sendGame(id);
-  await showModalWithFooterButtons(
-    null,
-    { i18n: "waitingFor", username: username },
-    [{ action: "game-cancel", i18n: "cancel", id: id }],
-    () => {
-      sendGameCancel(id);
-    },
-    true
-  );
-  chat.sendBusyOn();
 }
 
 async function receiveGame(data) {
   const id = data.sender;
   const username = data.sender_username;
   const link = data.link;
+  const tournament_id = data.tournament_id;
+  const tournament_name = data.tournament_name;
+  var i18n = "gameFrom";
 
-  await showModalWithFooterButtons(null, { i18n: "gameFrom", username: username }, [
-    { action: "game-decline", i18n: "decline", id: id },
-    { action: "game-accept", i18n: "accept", id: id, link: link },
-  ]);
+  if (tournament_id !== "") i18n = "tournamentFrom";
+
+  await showModalWithFooterButtons(
+    null,
+    {
+      i18n: i18n,
+      username: username.toUpperCase(),
+      "tournament-name": tournament_name.toUpperCase(),
+    },
+    [
+      { action: "game-decline", i18n: "decline", id: id },
+      { action: "game-accept", i18n: "accept", id: id, link: link },
+    ],
+    () => {
+      chat.sendGameDecline(id);
+      chat.sendBusyOff();
+    }
+  );
   chat.sendBusyOn();
 }
 
@@ -473,27 +429,16 @@ async function receiveGameDeclined(data) {
   await showModal(null, { i18n: "gameDeclined", username: username });
 }
 
-function sendGameDeclined(element) {
-  const id = element.dataset.id;
-
-  chat.sendBusyOff();
-  chat.sendGameDecline(id);
-}
-
-function sendGameAccept(element) {
-  const id = element.dataset.id;
-  const link = element.dataset.link;
-
-  chat.sendGameAccept(id);
-  initGameOnline(link);
-}
-
-function receiveGameAccept(data) {
+async function receiveGameAccept(data) {
   const id = data.sender;
   const link = data.link;
 
   if (!document.querySelector('[data-action="game-accept"]')) hideModal();
-  initGameOnline(link);
+  await initGameOnline(link);
+}
+
+async function receiveUnavailable(data) {
+  showModal(null, { i18n: "unavailable", username: data.receiver_username });
 }
 
 export default chat;

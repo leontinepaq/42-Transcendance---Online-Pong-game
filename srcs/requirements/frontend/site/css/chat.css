@@ -1,0 +1,199 @@
+.dropup-chat {
+  color: white;
+}
+
+.dropup-chat .dropdown-toggle::after {
+  display: none;
+}
+
+.dropup-chat .dropdown-menu {
+  background: transparent;
+  color: white;
+  border: solid var(--color-accent);
+  border-radius: 1.5rem;
+  padding: 1rem;
+  font-size: 1.2rem;
+  max-height: 400px;
+  max-width: 400px;
+  min-height: 300px;
+  min-width: 250px;
+  height: 30vh;
+  width: 25vw;
+  background: var(--color-accent-transparent);
+}
+
+.dropup-chat .dropdown-menu > .d-flex {
+  height: 100%;
+  width: 100%;
+}
+
+.btn-chat {
+  margin: 1rem;
+  color: white;
+  background: transparent;
+  margin-left: 0.5rem;
+  margin-right: 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  padding: 0rem 1rem;
+}
+
+.chat-header > * {
+  cursor: pointer;
+}
+
+.chat-user {
+  cursor: pointer;
+  position: relative; /* Needed to position the ::after element */
+  padding-right: 20px; /* Space for the status ball */
+}
+
+.chat-user::after {
+  content: ""; /* Required to create a pseudo-element */
+  position: absolute;
+  right: 5px; /* Adjust position on the right */
+  top: 50%;
+  transform: translateY(-50%); /* Vertically center the ball */
+  width: 8px; /* Size of the ball */
+  height: 8px; /* Size of the ball */
+  border-radius: 50%; /* Makes it circular */
+}
+
+.chat-user[data-status="1"]::after {
+  background-color: green; /* Green ball for online users */
+}
+
+.chat-user[data-status="2"]::after {
+  background-color: orange;
+}
+
+.chat-user[data-status="0"]::after {
+  background-color: grey; /* Grey ball for offline users */
+}
+
+.chat-users:empty::before {
+  content: "No friends yet.";
+  color: gray;
+  font-style: italic;
+  display: block;
+  text-align: left;
+}
+
+#msg-area-robot:empty::before {
+  content: "No notification.";
+  color: gray;
+  font-style: italic;
+  display: block;
+  text-align: left;
+}
+
+.msg {
+  background: var(--color-accent);
+  width: fit-content;
+  border-radius: 1rem;
+  padding: 0.25rem;
+  max-width: 75%;
+  text-wrap: wrap;
+  overflow-wrap: break-word; /* Wraps at natural break points */
+  word-wrap: break-word; /* Older name for compatibility */
+  margin-bottom: 0.2rem;
+}
+
+.msg-sent {
+  background: var(--color-accent-secondary);
+  margin-left: auto;
+}
+
+.msg {
+  width: fit-content;
+  position: relative;
+  background: var(--color-accent);
+  color: white;
+  padding: 0.25rem;
+  border-radius: 0 1rem 1rem 1rem;
+  margin: 5px 0;
+  overflow-wrap: break-word; /* Wraps at natural break points */
+  word-wrap: break-word; /* Older name for compatibility */
+  align-self: flex-start; /* push to left if inside flex */
+}
+
+.msg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-right: 0.6rem solid var(--color-accent);
+  border-bottom: 0.6rem solid transparent;
+}
+
+.msg-sent {
+  width: fit-content;
+  position: relative;
+  background: var(--color-accent-secondary); /* different color for right side */
+  color: white;
+  padding: 0.25rem 0.4rem;
+  border-radius: 1rem 0 1rem 1rem;
+  margin: 5px 0;
+  overflow-wrap: break-word; /* Wraps at natural break points */
+  word-wrap: break-word; /* Older name for compatibility */
+  align-self: flex-end; /* push to the right */
+}
+
+.msg-sent::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -7px;
+  width: 0;
+  height: 0;
+  border-left: 0.6rem solid var(--color-accent-secondary);
+  border-bottom: 0.6rem solid transparent;
+}
+
+.msg-alert {
+  background-color: red;
+}
+
+.msg-sent.msg-alert::before {
+  border-left: 0.6rem solid red;
+  border-bottom: 0.6rem solid transparent;
+}
+
+.offline {
+  color: red;
+  font-style: italic;
+  margin-left: auto;
+}
+
+.dropdown-menu .msg-area {
+  overflow-y: auto; /* Enable scrolling if the content overflows */
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.chat-users {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.flickering:not(.show) {
+  animation-duration: 1.5s;
+  animation-name: flicker;
+  animation-iteration-count: infinite;
+  transition: none;
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0px 0px 0px 6px var(--color-accent),
+      inset 0px 0px 0px 6px var(--color-accent);
+  }
+  100% {
+    opacity: 1;
+  }
+}
