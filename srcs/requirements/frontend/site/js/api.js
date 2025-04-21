@@ -39,7 +39,7 @@ async function refreshToken() {
 }
 
 export async function handleError(error, message = "An error occurred") {
-  // console.error(`${message}:`, error);
+  // console.error(`${message}:`, error); //todo  @leontinepaq a supp?? ou laisser
   await showModal({i18n: "error"}, {i18n: `${error.message}`});
 }
 

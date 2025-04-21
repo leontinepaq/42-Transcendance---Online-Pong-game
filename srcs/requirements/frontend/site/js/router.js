@@ -35,7 +35,7 @@ async function navigateToPage(route, isHistoryUpdate, ...params) {
 window.addEventListener("popstate", async (event) => {
   if (event.state) {
     console.log("Back to: ", event.state.route);
-    navigateToPage(event.state.route, false);
+    await navigateToPage(event.state.route, false);
   }
 });
 
