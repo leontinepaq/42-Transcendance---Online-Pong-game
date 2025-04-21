@@ -25,7 +25,7 @@ admin.site.register(Game, GameAdmin)
 
 # Tournament Admin
 class TournamentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'creator', 'finished', 'created_at')  # Customize the columns to display
+    list_display = ('name', 'creator', 'finished', 'winner','created_at')  # Customize the columns to display
     list_filter = ('finished', 'created_at')  # Filter by finished status and creation date
     search_fields = ('name', 'creator__username')  # Allow search by tournament name and creator username
     ordering = ('created_at',)  # Order by creation date

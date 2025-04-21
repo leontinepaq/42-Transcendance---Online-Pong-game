@@ -101,8 +101,9 @@ class Game(models.Model):
                 tournament.finished = True
                 tournament.winner = winner
                 tournament.save()
+                return game, winner.user.id
 
-        return game
+        return game, None
 
     @classmethod
     def create_ai(cls, id_player, score_player, score_ai, duration=None, longest_exchange=None):

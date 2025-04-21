@@ -257,7 +257,7 @@ class PongOnlineGameConsumer(PongSoloGameConsumer):
         self.decr_connected_players()
 
     async def save_game(self):
-        await sync_to_async(Game.create)(id1=self.user.id,
+        game, winner = await sync_to_async(Game.create)(id1=self.user.id,
                                          id2=self.opponent["id"],
                                          score_1=self.game.score[0],
                                          score_2=self.game.score[1],
