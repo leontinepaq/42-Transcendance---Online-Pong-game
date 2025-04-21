@@ -55,7 +55,7 @@ async function fetchAndDisplayTournaments(tab) {
     displayTournaments(tournaments, tab);
     doLanguage();
   } catch (error) {
-    handleError(error, "Display user error");
+    handleError(error, "Display tournament error");
   }
 }
 

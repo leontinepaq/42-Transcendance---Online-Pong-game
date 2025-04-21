@@ -82,6 +82,11 @@ todo @leontinepaq : regarder si utile ou supprimer / renommer */
   box-shadow: 0 0 10px var(--color-accent), 0 0 30px var(--color-accent);
 }
 
+.player-info.winner .avatar-50 {
+  border: 2px solid var(--color-accent-light);
+  box-shadow: 0 0 10px var(--color-accent), 0 0 30px var(--color-accent);
+}
+
 .trophy-icon {
   font-size: 24px;
   color: var(--color-accent-light);
