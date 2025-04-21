@@ -12,6 +12,7 @@ import { verify2faAppActions } from "./actions/validate2faApp.js";
 import { tournamentActions } from "./actions/tournament.js";
 import {translateActions} from "./translate.js";
 import { chatActions } from "./actions/chat.js";
+import {backgroundAction} from "./actions/toggleBackground.js"
 
 // Table des actions à gérer, "..." = concat
 const clickActions = [
@@ -29,6 +30,7 @@ const clickActions = [
   ...tournamentActions,
   ...chatActions,
   ...translateActions,
+  ...backgroundAction,
   // ...TwofaActions,
 ];
 

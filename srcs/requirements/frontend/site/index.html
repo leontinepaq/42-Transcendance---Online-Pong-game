@@ -53,10 +53,19 @@
         </div>
       </div>
     </div>
-    <div class="mt-2" id="language-select">
-      <button class="btn" data-action="translate-en" id="english">English 🇬🇧</button>
-      <button class="btn" data-action="translate-fr" id="french">Français 🇫🇷</button>
-      <button class="btn" data-action="translate-es" id="spanish">Español 🇪🇸</button>
+    <div class="d-flex justify-content-between mt-2">
+      <div id="language-select">
+        <button class="btn" data-action="translate-en" id="english">
+          English 🇬🇧
+        </button>
+        <button class="btn" data-action="translate-fr" id="french">
+          Français 🇫🇷
+        </button>
+        <button class="btn" data-action="translate-es" id="spanish">
+          Español 🇪🇸
+        </button>
+      </div>
+      <button class="btn" id="toggle-bg" data-action="toggle-bg" data-mode="deactivate">background</button>
     </div>
     <nav class="navbar">
       <div class="container d-flex justify-content-center">
@@ -89,8 +98,7 @@
           <li><hr class="dropdown-divider" /></li>
           <div
             class="msg-area d-flex flex-column flex-fill flex-column-reverse"
-            id="msg-area-robot">
-          </div>
+            id="msg-area-robot"></div>
         </div>
       </ul>
     </div>
