@@ -114,6 +114,13 @@ class Chat {
     });
   }
 
+  removeBubbles() {
+    this.bubbles.forEach((bubble, key, map) => {
+      bubble.remove();
+      map.delete(key);
+    })
+  }
+
   getNotification(tournament_id) {
     const id = parseInt(tournament_id);
 
@@ -170,6 +177,7 @@ class Chat {
   }
 
   disconnect() {
+    this.removeBubbles();
     this.reconnect = false;
     if (this.socket === null) return;
     this.socket.close();
@@ -247,6 +255,10 @@ class ChatBubble {
       "show.bs.dropdown",
       this.unsetFlickering.bind(this)
     );
+  }
+
+  remove() {
+    this.bubble.remove();
   }
 
   open() {

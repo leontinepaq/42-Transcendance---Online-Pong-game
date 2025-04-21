@@ -71,7 +71,3 @@ volumes:
     name: db
   media:
     name: media
-    # driver: local
-    # driver_opts:
-    #   device: $HOME/data/db
-    #   type: none
