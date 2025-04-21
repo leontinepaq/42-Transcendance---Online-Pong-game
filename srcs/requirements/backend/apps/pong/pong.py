@@ -173,12 +173,10 @@ class Pong:
         reaction_chance = 0.6  # 60% chance to react to ball movement
         if random.random() < reaction_chance:
             target_y += random.uniform(-10, 10)
-            move_amount = self.ai_speed * \
-                random.uniform(0.8, 1.2)  # Imperfect speed
             if self.right.y < target_y:
-                self.right.move(move_amount)
+                self.right.move(self.ai_speed)
             elif self.right.y > target_y:
-                self.right.move(-move_amount)
+                self.right.move(-self.ai_speed)
 
     def save_game_duration(self):
         if self.start_time and self.end_time:

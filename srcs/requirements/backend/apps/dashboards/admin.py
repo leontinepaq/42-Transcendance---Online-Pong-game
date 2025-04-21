@@ -16,7 +16,7 @@ admin.site.register(Participant, ParticipantAdmin)
 
 # Game Admin
 class GameAdmin(admin.ModelAdmin):
-    list_display = ('player1', 'player2', 'winner', 'score_player1', 'score_player2', 'created_at', 'finished')
+    list_display = ('player1', 'player2', 'winner', 'score_player1', 'score_player2', 'created_at', 'finished', 'tournament')
     list_filter = ('finished', 'created_at', 'winner')  # Filter by game finish status, date, winner
     search_fields = ('player1__name', 'player2__name')  # Allow search by player names
     ordering = ('created_at',)  # Order by creation date

@@ -8,7 +8,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o4r1!m^8xhfg1f*x)v1ts_pf5i97#x486ty6a!m9bnp%7&uygw'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -107,9 +107,9 @@ WSGI_APPLICATION = 'apps.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {"default": {'ENGINE': 'django.db.backends.postgresql',
-                         'NAME': 'postgres',
-                         'USER': 'postgres',
-                         'PASSWORD': 'postgres',
+                         'NAME': os.environ.get("POSTGRES_DB"),
+                         'USER': os.environ.get("POSTGRES_USER"),
+                         'PASSWORD': os.environ.get("POSTGRES_PASSWORD"),
                          'HOST': 'postgres',
                          'PORT': 5432,}}
 
@@ -144,8 +144,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email configuration for development (use an actual SMTP server in production)
 # This prints the email to the console
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'                # or your provider
+EMAIL_PORT = 587                             # TLS port
+EMAIL_USE_TLS = True                         # Use TLS (secure)
+EMAIL_HOST_USER = os.environ.get("EMAIL_USER")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASS")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
 
 MEDIA_ROOT = "/media/"
 DEFAULT_AVATAR_URL = "/media/avatars/default_avatar.png"
