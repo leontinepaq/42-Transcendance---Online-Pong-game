@@ -72,7 +72,7 @@ def display_available(request):
         participant_count__lt=4
     ).exclude(
         players=participant
-    )
+    ).order_by('-created_at')
     return paginated_response(request, available_tournaments, DisplayTournamentSerializer)
 
 @extend_schema(
@@ -96,7 +96,7 @@ def display_registered(request):
     ).filter(
         participant_count__lt=4,
         players=participant
-    )
+    ).order_by('-created_at')
     return paginated_response(request, registered_tournaments, DisplayTournamentSerializer)
 
 
@@ -121,7 +121,7 @@ def display_ongoing(request):
     ).filter(
         players=participant,
         participant_count=4
-    )
+    ).order_by('-created_at')
     return paginated_response(request, ongoing_tournaments, DisplayTournamentSerializer)
 
 @extend_schema(
@@ -141,7 +141,7 @@ def display_history(request):
     history_tournaments = Tournament.objects.filter(
         finished=True,
         players=participant
-    )
+    ).order_by('-created_at')
     return paginated_response(request, history_tournaments, DisplayTournamentSerializer)
 
 
