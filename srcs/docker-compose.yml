@@ -56,7 +56,6 @@ services:
           path: ./requirements/frontend/nginx.conf
           target: /etc/nginx/nginx.conf
     ports:
-      - "9999:80"
       - "8888:443"
     depends_on:
       - backend

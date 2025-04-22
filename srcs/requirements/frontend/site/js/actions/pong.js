@@ -109,6 +109,7 @@ function updatePlayerName(opponent) {
 
 async function handleSocketMessage(event) {
   state = JSON.parse(event.data);
+  console.log("Received ", state);
 
   if (state.info && state.opponent) updatePlayerName(state.opponent);
   if (state.info && state.message === "") return game.clearMessage();

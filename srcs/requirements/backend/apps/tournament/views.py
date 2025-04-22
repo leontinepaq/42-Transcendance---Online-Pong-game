@@ -10,6 +10,8 @@ from .serializers import (TournamentCreateSerializer,
                           TournamentRegisterSerializer,
                           ApiResponse,
                           ErrorResponseSerializer)
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 
 @extend_schema(
@@ -174,6 +176,10 @@ def register(request):
         return ApiResponse.error("This tournament already has 4 participants", status_code=400)
 
     tournament.players.add(participant)
+    if tournament.players.count() == 4:
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)("common_channel",
+                                                {"type": "toggle.update"})
 
     response_data = TournamentSuccessResponseSerializer(tournament)
     return ApiResponse.success(response_data.data, status_code=201)

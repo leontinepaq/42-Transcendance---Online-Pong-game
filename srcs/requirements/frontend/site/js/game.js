@@ -17,7 +17,7 @@ export default class Game {
   }
 
   clear() {
-    this.clearMessage();
+    // this.clearMessage();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
@@ -98,6 +98,7 @@ export default class Game {
   }
 
   writeMessage(msg) {
+    console.log("Writing game message ", msg);
     this.clear();
     this.backgroundText.setAttribute("data-i18n", i18n[msg]);
     doLanguage();

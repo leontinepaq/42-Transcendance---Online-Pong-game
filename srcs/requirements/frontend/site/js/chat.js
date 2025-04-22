@@ -405,11 +405,11 @@ async function receiveGame(data) {
   const id = data.sender;
   const username = data.sender_username;
   const link = data.link;
-  const tournament_id = data.tournament_id;
-  const tournament_name = data.tournament_name;
+  var tournament_name = "";
   var i18n = "gameFrom";
 
-  if (tournament_id !== "") i18n = "tournamentFrom";
+  if (data.tournament_name) tournament_name = data.tournament_name;
+  if (data.tournament) i18n = "tournamentFrom";
 
   await showModalWithFooterButtons(
     null,
