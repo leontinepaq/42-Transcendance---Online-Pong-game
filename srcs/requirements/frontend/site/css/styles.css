@@ -377,3 +377,22 @@ form {
   border: 2px solid var(--color-accent);
   background-color: var(--color-accent-transparent);
 }
+
+.text-instructions {
+  white-space: pre-wrap;
+}
+
+.gameInstructions{
+  position: absolute;
+  top: 75%;         /* centré verticalement */
+  left: 50%;        /* centré horizontalement */
+  color: var(--color-accent-light);
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none; /* pour que les clics passent à travers */
+
+}
+
+.game-background {
+  position: relative;
+}

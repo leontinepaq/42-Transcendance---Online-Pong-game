@@ -146,6 +146,11 @@
     "chatFailed": "La conexión al chat ha fallado después de cinco intentos.",
     "notification_online": "🏆 Torneo {{tournament-name}} 🏆: Haz clic aquí para invitar a {{username}} a jugar el próximo partido.",
     "notification_offline": "🏆 Torneo {{tournament-name}} 🏆:\n Próximo partido con {{username}}. {{username}} no está disponible en este momento.",
-    "tournamentFrom": "🏆 Torneo {{tournament-name}} 🏆: {{username}} te invita a jugar tu próximo partido."
+    "tournamentFrom": "🏆 Torneo {{tournament-name}} 🏆: {{username}} te invita a jugar tu próximo partido.",
+    "local-tournament": "TORNEO LOCAL",
+    "controls": "CONTROLES",
+    "instructions":"🅆 / 🅂 o ↑ / ↓ – Mover la paleta\nEspacio – Pausa",
+    "instructions-local":"🅆 / 🅂 – Mover la paleta IZQUIERDA\n↑ / ↓ – Mover la paleta DERECHA\nEspacio – Pausa",
+    "background": "FONDO ESTRELLADO"
   }
   

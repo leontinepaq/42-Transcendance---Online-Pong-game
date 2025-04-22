@@ -1,4 +1,5 @@
 import {doLanguage} from "./translate.js"
+import { show, hide } from "./utils.js";
 
 const i18n = {
   "Waiting for 2nd player": "waiting",
@@ -13,6 +14,8 @@ export default class Game {
     this.leftScore = document.getElementById("leftScore");
     this.rightScore = document.getElementById("rightScore");
     this.backgroundText = document.getElementById("gameBackgroundText");
+    this.instructions = document.getElementById("gameInstructions");
+    this.instructionsText = document.getElementById("instructionsText");
     this.drawPause();
   }
 
@@ -90,6 +93,7 @@ export default class Game {
     const pauseY = this.canvas.height / 2 - barHeight / 2;
     this.ctx.fillRect(pauseX + 10, pauseY, barWidth, barHeight);
     this.ctx.fillRect(pauseX + 50, pauseY, barWidth, barHeight);
+    show(this.instructions);
   }
 
   updateScore(state) {
@@ -111,8 +115,16 @@ export default class Game {
 
   draw(state) {
     this.clear();
+    hide(this.instructions);
     this.updateScore(state);
     this.drawBall(state.ball.x, state.ball.y, state.ball.r);
     this.drawPaddle(state);
+  }
+
+  setInstructions(mode) {
+    if (mode == "multi")
+      this.instructionsText.dataset.i18n="instructions-local"
+    else
+      this.instructionsText.dataset.i18n="instructions"
   }
 }

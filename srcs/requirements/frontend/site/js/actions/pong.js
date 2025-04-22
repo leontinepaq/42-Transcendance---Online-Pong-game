@@ -78,6 +78,7 @@ function playGame(link = null) {
   if (!link) socket = new WebSocket(links[mode]);
   else socket = new WebSocket(link);
   updatePlayerName("");
+  game.setInstructions(mode);
 
   socket.onmessage = handleSocketMessage;
 
