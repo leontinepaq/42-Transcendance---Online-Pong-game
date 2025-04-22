@@ -2,6 +2,7 @@ from django.db import models
 from users.models import UserProfile
 from django.shortcuts import get_object_or_404
 
+
 class Participant(models.Model):
     user = models.ForeignKey(UserProfile,
                              on_delete=models.CASCADE,
@@ -18,7 +19,7 @@ class Participant(models.Model):
                                                      name="Unknown",
                                                      is_ai=False)
         return unknown
-    
+
     @classmethod
     def get_unknown_pk(cls):
         unknown = cls.get_unknown()
@@ -43,9 +44,10 @@ class Participant(models.Model):
                                                 name="Computer",
                                                 is_ai=True)
         return ai
-    
+
     def get_id(self):
         return self.user.id if self.user else None
+
 
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
@@ -139,51 +141,64 @@ class Tournament(models.Model):
             creator_user = UserProfile.objects.get(id=creator_id)
         except UserProfile.DoesNotExist:
             raise ValueError("User not found")
-        
+
         participant = Participant.get(creator_id)
         tournament = cls.objects.create(name=name, creator=creator_user)
         tournament.players.add(participant)
         return tournament
-    
+
+
     def get_next_match(self):
-        games = list(self.games.all().order_by('created_at'))
-        players = list(self.players.all())
+        existing_games = list(self.games.all().order_by('created_at'))
+        players = list(self.players.all().order_by('id'))
 
         if len(players) != 4:
-            return None
-        if len(games) == 0:
-            return (players[0].user, players[1].user)
-        elif len(games) == 1:
-            return (players[2].user, players[3].user)
-        elif len(games) == 2:
-            winners = [game.winner for game in games]
-            return (winners[0].user, winners[1].user)
+            return []
 
-        return None
-    
-    @classmethod
-    def get_next_matchs(cls):
-        matchups = []
+        if len(existing_games) == 0:
+            game1 = Game(player1=players[0], player2=players[1], tournament=self)
+            game2 = Game(player1=players[2], player2=players[3], tournament=self)
+            return [game1, game2]
 
-        for tournament in cls.objects.filter(finished=False):
-            next_match = tournament.get_next_match()
-            if next_match:
-                p1, p2 = next_match
-                matchups.append((p1, p2, tournament))
+        elif len(existing_games) == 1:
+            first_game = existing_games[0]
+            if first_game.player1 in (players[0], players[1]):
+                second_game = Game(
+                    player1=players[2], player2=players[3], tournament=self)
+            else:
+                second_game = Game(
+                    player1=players[0], player2=players[1], tournament=self)
+            return [first_game, second_game]
 
-        return matchups
-    
+        elif len(existing_games) == 2:
+            semi1 = existing_games[0]
+            semi2 = existing_games[1]
+            final = Game(
+                player1=semi1.winner,
+                player2=semi2.winner,
+                tournament=self
+            )
+            return [semi1, semi2, final]
+
+        elif len(existing_games) >= 3:
+            return existing_games[:3]  # all matches played
+
+        return []
+
     @classmethod
     def get_next_matchs_for_user(cls, user_id):
         matchups = []
 
         for tournament in cls.objects.filter(finished=False,
                                              players__user__id=user_id).distinct():
-            next_match = tournament.get_next_match()
-            if next_match:
-                p1, p2 = next_match
+            next = tournament.get_next_match()
+            for match in next:
+                if match.id:
+                    continue
+                p1 = match.player1.user
+                p2 = match.player2.user
                 if user_id in (p1.id, p2.id):
                     matchups.append({"player": p1 if p1.id != user_id else p2,
                                      "tournament": tournament})
-
+        print(matchups)
         return matchups

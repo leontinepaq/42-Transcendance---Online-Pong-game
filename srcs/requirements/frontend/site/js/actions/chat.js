@@ -1,6 +1,7 @@
 import { initGameOnline } from "./pong.js";
 import { chat } from "../chat.js";
 import { hideModal, showModalWithFooterButtons } from "../modals.js";
+import { navigate } from "../router.js"
 
 export const chatActions = [
   {

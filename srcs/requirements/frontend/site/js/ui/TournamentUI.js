@@ -105,20 +105,23 @@ function createEmptyGame() {
   `;
 }
 
-function createMiniMatch(game) {
+function createMiniMatch(game, revert = false) {
   if (!game) return createEmptyGame();
   const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
+  const notPlayed = game.id === null;
 
-  const player1 = createMiniPlayerBlock(
+  var player1 = createMiniPlayerBlock(
     game.player1,
-    game.score_player1,
-    isPlayer1Winner
+    notPlayed ? "-" : game.score_player1,
+    notPlayed ? false : isPlayer1Winner
   );
-  const player2 = createMiniPlayerBlock(
+  var player2 = createMiniPlayerBlock(
     game.player2,
-    game.score_player2,
-    !isPlayer1Winner
+    notPlayed ? "-" : game.score_player2,
+    notPlayed ? false : !isPlayer1Winner
   );
+
+  if (revert) [player1, player2] = [player2, player1];
 
   return `
 	  <div class="match-content d-flex justify-content-between align-items-center p-2">
@@ -133,7 +136,11 @@ function createTournamentMatches(tournament, viewKey) {
   if (viewKey == "available" || viewKey == "registered") return ``;
   const matchLeft = createMiniMatch(tournament.games[0]);
   const matchRight = createMiniMatch(tournament.games[1]);
-  const matchFinale = createMiniMatch(tournament.games[2]);
+  const matchFinale = createMiniMatch(
+    tournament.games[2],
+    tournament.games[2] &&
+      tournament.games[0].winner.id != tournament.games[2].player1.id
+  );
   return `
 	  <div class="matches d-flex flex-column align-items-center justify-content-center mt-4 mb-4">
 		<h3 data-i18n="matches">Matches</h3>

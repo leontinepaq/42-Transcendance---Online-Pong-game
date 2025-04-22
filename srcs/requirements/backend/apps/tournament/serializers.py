@@ -26,7 +26,8 @@ class DisplayTournamentSerializer(serializers.ModelSerializer):
         return ParticipantSerializer(participants, many=True).data
 
     def get_games(self, obj):
-        games = obj.games.all().order_by('created_at')  # ou .filter(tournament=obj)
+        # games = obj.games.all().order_by('created_at')  # ou .filter(tournament=obj)
+        games = obj.get_next_match()
         return GameSerializer(games, many=True).data
 
 class TournamentRegisterSerializer(serializers.Serializer):

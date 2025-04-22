@@ -93,6 +93,8 @@ class CommonConsumer(UserConsumer):
         
     def get_next_games(self):
         next = Tournament.get_next_matchs_for_user(self.user.id)
+        if next is None:
+            return []
         return [{"id": game["player"].id,
                  "username": game["player"].username,
                  "online": is_online(game["player"].id),

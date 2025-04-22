@@ -19,7 +19,7 @@ admin.avatar_url="/media/avatars/admin.jpg"
 admin.is_active=False
 admin.save()
 
-for name in usernames:    
+for name in usernames:
     if not UserModel.objects.filter(username=name).exists():
         user=UserModel.objects.create_user(name, name + "@test.com", password='test')
         user.avatar_url=f"/media/avatars/{name}.jpg"
