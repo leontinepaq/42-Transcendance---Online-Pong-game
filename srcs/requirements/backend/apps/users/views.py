@@ -111,7 +111,6 @@ def login(request):
     
     refresh=RefreshToken.for_user(user)
     response=Response({"details": "Login successful"})
-    print("JWT TOKEN IS \n", str(refresh.access_token))
     response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                         value=str(refresh.access_token),
                         max_age=settings.SIMPLE_JWT["ACCESS_TOKEN_LIFETIME"],
@@ -266,7 +265,6 @@ class CookieTokenRefreshView(TokenRefreshView):
             return ResponseRefreshTokenErrorInvalid.response()
 
         access_token = serializer.validated_data.get("access")
-        print("JWT TOKEN IS \n", access_token)
         response = ResponseRefreshToken().response()
         response.set_cookie(key=settings.SIMPLE_JWT["AUTH_COOKIE"],
                             value=access_token,

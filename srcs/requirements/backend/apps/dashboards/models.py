@@ -200,5 +200,4 @@ class Tournament(models.Model):
                 if user_id in (p1.id, p2.id):
                     matchups.append({"player": p1 if p1.id != user_id else p2,
                                      "tournament": tournament})
-        print(matchups)
         return matchups

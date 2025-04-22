@@ -252,9 +252,6 @@ def unblock_user(request, user_id):
 def get_friends(request):
     user = request.user
     friends = user.friends.all()
-    print("printing...")
-    for friend in friends:
-        print(friend.username)
     serializer = UserPublicProfileSerializer(friends, many=True)
     return Response(serializer.data, status=200)
 
