@@ -65,6 +65,8 @@ function endGameBackMenu() {
 }
 
 function sendTogglePause() {
+  if (!socket)
+    return ;
   socket.send(JSON.stringify({ toggle_pause: true, side: "left", paddle: 0 }));
 }
 
@@ -173,6 +175,8 @@ async function displayGameOver(state) {
 }
 
 function sendMove(left = true, up = true) {
+  if (!socket)
+    return ;
   socket.send(
     JSON.stringify({
       toggle_pause: false,

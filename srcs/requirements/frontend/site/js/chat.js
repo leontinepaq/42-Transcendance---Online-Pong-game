@@ -224,6 +224,8 @@ class Chat {
 
   send(message) {
     console.log("Sending: ", message);
+    if (!this.socket)
+      return ;
     this.socket.send(JSON.stringify(message));
   }
 
