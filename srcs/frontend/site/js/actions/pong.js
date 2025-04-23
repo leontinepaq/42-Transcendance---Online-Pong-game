@@ -213,7 +213,7 @@ function updatePlayerName(opponent) {
 
 async function handleSocketMessage(event) {
   state = JSON.parse(event.data);
-  console.log("Received ", state);
+  // console.log("Received ", state);
 
   if (state.info && state.opponent) updatePlayerName(state.opponent);
   if (state.info && state.message === "") return game.clearMessage();
@@ -226,7 +226,7 @@ async function handleSocketMessage(event) {
 }
 
 function handleTournamentMatchEnd(state) {
-  console.log(state);
+  // console.log(state);
   tournament.games[tournament.idx].id = 1; //Game played -> id exists
   tournament.games[tournament.idx].score_player1 = state.score[0];
   tournament.games[tournament.idx].score_player2 = state.score[1];
@@ -338,7 +338,7 @@ function keyGameLoop() {
   }
   if (keysPressed["ArrowDown"]) {
     if (mode === "multi" || mode === "tournament") sendMoveDown(false);
-    else if (!keysPressed("s")) sendMoveDown();
+    else if (!keysPressed["s"]) sendMoveDown();
   }
 }
 

@@ -1,21 +1,21 @@
 all:		up
 
 hard-up:
-				docker compose -f ./srcs/docker-compose.yml up --force-recreate
+				docker compose -f ./docker-compose.yml up --force-recreate
 
 up:
-				docker compose -f ./srcs/docker-compose.yml up --build --watch
+				docker compose -f ./docker-compose.yml up --build --watch
 
 down:
-				docker compose -f ./srcs/docker-compose.yml down 
+				docker compose -f ./docker-compose.yml down
 
 stop:
-				docker compose -f ./srcs/docker-compose.yml stop
+				docker compose -f ./docker-compose.yml stop
 
 re:				down up
 
 populate_db:
-				cat ./srcs/requirements/backend/populate_db.py | \
+				cat ./srcs/backend/populate_db.py | \
 				docker exec --interactive backend python ./apps/manage.py shell
 				@for f in pp/*; do \
 					if [ -f "$$f" ]; then \

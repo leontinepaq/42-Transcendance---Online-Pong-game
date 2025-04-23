@@ -1,7 +1,7 @@
 services:
 
   postgres:
-    build: ./requirements/postgres
+    build: ./srcs/postgres
     image: postgres
     container_name: postgres
     volumes:
@@ -16,7 +16,7 @@ services:
     restart: always
 
   backend:
-    build: ./requirements/backend
+    build: ./srcs/backend
     image: backend
     container_name: backend
     restart: always
@@ -27,10 +27,10 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./requirements/backend/apps
+          path: ./srcs/backend/apps
           target: /apps/
         - action: sync+restart
-          path: ./requirements/backend/requirements.txt
+          path: ./srcs/backend/requirements.txt
           target: /
     depends_on:
       postgres:
@@ -39,7 +39,7 @@ services:
       - ".env"
 
   frontend:
-    build: ./requirements/frontend
+    build: ./srcs/frontend
     image: frontend
     container_name: frontend
     volumes:
@@ -48,12 +48,12 @@ services:
     develop:
       watch:
         - action: sync
-          path: ./requirements/frontend/site
+          path: ./srcs/frontend/site
           target: /site/
           ignore:
             - node_modules/
         - action: sync+restart
-          path: ./requirements/frontend/nginx.conf
+          path: ./srcs/frontend/nginx.conf
           target: /etc/nginx/nginx.conf
     ports:
       - "8888:443"

@@ -60,7 +60,7 @@ class Chat {
 
     this.onmessage = async (event) => {
       const data = JSON.parse(event.data);
-      console.log("Received: ", data);
+      // console.log("Received: ", data);
 
       if (data.type === "update") return this.updateFriendList(data.data);
       else if (data.type === "message") this.addReceivedMessage(data);
@@ -223,7 +223,7 @@ class Chat {
   }
 
   send(message) {
-    console.log("Sending: ", message);
+    // console.log("Sending: ", message);
     if (!this.socket)
       return ;
     this.socket.send(JSON.stringify(message));

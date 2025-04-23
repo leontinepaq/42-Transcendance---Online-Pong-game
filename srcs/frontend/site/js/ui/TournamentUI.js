@@ -106,7 +106,6 @@ function createEmptyGame() {
 }
 
 function createMiniMatch(game, revert = false) {
-  console.log(game);
   if (!game) return createEmptyGame();
   const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
   const notPlayed = game.id === null;
@@ -134,7 +133,6 @@ function createMiniMatch(game, revert = false) {
 }
 
 export function createTournamentMatches(tournament, viewKey) {
-  console.log(tournament);
   if (viewKey == "available" || viewKey == "registered") return ``;
   const matchLeft = createMiniMatch(tournament.games[0]);
   const matchRight = createMiniMatch(tournament.games[1]);

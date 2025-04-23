@@ -102,7 +102,7 @@ export default class Game {
   }
 
   writeMessage(msg) {
-    console.log("Writing game message ", msg);
+    // console.log("Writing game message ", msg);
     this.clear();
     this.backgroundText.setAttribute("data-i18n", i18n[msg]);
     doLanguage();
