@@ -32,7 +32,7 @@ for name in usernames:
 for i in range(0, 50):
     score_1 = random.randint(0, 2)
     score_2 = random.randint(0, 2)
-    longest_exchange = random.randint(0, 100)
+    longest_exchange = random.randint(2, 50)
     duration = datetime.timedelta(minutes=random.randint(0, 5),
                                   seconds=random.randint(0, 60))
     if random.randint(0, 1):
@@ -56,7 +56,7 @@ for i in range(0, 50):
     game.created_at = timezone.now() - datetime.timedelta(days=random.randint(0, 10))
     game.save()
 
-for i in range(0, 30):
+for i in range(0, 6):
     players = random.sample(ids, random.randint(2, 4))
     tournament = Tournament.create_tournament(f"Tournament {i}", players[0])
     for player in players[1:]:
