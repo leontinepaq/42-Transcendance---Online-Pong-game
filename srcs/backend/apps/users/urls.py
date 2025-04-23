@@ -7,7 +7,8 @@ from .views import (register,
                     send_2fa_mail_activation,
                     verify_2fa_mail,
                     get_2fa_qr_activation,
-                    verify_2fa_qr,)
+                    verify_2fa_qr,
+					forgotten_password)
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -22,4 +23,5 @@ urlpatterns = [
     path("verify_2fa_mail/", verify_2fa_mail),
     path('get_2fa_qr_activation/', get_2fa_qr_activation),
     path('verify_2fa_qr/', verify_2fa_qr),
+	path('forgotten_password', forgotten_password)
 ]

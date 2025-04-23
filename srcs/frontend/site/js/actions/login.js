@@ -66,7 +66,15 @@ export async function handleAuth(element, event) {
   }
 }
 
-// todo @samihelal / @leontinepaq  => surement un lien vers une autre page donc pas gere ici mais a faire
 async function handleForgotPwd(element, event) {
-  console.log("{login.js} forgot password button clicked", element);
-}
+  const username = document.getElementById("username").value;
+    try {
+      const response = await authFetchJson("/api/user/forgotten_password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username })
+      });
+    } catch (error) {
+      handleError(error, "Forget password error");
+    }
+  }

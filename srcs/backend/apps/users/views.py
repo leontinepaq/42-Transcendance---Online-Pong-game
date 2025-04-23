@@ -21,6 +21,11 @@ from django.conf import settings
 import qrcode
 import pyotp
 import base64
+import string
+from django.utils.crypto import get_random_string
+from django.core.mail import send_mail
+from django.shortcuts import get_object_or_404
+
 
 User=get_user_model()
 
@@ -273,3 +278,18 @@ class CookieTokenRefreshView(TokenRefreshView):
                             secure=settings.SIMPLE_JWT["AUTH_COOKIE_SECURE"],
                             samesite=settings.SIMPLE_JWT["AUTH_COOKIE_SAMESITE"])
         return response
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def forgotten_password(request):
+    username = request.data.get("username")
+    user = get_object_or_404(UserProfile, username=username)
+    new_password = get_random_string(length=8,allowed_chars=string.ascii_letters + string.digits)
+    user.set_password(new_password)
+    user.save()
+    send_mail('Forgotten Password',
+              f'Your new password is: {new_password}',
+              settings.DEFAULT_FROM_EMAIL,
+              [user.email],
+              fail_silently=False)
+    return GenericResponse({"details": "Password reset"}).response(200)
