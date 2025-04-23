@@ -2,7 +2,7 @@ from datetime import timedelta
 from collections import defaultdict
 from .models import Game, Participant
 from django.db.models import Q
-from django.utils import timezone # todo @leontinepaq a checker
+from django.utils import timezone # @leontinepaq : pourrait etre + robuste avec timezone -> game_date = timezone.localtime(game.created_at).date()
 
 
 # Fonction principale pour obtenir les statistiques

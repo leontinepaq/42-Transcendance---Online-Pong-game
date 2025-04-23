@@ -21,7 +21,6 @@ export async function checkAuth() {
   }
 }
 
-//todo @leontinepaq a supp + dans bck
 async function refreshToken() {
   const response = await fetch("/api/token/refresh/", {
     method: "POST",
@@ -39,7 +38,7 @@ async function refreshToken() {
 }
 
 export async function handleError(error, message = "An error occurred") {
-  // console.error(`${message}:`, error); //todo  @leontinepaq a supp?? ou laisser
+  // console.error(`${message}:`, error); //debug
   await showModal({i18n: "error"}, {i18n: `${error.message}`});
 }
 
@@ -48,21 +47,6 @@ export async function authFetchJson(url, options = {}) {
     ...options,
     credentials: "include",
   });
-  // if (response.status === 401) {
-  //   //todo @leontinepaq ou @Jean-Antoine > a checker : n'est jamais appelee..? (j'ai limpression) + je crois que ca ne fonctionnerait meme pas
-  //   // si error 401 et changement de langue, refresh en boucle ?? // enlever ce trucccc
-  //   console.log("refhresh token")
-  //   const refreshSuccess = await refreshToken();
-  //   if (refreshSuccess) {
-  //     response = await fetch(url, {
-  //       ...options,
-  //       credentials: "include",
-  //     });
-  //   } else {
-  //     navigate("login");
-  //     throw new Error("Authentication failed");
-  //   }
-  // }
   return parseJsonResponse(response);
 }
 
@@ -80,7 +64,7 @@ async function parseJsonResponse(response) {
       const data = await response.json();
       details = data.details;
     } catch (error) {
-      // console.warn("Failed to parse error response:", error); //todo @leontinepaq checker si try utile..?
+      // console.warn("Failed to parse error response:", error);
     }
     throw new Error(details);
   }

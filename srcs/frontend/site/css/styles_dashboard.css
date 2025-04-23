@@ -4,9 +4,7 @@
   --chart-text-color: var(--color-light);
 }
 
-/* Pour fixer la largeur des lignes et les centrer dans le container 
-todo @leontinepaq : regarder si utile ou supprimer / renommer */
-.fixed-width-row {
+.dashboard-row {
   margin: 0 auto;
   min-height: 20rem;
 }

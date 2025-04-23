@@ -42,7 +42,7 @@ class TournamentRegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError("Tournament has already finished.")
         return value
 
-# todo @leontinepaq : a deplacer dans un dir commun ..?
+# @leontinepaq : pourrait etre dans un dir commun
 
 from rest_framework.response import Response
 from rest_framework import status
