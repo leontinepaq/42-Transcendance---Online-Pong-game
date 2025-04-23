@@ -150,5 +150,18 @@
     "controls": "COMMANDES",
     "instructions":"🅆 / 🅂 ou ↑ / ↓ – Déplacer la raquette\nEspace – Pause",
     "instructions-local":"🅆 / 🅂 – Déplacer la raquette GAUCHE\n↑ / ↓ – Déplacer la raquette DROITE\nEspace – Pause",
-    "background": "FOND ÉTOILÉ"
+    "background": "FOND ÉTOILÉ",
+    "playerNameEmpty": "Le nom du joueur ne peut pas être vide",
+    "doublePlayerName": "Les noms des joueurs doivent être uniques",
+    "playNext": "Jouer le prochain match",
+    "leaveTournament": "Quitter le tournoi",
+    "winnerIs": "GAGNANT : {{username}}",
+    "nextMatch": "PROCHAIN ​​MATCH : {{player1}} CONTRE {{player2}}",
+    "backToMenu": "RETOUR AU MENU",
+    "backToHome": "RETOUR À L'ACCUEIL",
+    "passwordMailSent": "Un nouveau mot de passe vous a été envoyé par e-mail",
+    "confirmEmail": "Confirmez votre adresse e-mail avec le code reçu :",
+    "2fa-sent-mail": "Code 2FA reçu par e-mail",
+    "2fa-sent-app": "Code 2FA de l'application d'authentification",
+    "enterPlayerNames" : "SAISIR LES NOMS DES JOUEURS"
   }

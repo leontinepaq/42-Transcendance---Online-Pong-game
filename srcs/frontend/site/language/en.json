@@ -158,6 +158,11 @@
     "winnerIs": "WINNER: {{username}}",
     "nextMatch": "NEXT MATCH: {{player1}} VS {{player2}}",
     "backToMenu": "BACK TO MENU",
-    "backToHome": "BACK TO HOME"
+    "backToHome": "BACK TO HOME",
+    "passwordMailSent": "A new password has been sent to you via email",
+    "confirmEmail": "Confirm your email address with the code you received:",
+    "2fa-sent-mail":"2FA code received by mail",
+    "2fa-sent-app":"2FA code from authentificator app",
+    "enterPlayerNames" : "ENTER PLAYER NAMES"
 }
   

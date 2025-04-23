@@ -21,11 +21,15 @@ export const loginActions = [
 export async function displayAuthSection(data, username) {
   document.getElementById("login-page-title").dataset.username = username;
   doLanguage();
-  if (data.two_factor_mail == true)
-    document.getElementById("auth-label").textContent = "2FA code received by mail";
-  if (data.two_factor_auth == true)
-    document.getElementById("auth-label").textContent =
-      "2FA code from authentificator app";
+  let authLabel = document.getElementById("auth-label")
+  if (data.two_factor_mail == true){
+    authLabel.textContent = "2FA code received by mail";
+    authLabel.dataset.i18n = "2fa-sent-mail"
+  }
+  if (data.two_factor_auth == true){
+    authLabel.textContent = "2FA code from authentificator app";
+    authLabel.dataset.i18n = "2fa-sent-app"
+  }
   if (data.two_factor_mail == true || data.two_factor_auth == true)
     for (const el of document.getElementsByClassName("2fa-enabled")) show(el);
   for (const el of document.getElementsByClassName("auth-login")) show(el);
@@ -74,6 +78,7 @@ async function handleForgotPwd(element, event) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username })
       });
+      show(document.getElementById("passwordMailSent"));
     } catch (error) {
       handleError(error, "Forget password error");
     }

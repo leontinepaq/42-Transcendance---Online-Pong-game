@@ -150,6 +150,19 @@
     "controls": "CONTROLES",
     "instructions":"🅆 / 🅂 o ↑ / ↓ – Mover la paleta\nEspacio – Pausa",
     "instructions-local":"🅆 / 🅂 – Mover la paleta IZQUIERDA\n↑ / ↓ – Mover la paleta DERECHA\nEspacio – Pausa",
-    "background": "FONDO ESTRELLADO"
+    "background": "FONDO ESTRELLADO",
+    "playerNameEmpty": "El nombre del jugador no puede estar vacío",
+    "doublePlayerName": "Los nombres de los jugadores deben ser únicos",
+    "playNext": "Jugar al siguiente partido",
+    "leaveTournament": "Abandonar el torneo",
+    "winnerIs": "GANADOR: {{username}}",
+    "nextMatch": "PRÓXIMO PARTIDO: {{player1}} VS {{player2}}",
+    "backToMenu": "VOLVER AL MENÚ",
+    "backToHome": "VOLVER A LA PÁGINA PRINCIPAL",
+    "passwordMailSent": "Se te ha enviado una nueva contraseña por correo electrónico",
+    "confirmEmail": "Confirma tu dirección de correo electrónico con el código que recibiste:",
+    "2fa-sent-mail": "Código de 2FA recibido por correo",
+    "2fa-sent-app": "Código de 2FA de la aplicación de autenticación",
+    "enterPlayerNames": "INTRODUCIR LOS NOMBRES DE LOS JUGADORES"
   }
   

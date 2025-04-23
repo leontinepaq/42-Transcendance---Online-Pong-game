@@ -9,6 +9,7 @@ const errors = {
   "Wrong password": "wrongPwd",
   "Wrong code": "wrongCode",
   "Wrong code/Wrong password": "wrongPwdCode",
+  "Wrong or expired code":"wrongCode",
   "Invalid user_id": "invalidUserID",
   "user_id is required": "userIDRequired",
 
@@ -57,6 +58,8 @@ const errors = {
   "playerNameEmpty": "playerNameEmpty",
   "nextMatch": "nextMatch",
   "winnerIs": "winnerIs",
+
+  "error":"error",
 };
 
 let modal = null;

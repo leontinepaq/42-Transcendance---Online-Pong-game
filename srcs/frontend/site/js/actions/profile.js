@@ -59,7 +59,7 @@ async function switchToEditMode(button, valueDisplay, input, confirmInput) {
     input.value = valueDisplay.textContent;
     hide(valueDisplay);
   }
-  show(input.parentElement); //todo @leontinepaq a checker si pas plutot par le parent 
+  show(input.parentElement); 
   if (confirmInput) show(confirmInput);
   button.textContent = button.dataset.saveText;
   button.dataset.mode = "save"

@@ -8,7 +8,6 @@ export const signupActions = [
   },
 ];
 
-
 async function handleSignup(element, event) {
   const username = document.getElementById("new-username").value;
   const password = document.getElementById("new-password").value;
@@ -19,7 +18,7 @@ async function handleSignup(element, event) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password, confirm_password }),
-    }); //todo @leontinepaq demander a @Jean-Antoine si peut login en meme temmps
+    });
     navigate("home");
   } catch (error) {
     handleError(error, "Signup error");
