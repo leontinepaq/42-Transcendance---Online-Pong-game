@@ -420,6 +420,7 @@ async function receiveGame(data) {
       username: username.toUpperCase(),
       "tournament-name": tournament_name.toUpperCase(),
     },
+    null,
     [
       { action: "game-decline", i18n: "decline", id: id },
       { action: "game-accept", i18n: "accept", id: id, link: link },

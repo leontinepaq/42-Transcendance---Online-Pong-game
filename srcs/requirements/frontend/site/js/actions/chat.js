@@ -83,6 +83,7 @@ async function sendGame(element) {
   await showModalWithFooterButtons(
     null,
     { i18n: "waitingFor", username: username.toUpperCase() },
+    null,
     [{ action: "game-cancel", i18n: "cancel", id: id }],
     () => {sendGameCancel(id);},
     true

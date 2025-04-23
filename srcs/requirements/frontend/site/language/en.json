@@ -54,7 +54,6 @@
     "newCode": "NEW CODE",
     "pause": "PAUSE",
     "congratulations": "Congratulations!",
-    "winnerIs": "The winner is: ",
     "amazingVictory": "What an amazing victory!",
     "close": "CLOSE",
     "playAgain": "PLAY AGAIN",
@@ -151,6 +150,14 @@
     "controls": "CONTROLS",
     "instructions":"🅆 / 🅂 or ↑ / ↓ – Move paddle\nSpace – Pause",
     "instructions-local":"🅆 / 🅂 – Move LEFT paddle (player 1)\n↑ / ↓ – Move RIGHT paddle (player 2)\nSpace – Pause",
-    "background": "STARRY BACKGROUND"
+    "background": "STARRY BACKGROUND",
+    "playerNameEmpty": "Player name cannot be empty",
+    "doublePlayerName": "Player names must be unique",
+    "playNext": "Play next match",
+    "leaveTournament": "Leave tournament",
+    "winnerIs": "WINNER: {{username}}",
+    "nextMatch": "NEXT MATCH: {{player1}} VS {{player2}}",
+    "backToMenu": "BACK TO MENU",
+    "backToHome": "BACK TO HOME"
 }
   

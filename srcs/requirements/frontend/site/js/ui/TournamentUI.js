@@ -77,7 +77,7 @@ function createMiniPlayerBlock(player, score, isWinner) {
   return `
     <div class="player-info ${isWinner ? "winner" : ""}">
       <img src="${player.avatar_url}" alt="${
-    player.name
+    player.name[0]
   }" class="avatar-50 img-fluid rounded-circle" />
       <div class="text-center mt-1">
         <div class="username fs-6">
@@ -106,6 +106,7 @@ function createEmptyGame() {
 }
 
 function createMiniMatch(game, revert = false) {
+  console.log(game);
   if (!game) return createEmptyGame();
   const isPlayer1Winner = game.winner && game.winner.id === game.player1.id;
   const notPlayed = game.id === null;
@@ -132,7 +133,8 @@ function createMiniMatch(game, revert = false) {
 	`;
 }
 
-function createTournamentMatches(tournament, viewKey) {
+export function createTournamentMatches(tournament, viewKey) {
+  console.log(tournament);
   if (viewKey == "available" || viewKey == "registered") return ``;
   const matchLeft = createMiniMatch(tournament.games[0]);
   const matchRight = createMiniMatch(tournament.games[1]);
@@ -172,3 +174,5 @@ export const TournamentUI = {
 	  </div>`;
   },
 };
+
+export default TournamentUI;

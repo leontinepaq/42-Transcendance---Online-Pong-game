@@ -51,7 +51,12 @@ const errors = {
   "gameFrom": "gameFrom",
   "gameDeclined": "gameDeclined",
   "tournamentFrom": "tournamentFrom",
-  "chatFailed": "chatFailed"
+  "chatFailed": "chatFailed",
+
+  "doublePlayerName": "doublePlayerName",
+  "playerNameEmpty": "playerNameEmpty",
+  "nextMatch": "nextMatch",
+  "winnerIs": "winnerIs",
 };
 
 let modal = null;
@@ -98,7 +103,7 @@ export async function showModal(
 
   setI18NContentData(getModalElement("title"), title_i18n);
   setI18NContentData(getModalElement("body"), body_i18n);
-  setI18NContentData(getModalElement("title"), footer_i18n);
+  setI18NContentData(getModalElement("footer"), footer_i18n);
 
   const modalElement = document.getElementById("myModal");
   modal = new bootstrap.Modal(modalElement, { backdrop: closeOnClickOutside });
@@ -176,6 +181,7 @@ function footerButton(data = {}) {
 export async function showModalWithFooterButtons(
   title_i18n = { i18n: "" },
   body_i18n = { i18n: "" },
+  bodyUi = null,
   buttons = [{ action: "cancel", i18n: "cancel", username: "Username" }],
   onClose = null,
   closeOnClickOutside = true
@@ -189,7 +195,7 @@ export async function showModalWithFooterButtons(
     title_i18n,
     body_i18n,
     null,
-    null,
+    bodyUi,
     buttonsElements,
     onClose,
     closeOnClickOutside
