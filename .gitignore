@@ -1,4 +1,5 @@
 /django_backend/data
+.env
 *.env
 *.venv
 *.sqlite*
@@ -8,8 +9,8 @@ myenv
 /dir_lele/
 .vscode
 
-srcs/requirements/frontend/site/__mocks__
-srcs/requirements/frontend/site/__tests__
+./srcs/frontend/site/__mocks__
+./srcs/frontend/site/__tests__
 node_modules
 jest.config.js
 package-lock.json
