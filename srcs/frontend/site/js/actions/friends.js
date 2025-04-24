@@ -2,7 +2,6 @@ import { authFetchJson, handleError } from "../api.js";
 import { navigate } from "../router.js";
 import { show, hide } from "../utils.js";
 import { chat } from "../chat.js";
-import { hideChat } from "../ui/ChatUI.js";
 import { UserUI } from "../ui/UserUI.js";
 import { doLanguage } from "../translate.js";
 
@@ -122,8 +121,7 @@ async function handleDynamicFriendAction(element) {
     });
     console.log(message + ": ", response);
     await fetchAndDisplayUsers(tab);
-    await chat.updateList();
-    if (actionType === "block-user") hideChat(userId);
+    if (actionType === "block-user") chat.removeBubble(userId);
     doLanguage();
   } catch (error) {
     handleError(error, "Error in friend action");

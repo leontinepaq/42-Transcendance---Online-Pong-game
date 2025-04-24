@@ -49,6 +49,7 @@ function chatBubbleContent(id, username) {
 export function createChatBubble(userId, username) {
   var bubble = document.createElement("div");
   bubble.classList.add("btn-group", "dropup", "dropup-chat");
+  // bubble.id = "bubble-" + userId;
   bubble.setAttribute("data-id", userId);
   bubble.setAttribute("data-username", username);
   bubble.innerHTML = chatBubbleContent(userId, username);
@@ -62,9 +63,6 @@ export function getFriendListContainer() {
   return document.getElementById("chat-users");
 }
 
-export function getChatBubble(id) {
-  return document.getElementById("bubble-" + id);
-}
 
 export function getChatInput(id) {
   return document.getElementById("chat-input-" + id);
@@ -76,9 +74,4 @@ export function getMessageArea(id) {
 
 export function getFooter() {
   return document.getElementsByTagName("footer")[0];
-}
-
-export function hideChat(id) {
-  const bubble = getChatBubble(id);
-  if (bubble) hide(bubble);
 }

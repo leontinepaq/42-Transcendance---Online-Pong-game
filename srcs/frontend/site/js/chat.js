@@ -11,7 +11,6 @@ import {
   getChatInput,
   getMessageArea,
   getFooter,
-  getChatBubble,
 } from "./ui/ChatUI.js";
 
 // JSON MSG MODEL
@@ -95,8 +94,22 @@ class Chat {
     return bubble;
   }
 
+  removeBubble(id) {
+    var userId;
+
+    if (typeof id === "number") userId = id;
+    else userId = parseInt(id);
+
+    if (!this.bubbles.has(userId))
+      return;
+
+    this.bubbles.get(userId).remove();
+    this.bubbles.delete(userId);
+  }
+
   updateFriendList(data) {
     clearFriendListContainer();
+    this.status.clear();
 
     data.forEach((friend) => {
       var friendElement = createFriendListElement(friend.id, friend.username);
@@ -107,6 +120,9 @@ class Chat {
   }
 
   updateStatus() {
+    document.querySelectorAll(`.chat-user`).forEach((element) => {
+      element.removeAttribute("data-status");
+    });
     this.status.forEach((status, id) => {
       document.querySelectorAll(`.chat-user[data-id="${id}"]`).forEach((element) => {
         element.setAttribute("data-status", status);
