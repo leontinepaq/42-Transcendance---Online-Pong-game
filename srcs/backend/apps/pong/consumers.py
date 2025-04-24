@@ -86,7 +86,7 @@ class PongSoloGameConsumer(UserConsumer):
             if not self.game.is_paused():
                 self.game.update()
                 await self.update()
-            await asyncio.sleep(0.02)
+            await asyncio.sleep(0.016)
         if self.game.over and self.save:
             await self.save_game()
 
