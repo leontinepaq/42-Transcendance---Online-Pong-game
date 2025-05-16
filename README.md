@@ -5,18 +5,32 @@ Built with Django (REST API) and vanilla JavaScript with Bootstrap.
 
 ## Features
 
-- Pong games (solo vs IA, mumltiplayer local, multiplayer online)
-- User authentication with 2FA (email or app)
-- Join, create, and manage tournaments
-- Personal dashboard with stats and match history
-- Friends management
-- Live chat
+- Pong game (solo vs IA, multiplayer local, multiplayer online) with game logic handled entirely server-side  
+- Tournaments creation and match-making  
+- Personal dashboard with stats and match history  
+- User management  
+- Friend system (add/remove/block, invite to games)  
+- Live chat and notifications  
+- User authentication with 2FA (email or app) and JWT  
+- Documented API via Swagger/OpenAPI for easy access and integration 
 
+## Tech Stack
+- Frontend: Vanilla JavaScript, Bootstrap, Lottie animations, SVG, Chart.js
+- Backend: Django, PostgreSQL
+- Authentication: Simple JWT, Django OTP (2FA)
 
 ## Screenshots
 
-<img src="screenshots/login.gif" alt="Login" width="600" />
+<img src="screenshots/login.gif" alt="Login" width="500" />
 
-<img src="screenshots/game.gif" alt="Game" width="600" />
+<img src="screenshots/game.gif" alt="Game" width="500" />
 
-<img src="screenshots/dashboard.png" alt="Dashboard Screenshot" width="600" />
+<img src="screenshots/dashboard.png" alt="Dashboard" width="500" />
+
+## My Contribution
+
+- Designed the user interface (mockups, animations, layout)
+- Developed the frontend (SPA logic, responsive design)
+- Implemented dashboard visualizations and game interaction features  
+- Integrated frontend with backend APIs  
+- Collaborated on backend API design
