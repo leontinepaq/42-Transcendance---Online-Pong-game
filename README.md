@@ -12,7 +12,6 @@ Built with Django (REST API) and vanilla JavaScript with Bootstrap.
 - Friends management
 - Live chat
 
-## Screenshots
 
 ## Screenshots
 
@@ -21,8 +20,3 @@ Built with Django (REST API) and vanilla JavaScript with Bootstrap.
 <img src="screenshots/game.gif" alt="Game" width="600" />
 
 <img src="screenshots/dashboard.png" alt="Dashboard Screenshot" width="600" />
-
-
-## UX Demo
-
-[Watch the video demo](https://your-link-here.com)
