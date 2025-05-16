@@ -8,10 +8,3 @@ myenv
 
 /dir_lele/
 .vscode
-
-./srcs/frontend/site/__mocks__
-./srcs/frontend/site/__tests__
-node_modules
-jest.config.js
-package-lock.json
-package.json

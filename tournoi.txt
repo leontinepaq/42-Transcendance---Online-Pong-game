@@ -1,3 +1,0 @@
-- Entrer les noms des differents players (poser une limite ?) -> uniquement pair ?
-- organiser lordre de jeu des differents en fonction de la victoire
-- 
