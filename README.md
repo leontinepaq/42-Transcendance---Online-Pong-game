@@ -14,11 +14,13 @@ Built with Django (REST API) and vanilla JavaScript with Bootstrap.
 
 ## Screenshots
 
-![Login](screenshots/login.gif)
+## Screenshots
 
-![Game](screenshots/game.gif)
+<img src="screenshots/login.gif" alt="Login" width="600" />
 
-![Dashboard Screenshot](screenshots/dashboard.png)
+<img src="screenshots/game.gif" alt="Game" width="600" />
+
+<img src="screenshots/dashboard.png" alt="Dashboard Screenshot" width="600" />
 
 
 ## UX Demo
