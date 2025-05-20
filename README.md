@@ -15,7 +15,7 @@ Built with Django (REST API) and vanilla JavaScript with Bootstrap.
 - Documented API via Swagger/OpenAPI for easy access and integration 
 
 ## Tech Stack
-- Frontend: Vanilla JavaScript, Bootstrap, Lottie animations, SVG, Chart.js
+- Frontend: Vanilla JavaScript, Bootstrap, Lottie animations, Chart.js
 - Backend: Django, PostgreSQL
 - Authentication: Simple JWT, Django OTP (2FA)
 
@@ -26,6 +26,9 @@ Built with Django (REST API) and vanilla JavaScript with Bootstrap.
 <img src="screenshots/game.gif" alt="Game" width="500" />
 
 <img src="screenshots/dashboard.png" alt="Dashboard" width="500" />
+
+## UX Demo
+📺 [Watch the video demo](https://youtu.be/MYb7H_pePgw)
 
 ## My Contribution
 
